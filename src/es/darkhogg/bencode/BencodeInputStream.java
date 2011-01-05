@@ -1,3 +1,17 @@
+/**
+ * This package is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This package is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this package.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package es.darkhogg.bencode;
 
 import java.io.Closeable;
@@ -13,6 +27,13 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+/**
+ * An object that can pull complete values from a stream. Composite values
+ * are fully read and mapped into memory.
+ * 
+ * @author Daniel Escoz
+ * @version 1.0.0
+ */
 public final class BencodeInputStream implements Closeable {
 
 	private static final int INTEGER_VALUE = (int) 'i';
@@ -27,15 +48,36 @@ public final class BencodeInputStream implements Closeable {
 	
 	private final InputStream stream;
 	
+	/**
+	 * Constructs a BencodeInputStream that uses the given InputStream as
+	 * source of bencoded values
+	 * 
+	 * @param in Stream to wrap in this object
+	 */
 	public BencodeInputStream ( InputStream in ) {
 		stream = in;
 	}
 	
+	/**
+	 * Constructs a BencodeInputStream that reads bencoded values from the
+	 * specified file
+	 * 
+	 * @param file The file to open
+	 * @throws FileNotFoundException if the file does not exist, is a directory
+	 *         rather than a regular file, or for some other reason cannot be
+	 *         opened for reading.
+	 */
 	public BencodeInputStream ( File file )
 	throws FileNotFoundException {
 		this( new FileInputStream( file ) );
 	}
 	
+	/**
+	 * Retrieves a value from this object wrapped stream
+	 * 
+	 * @return The next value in the stream
+	 * @throws IOException If some I/O error occurs
+	 */
 	public Value<?> readValue ()
 	throws IOException {
 		int first = stream.read();

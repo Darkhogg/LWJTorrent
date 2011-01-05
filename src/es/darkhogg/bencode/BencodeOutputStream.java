@@ -1,3 +1,17 @@
+/**
+ * This package is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This package is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this package.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package es.darkhogg.bencode;
 
 import java.io.Closeable;
@@ -10,21 +24,45 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Map;
 
+/**
+ * An object that pushes bencoded values into a stream.
+ * 
+ * @author Daniel Escoz
+ * @version 1.0.0
+ */
 public final class BencodeOutputStream implements Closeable {
 	
 	private final OutputStream stream;
 	private final PrintWriter printer;
 	
-	public BencodeOutputStream ( OutputStream in ) {
-		stream = in;
-		printer = new PrintWriter( new OutputStreamWriter( in ) );
+	/**
+	 * Constructs a BencodeOutputStream that writes bencoded values to the
+	 * given OutputStream
+	 * 
+	 * @param out Stream to wrap in this object
+	 */
+	public BencodeOutputStream ( OutputStream out ) {
+		stream = out;
+		printer = new PrintWriter( new OutputStreamWriter( out ) );
 	}
 	
+	/**
+	 * Constructs a BencodeInputStream that writes bencoded values to the
+	 * specified file
+	 * 
+	 * @param file The file to open
+	 */
 	public BencodeOutputStream ( File file )
 	throws FileNotFoundException {
 		this( new FileOutputStream( file ) );
 	}
 	
+	/**
+	 * Writes a bencoded value into the wrapped stream 
+	 * 
+	 * @param value The value to write
+	 * @throws IOException If some I/O error occurs
+	 */
 	public void writeValue ( Value<?> value )
 	throws IOException {
 		if ( value instanceof StringValue ) {
