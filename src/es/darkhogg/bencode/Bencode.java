@@ -15,6 +15,11 @@
 package es.darkhogg.bencode;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Namespace for global constants and functions of this package
@@ -29,4 +34,87 @@ public class Bencode {
 	 */
 	public static final Charset UTF8 = Charset.forName( "UTF-8" );
 	
+	/**
+	 * Converts a bencode value to Java standard objects.
+	 * <p>
+	 * <i>NOTE: This method delegates its calls to its more concrete overloads.
+	 * See them for details on how <tt>Value</tt>s are converted</i>
+	 * 
+	 * @param val The value to be converted
+	 * @return An object from the standard Java API that represents the same
+	 *         information
+	 */
+	public Object convertFromValue ( Value<?> val ) {
+		if ( val instanceof IntegerValue ) {
+			return convertFromValue( (IntegerValue) val );
+			
+		} else if ( val instanceof StringValue ) {
+			return convertFromValue( (StringValue) val );
+			
+		} else if ( val instanceof ListValue ) {
+			return convertFromValue( (ListValue) val );
+			
+		} else if ( val instanceof DictionaryValue ) {
+			return convertFromValue( (DictionaryValue) val );
+			
+		} else {
+			throw new IllegalArgumentException();
+			
+		}
+	}
+	
+	/**
+	 * Converts a bencode integer value to a <tt>Long</tt>
+	 * 
+	 * @param val The value to be converted
+	 * @return A <tt>Long</tt> object that represents the given value
+	 */
+	public Long convertFromValue ( IntegerValue val ) {
+		return val.getValue();
+	}
+	
+	/**
+	 * Converts a bencode string value to a <tt>String</tt>
+	 * 
+	 * @param val The value to be converted
+	 * @return A <tt>String</tt> object that represents the given value
+	 */
+	public String convertFromValue ( StringValue val ) {
+		return val.toString();
+	}
+	
+	/**
+	 * Converts a bencode list value to a <tt>List</tt> of converted values
+	 * 
+	 * @param val The value to be converted
+	 * @return A <tt>List</tt> object that represents the given value
+	 */
+	public List<Object> convertFromValue ( ListValue val ) {
+		List<Object> retList = new ArrayList<Object>();
+		List<Value<?>> valList = val.getValue();
+		
+		for ( Value<?> v : valList ) {
+			retList.add( convertFromValue( v ) );
+		}
+		
+		return retList;
+	}
+	
+	/**
+	 * Converts a bencode list value to a <tt>SortedMap</tt> from
+	 * <tt>String</tt> to converted values
+	 * 
+	 * @param val The value to be converted
+	 * @return A <tt>SortedMap</tt> object that represents the given value
+	 */
+	public SortedMap<String,Object> convertFromValue ( DictionaryValue val ) {
+		SortedMap<String,Object> retMap = new TreeMap<String,Object>();
+		SortedMap<String,Value<?>> valMap = val.getValue();
+		
+		for ( Map.Entry<String,Value<?>> me : valMap.entrySet() ) {
+			retMap.put( me.getKey(), convertFromValue( me.getValue() ) );
+		}
+		
+		return retMap;
+	}
 }
