@@ -16,10 +16,9 @@ package es.darkhogg.bencode;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Namespace for global constants and functions of this package
@@ -107,14 +106,145 @@ public class Bencode {
 	 * @param val The value to be converted
 	 * @return A <tt>SortedMap</tt> object that represents the given value
 	 */
-	public SortedMap<String,Object> convertFromValue ( DictionaryValue val ) {
-		SortedMap<String,Object> retMap = new TreeMap<String,Object>();
-		SortedMap<String,Value<?>> valMap = val.getValue();
+	public Map<String,Object> convertFromValue ( DictionaryValue val ) {
+		Map<String,Object> retMap = new HashMap<String,Object>();
+		Map<String,Value<?>> valMap = val.getValue();
 		
 		for ( Map.Entry<String,Value<?>> me : valMap.entrySet() ) {
 			retMap.put( me.getKey(), convertFromValue( me.getValue() ) );
 		}
 		
 		return retMap;
+	}
+	
+	/**
+	 * Converts a regular object into a bencode value.
+	 * <p>
+	 * <i>NOTE: This method delegates its calls to its more specific overloads,
+	 * excepts in the case of a <tt>Value</tt> itself, which is immediately
+	 * returned. If the object cannot be converted to a <tt>Value</tt>, a
+	 * <tt>ClassCastException</tt> is thrown.
+	 * 
+	 * @param obj Object to convert into a <tt>Value</tt>
+	 * @return a value that represents the same information that the given
+	 *         object
+	 * @throws ClassCastException if the object cannot be converted to
+	 *         <tt>Value</tt>
+	 */
+	public Value<?> convertToValue ( Object obj ) {
+		if ( obj instanceof Value<?> ) {
+			return (Value<?>) obj;
+			
+		} else if ( obj instanceof byte[] ) {
+			return convertToValue( (byte[]) obj );
+			
+		} else if ( obj instanceof char[] ) {
+			return convertToValue( (char[]) obj );
+			
+		} else if ( obj instanceof CharSequence ) {
+			return convertToValue( (CharSequence) obj );
+			
+		} else if ( obj instanceof Number ) {
+			return convertToValue( (Number) obj );
+			
+		} else if ( obj instanceof Iterable<?> ) {
+			return convertToValue( (Iterable<?>) obj );
+			
+		} else if ( obj instanceof Map<?,?> ) {
+			return convertToValue( (Map<?,?>) obj );
+			
+		} else {
+			throw new ClassCastException();
+		}
+	}
+	
+	/**
+	 * Converts a byte array to a bencode string value by creating a new 
+	 * <tt>StringValue</tt> with the given byte array
+	 * 
+	 * @param obj Object to convert into a <tt>Value</tt>
+	 * @return a value that represents the same information that the given
+	 *         object
+	 */
+	public StringValue convertToValue ( byte[] obj ) {
+		return new StringValue( obj );
+	}
+	
+	/**
+	 * Converts a char array to a bencode string value by creating a new 
+	 * <tt>StringValue</tt> from a new String creted from the given array
+	 * 
+	 * @param obj Object to convert into a <tt>Value</tt>
+	 * @return a value that represents the same information that the given
+	 *         object
+	 */
+	public StringValue convertToValue ( char[] obj ) {
+		return new StringValue( new String( obj ) );
+	}
+	
+	/**
+	 * Converts a <tt>CharSequence</tt> to a bencode string value by
+	 * creating a new <tt>StringValue</tt> with the String that represents
+	 * the given object
+	 * 
+	 * @param obj Object to convert into a <tt>Value</tt>
+	 * @return a value that represents the same information that the given
+	 *         object
+	 */
+	public StringValue convertToValue ( CharSequence obj ) {
+		return new StringValue( obj.toString() );
+	}
+	
+	/**
+	 * Converts a number to a bencode string value by creating a new 
+	 * <tt>IntegerValue</tt> with the corresponding long value
+	 * 
+	 * @param obj Object to convert into a <tt>Value</tt>
+	 * @return a value that represents the same information that the given
+	 *         object
+	 */
+	public IntegerValue convertToValue ( Number obj ) {
+		return new IntegerValue( obj.longValue() );
+	}
+	
+	/**
+	 * Converts any <tt>Iterable</tt> to a <tt>ListValue</tt> by converting the
+	 * elements in the iterable using {@link convertToValue(Object)}.
+	 * 
+	 * @param obj Object to convert into a <tt>Value</tt>
+	 * @return a value that represents the same information that the given
+	 *         object
+	 * @throws ClassCastException if some elemnt of the iterable cannot be
+	 *         converted to <tt>Value</tt>
+	 */
+	public ListValue convertToValue ( Iterable<?> obj ) {
+		List<Value<?>> list = new ArrayList<Value<?>>();
+		
+		for ( Object o : obj ) {
+			list.add( convertToValue( o ) );
+		}
+		
+		return new ListValue( list );
+	}
+	
+	/**
+	 * Converts a <tt>Map</tt> to a <tt>DirectoryValue</tt> by converting the
+	 * keys to Strings and converting the values using
+	 * {@link convertToValue(Object)}
+	 * 
+	 * @param obj Object to convert into a <tt>Value</tt>
+	 * @return a value that represents the same information that the given
+	 *         object
+	 * @throws ClassCastException if some value in the mappings cannot be
+	 *         converted <tt>Value</tt>
+	 */
+	public DictionaryValue convertToValue ( Map<?,?> obj ) {
+		Map<String,Value<?>> map = new HashMap<String,Value<?>>();
+		
+		for ( Map.Entry<?,?> me : obj.entrySet() ) {
+			map.put( me.getKey().toString(), convertToValue( me.getValue() ) );
+		}
+		
+		return new DictionaryValue( map );
 	}
 }

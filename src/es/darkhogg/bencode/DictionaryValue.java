@@ -14,6 +14,7 @@
  */
 package es.darkhogg.bencode;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -24,9 +25,9 @@ import java.util.TreeMap;
  * @author Daniel Escoz
  * @version 1.0.0
  */
-public final class DictionaryValue extends Value<SortedMap<String,Value<?>>> {
+public final class DictionaryValue extends Value<Map<String,Value<?>>> {
 
-	private SortedMap<String, Value<?>> value;
+	private Map<String, Value<?>> value;
 	
 	/**
 	 * Creates this object with an empty map
@@ -40,22 +41,22 @@ public final class DictionaryValue extends Value<SortedMap<String,Value<?>>> {
 	 * 
 	 * @param value Initial value
 	 */
-	public DictionaryValue ( SortedMap<String,Value<?>> value ) {
+	public DictionaryValue ( Map<String,Value<?>> value ) {
 		super( value );
 	}
 	
 	@Override
-	public SortedMap<String, Value<?>> getValue () {
-		return value;
+	public Map<String, Value<?>> getValue () {
+		return Collections.unmodifiableMap( value );
 	}
 
 	@Override
-	public void setValue ( SortedMap<String, Value<?>> value ) {
+	public void setValue ( Map<String,Value<?>> value ) {
 		if ( value == null ) {
 			throw new NullPointerException();
 		}
 		
-		this.value = value;
+		this.value = new TreeMap<String,Value<?>>( value );
 	}
 
 	@Override

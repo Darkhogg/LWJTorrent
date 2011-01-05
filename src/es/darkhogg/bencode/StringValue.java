@@ -14,6 +14,8 @@
  */
 package es.darkhogg.bencode;
 
+import java.util.Arrays;
+
 /**
  * Wraps the bencoded strin value as an array of bytes. This object represents
  * bencoded string as bytes to simplify handling of binary data. The toString
@@ -55,7 +57,7 @@ public final class StringValue extends Value<byte[]> {
 			throw new NullPointerException();
 		}
 		
-		this.value = value;
+		this.value = Arrays.copyOf( value, value.length );
 		this.str = new String( value, Bencode.UTF8 );
 	}
 	
@@ -66,7 +68,8 @@ public final class StringValue extends Value<byte[]> {
 	 * @param value New String value
 	 */
 	public void setStringValue ( String value ) {
-		setValue( value.getBytes( Bencode.UTF8 ) );
+		this.value = value.getBytes( Bencode.UTF8 );
+		this.str = value;
 	}
 	
 	@Override

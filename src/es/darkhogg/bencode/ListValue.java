@@ -15,6 +15,7 @@
 package es.darkhogg.bencode;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -45,7 +46,7 @@ public final class ListValue extends Value<List<Value<?>>> {
 	
 	@Override
 	public List<Value<?>> getValue () {
-		return value;
+		return Collections.unmodifiableList( value );
 	}
 
 	@Override
@@ -54,7 +55,7 @@ public final class ListValue extends Value<List<Value<?>>> {
 			throw new NullPointerException();
 		}
 		
-		this.value = value;
+		this.value = new ArrayList<Value<?>>( value );
 	}
 	
 	@Override
