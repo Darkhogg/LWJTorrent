@@ -1,5 +1,5 @@
  
- es.darkhogg.bencode is a simple Java implementation of Bencode, a format
+ Darkhogg Bencode is a simple Java implementation of Bencode, a format
  designed for the BitTorrent .torrent files.
  
  To read a file or some other stream, simply instantiate BencodeInputStream and
@@ -11,9 +11,9 @@
  methods convertToValue.
  
  If you find any problems, bugs, etc., please use the GitHub main project
- page: https://github.com/Darkhogg/es.darkhogg.bencode/
+ page: https://github.com/Darkhogg/Darkhogg-Bencode/
  
- es.darkhogg.bencode  Copyright (C) 2011  Daniel Escoz
+ Darkhogg Bencode  Copyright (C) 2011  Daniel Escoz
  This library comes with ABSOLUTELY NO WARRANTY.
  This is free software, and you are welcome to redistribute it
  under certain conditions. See LICENSE.txt for details.

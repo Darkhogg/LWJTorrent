@@ -12,7 +12,7 @@
  otros objetos usando los métodos convertToValue de Bencode.
  
  Ante cualquier problema, bug, etc., contactar con el autor usando la página
- del proyecto en GitHub: https://github.com/Darkhogg/es.darkhogg.bencode/
+ del proyecto en GitHub: https://github.com/Darkhogg/Darkhogg-Bencode
  
  es.darkhogg.bencode  Copyright (C) 2011  Daniel Escoz
  Esta libreria viene sin ABSOLUTAMENTE NINGUNA GARANTÍA.
