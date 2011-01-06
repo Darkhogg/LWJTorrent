@@ -14,6 +14,6 @@
  page: https://github.com/Darkhogg/es.darkhogg.bencode/
  
  es.darkhogg.bencode  Copyright (C) 2011  Daniel Escoz
- This program comes with ABSOLUTELY NO WARRANTY.
+ This library comes with ABSOLUTELY NO WARRANTY.
  This is free software, and you are welcome to redistribute it
  under certain conditions. See LICENSE.txt for details.
