@@ -4,7 +4,11 @@
  
  To read a file or some other stream, simply instantiate BencodeInputStream and
  call readValue(). This will return a Value<?>, which can be casted to one of
- its subclasses or converted using the convert* methods in Bencode.
+ its subclasses or converted using the convertFromValue methods in Bencode.
+ 
+ To do the opposite, writing data to streams, use BencodeOutputStream. You can
+ write Values directly or convert other objects into values using the Bencode
+ methods convertToValue.
  
  If you find any problems, bugs, etc., please use the GitHub main project
  page: https://github.com/Darkhogg/es.darkhogg.bencode/

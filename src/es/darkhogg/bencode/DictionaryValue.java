@@ -27,7 +27,7 @@ import java.util.TreeMap;
  */
 public final class DictionaryValue extends Value<Map<String,Value<?>>> {
 
-	private Map<String, Value<?>> value;
+	private SortedMap<String, Value<?>> value;
 	
 	/**
 	 * Creates this object with an empty map
