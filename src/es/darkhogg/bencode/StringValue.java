@@ -49,7 +49,7 @@ public final class StringValue extends Value<byte[]> {
 	}
 	
 	public byte[] getValue () {
-		return value;
+		return Arrays.copyOf( value, value.length );
 	}
 	
 	public void setValue ( byte[] value ) {
