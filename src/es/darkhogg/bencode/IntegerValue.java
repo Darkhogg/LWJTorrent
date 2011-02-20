@@ -49,5 +49,11 @@ public final class IntegerValue extends Value<Long> {
 	public String toString () {
 		return value.toString();
 	}
+
+	@Override
+	public long getEncodedLength ()  {
+		double val = value.doubleValue();
+		return 3 + (long) Math.log10( Math.abs( val ) ) + (val<0?1:0);
+	}
 	
 }

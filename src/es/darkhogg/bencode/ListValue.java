@@ -71,4 +71,15 @@ public final class ListValue extends Value<List<Value<?>>> {
 		return sb.append( ']' ).toString();
 	}
 
+	@Override
+	public long getEncodedLength () {
+		long childLength = 0;
+		
+		for ( Value<?> val : value ) {
+			childLength += val.getEncodedLength();
+		}
+		
+		return childLength + 2;
+	}
+
 }
