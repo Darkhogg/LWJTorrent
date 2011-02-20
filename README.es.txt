@@ -10,7 +10,7 @@ Para realizar la acción contraria, escribir valores a un stream, utiliza la
 clase BencodeOutputStream. Puedes escribir Values directamente o convertir
 otros objetos usando los métodos convertToValue de Bencode.
 
-Ante cualquier problema, bug, etc., contactar con el autor usando la p�gina
+Ante cualquier problema, bug, etc., contactar con el autor usando la página
 del proyecto en GitHub: https://github.com/Darkhogg/Darkhogg-Bencode
 
 Darkhogg Bencode  Copyright (C) 2011  Daniel Escoz
