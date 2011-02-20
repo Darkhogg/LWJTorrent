@@ -4,7 +4,7 @@ formato originalmente diseñado para los ficheros .torrent de BitTorrent.
 Para leer valores bencode de un fichero o cualquier otro stream, simplemente
 instancia BencodeInputStream y llama readValue(). Esto devolverá un Value<?>,
 que puede ser convertido directamente a una de sus subclases o convertido a un
-objeto est�ndar de la API de Java usando convertFromValue de la clase Bencode.
+objeto estándar de la API de Java usando convertFromValue de la clase Bencode.
 
 Para realizar la acción contraria, escribir valores a un stream, utiliza la
 clase BencodeOutputStream. Puedes escribir Values directamente o convertir
