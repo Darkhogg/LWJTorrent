@@ -24,7 +24,7 @@ import java.util.Map;
  * Namespace for global constants and functions of this package
  * 
  * @author Daniel Escoz
- * @version 1.0.0
+ * @version 1.0.1
  */
 public class Bencode {
 	
@@ -32,6 +32,48 @@ public class Bencode {
 	 * UTF-8 charset used for Bencode
 	 */
 	public static final Charset UTF8 = Charset.forName( "UTF-8" );
+	
+	/**
+	 * Gets a child element from the passed value using the strings as a path.
+	 * <p>
+	 * Each element of the <tt>strings</tt> parameter represents an element of
+	 * the path. Dictionaries can be accessed using its string keys and lists
+	 * using numeric strings. If an element doesn't exist, this method returns
+	 * <tt>null</tt>.
+	 * 
+	 * @param from Value to get the child from
+	 * @param strings Path to the child
+	 * @return Child accessed from the path, or <tt>null</tt> if it doesn't
+	 *         exist.
+	 */
+	public static Value<?> getChildValue ( Value<?> from, String... strings ) {
+		Value<?> value = from;
+		
+		for ( String string : strings ) {
+			if ( value instanceof DictionaryValue ) {
+				DictionaryValue dval = (DictionaryValue) value;
+				Map<String,Value<?>> map = dval.getValue();
+				
+				value = map.get( string );
+				
+			} else if ( value instanceof ListValue ) {
+				ListValue lval = (ListValue) value;
+				List<Value<?>> list = lval.getValue();
+				int pos = 0;
+				try {
+					pos = Integer.parseInt( string );
+				} catch ( NumberFormatException e ) {
+					return null;
+				}
+				
+				value = list.get( pos );
+			} else {
+				return null;
+			}
+		}
+		
+		return value;
+	}
 	
 	/**
 	 * Converts a bencode value to Java standard objects.
@@ -121,7 +163,7 @@ public class Bencode {
 	 * Converts a regular object into a bencode value.
 	 * <p>
 	 * <i>NOTE: This method delegates its calls to its more specific overloads,
-	 * excepts in the case of a <tt>Value</tt> itself, which is immediately
+	 * except in the case of a <tt>Value</tt> itself, which is immediately
 	 * returned. If the object cannot be converted to a <tt>Value</tt>, a
 	 * <tt>ClassCastException</tt> is thrown.
 	 * 
@@ -214,8 +256,8 @@ public class Bencode {
 	 * @param obj Object to convert into a <tt>Value</tt>
 	 * @return a value that represents the same information that the given
 	 *         object
-	 * @throws ClassCastException if some elemnt of the iterable cannot be
-	 *         converted to <tt>Value</tt>
+	 * @throws ClassCastException if some element of the <tt>Iterable</tt>
+	 *         cannot be converted to <tt>Value</tt>
 	 */
 	public ListValue convertToValue ( Iterable<?> obj ) {
 		List<Value<?>> list = new ArrayList<Value<?>>();
@@ -235,8 +277,8 @@ public class Bencode {
 	 * @param obj Object to convert into a <tt>Value</tt>
 	 * @return a value that represents the same information that the given
 	 *         object
-	 * @throws ClassCastException if some value in the mappings cannot be
-	 *         converted <tt>Value</tt>
+	 * @throws ClassCastException if some value in the mapping cannot be
+	 *         converted to <tt>Value</tt>
 	 */
 	public DictionaryValue convertToValue ( Map<?,?> obj ) {
 		Map<String,Value<?>> map = new HashMap<String,Value<?>>();
@@ -246,5 +288,102 @@ public class Bencode {
 		}
 		
 		return new DictionaryValue( map );
+	}
+
+	/**
+	 * Returns a copy of the given <tt>value</tt>. The returned copy is
+	 * guaranteed to be independent from the passed object, in that no
+	 * references to child <tt>Value</tt>s or other mutable objects are held
+	 * by the copy.
+	 * <p>
+	 * <i>NOTE: This method delagates its calls to its more specific overloads.
+	 * See them for details on how <tt>Value</tt>s are copied.</i>
+	 * 
+	 * @param value Bencode value to copy
+	 * @return A copy of the given <tt>value</tt>
+	 */
+	public Value<?> copyOf ( Value<?> value ) {
+		if ( value instanceof IntegerValue ) {
+			return copyOf( (IntegerValue) value );
+			
+		} else if ( value instanceof StringValue ) {
+			return copyOf( (StringValue) value );
+			
+		} else if ( value instanceof ListValue ) {
+			return copyOf( (ListValue) value );
+			
+		} else if ( value instanceof DictionaryValue ) {
+			return copyOf( (DictionaryValue) value );
+			
+		} else {
+			throw new IllegalArgumentException();
+			
+		}
+	}
+	
+	/**
+	 * Returns a copy of the given <tt>IntegerValue</tt>. The copy will
+	 * initially have the same value as the original. Changes on the copy won't
+	 * affect the original and vice-versa.
+	 * 
+	 * @param value Bencode integer value to copy
+	 * @return A copy of the given <tt>value</tt>
+	 */
+	public IntegerValue copyOf ( IntegerValue value ) {
+		return new IntegerValue( value.getValue() );
+	}
+	
+	/**
+	 * Returns a copy of the given <tt>StringValue</tt>. The copy will
+	 * initially have the same value as the original. Changes on the copy won't
+	 * affect the original and vice-versa.
+	 * 
+	 * @param value Bencode string value to copy
+	 * @return A copy of the given <tt>value</tt>
+	 */
+	public StringValue copyOf ( StringValue value ) {
+		return new StringValue( value.getValue() );
+	}
+	
+	/**
+	 * Returns a copy of the given <tt>ListValue</tt>. Changes on the copy
+	 * won't affect the original and vice-versa.
+	 * <p>
+	 * The initial value of the copy is a <tt>List</tt> which elements are
+	 * copies of the elements of the original object, in the same order.
+	 * This ensures that no mutable references are shared between the original
+	 * and the copy.
+	 * 
+	 * @param value Bencode list value to copy
+	 * @return A copy of the given <tt>value</tt>
+	 */
+	public ListValue copyOf ( ListValue value ) {
+		List<Value<?>> lv = new ArrayList<Value<?>>();
+		for ( Value<?> v : value.getValue() ) {
+			lv.add( copyOf( v ) );
+		}
+		
+		return new ListValue( lv );
+	}
+	
+	/**
+	 * Returns a copy of the given <tt>DisctionaryValue</tt>. Changes on the
+	 * copy won't affect the original and vice-versa.
+	 * <p>
+	 * The initial value of the copy is a <tt>Map</tt> which keys are the same
+	 * and its assocciated values are copies of the corresponding values of the
+	 * original object. This ensures that no mutable references are shared
+	 * between the original and the copy.
+	 * 
+	 * @param value Bencode dictionary value to copy
+	 * @return A copy of the given <tt>value</tt>
+	 */
+	public DictionaryValue copyOf ( DictionaryValue value ) {
+		Map<String,Value<?>> mv = new HashMap<String,Value<?>>();
+		for ( Map.Entry<String,Value<?>> me : value.getValue().entrySet() ) {
+			mv.put( me.getKey(), copyOf( me.getValue() ) );
+		}
+		
+		return new DictionaryValue( mv );
 	}
 }

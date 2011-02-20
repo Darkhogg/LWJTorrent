@@ -18,8 +18,9 @@ import java.util.Arrays;
 
 /**
  * Wraps the bencoded strin value as an array of bytes. This object represents
- * bencoded string as bytes to simplify handling of binary data. The toString
- * method can retrieve a string created converting the value using UTF-8.
+ * bencoded string as bytes to simplify handling of binary data. The
+ * <tt>toString</tt> method can retrieve a string created converting the value
+ * using <tt>UTF-8</tt>.
  * 
  * @author Daniel Escoz
  * @version 1.0.0
@@ -40,7 +41,7 @@ public final class StringValue extends Value<byte[]> {
 	
 	/**
 	 * Creates this object by converting the given String to bytes using the
-	 * UTF-8 charset
+	 * <tt>UTF-8</tt> charset
 	 * 
 	 * @param value Initial String value
 	 */
@@ -63,7 +64,7 @@ public final class StringValue extends Value<byte[]> {
 	
 	/**
 	 * Sets this object value by converting the given String to bytes using the
-	 * UTF-8 charset 
+	 * <tt>UTF-8</tt> charset 
 	 * 
 	 * @param value New String value
 	 */
@@ -72,8 +73,23 @@ public final class StringValue extends Value<byte[]> {
 		this.str = value;
 	}
 	
+	/**
+	 * Returns this objects value as a string. The bytes are interpreted as an
+	 * UTF-8 encoded string.
+	 * 
+	 * @return The string represented in this object
+	 */
+	public String getStringValue () {
+		return str;
+	}
+	
 	@Override
 	public String toString () {
 		return "\"" + str + "\"";
+	}
+
+	@Override
+	public long getEncodedLength () {
+		return value.length + 2 + (long) Math.log10( value.length );
 	}
 }

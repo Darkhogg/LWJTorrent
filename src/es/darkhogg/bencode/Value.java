@@ -15,10 +15,14 @@
 package es.darkhogg.bencode;
 
 /**
- * Represents a value that can be bencoded
+ * Represents a value that can be bencoded.
+ * <p>
+ * Even if this class is generic, it should never be used in a form different
+ * than <tt>Value&lt;?&gt;</tt>. Generic support is given only for convenience when
+ * implementing subclasses.
  * 
  * @author Daniel Escoz
- * @param <T> Basic return type for the class
+ * @param T Basic return type for the class
  * @version 1.0.0
  */
 public abstract class Value<T> {
@@ -45,5 +49,15 @@ public abstract class Value<T> {
 	 * @param value New value
 	 */
 	public abstract void setValue ( T value );
+	
+	/**
+	 * Returns the length, in bytes, this values will take up when encoded using
+	 * UTF-8 as the encoding character set.
+	 * <p>
+	 * If the size cannot be specified, an upper bound must be returned.
+	 * 
+	 * @return The length of the encoded byte stream for this value
+	 */
+	public abstract long getEncodedLength ();
 	
 }

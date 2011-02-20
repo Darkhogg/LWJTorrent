@@ -73,4 +73,17 @@ public final class DictionaryValue extends Value<Map<String,Value<?>>> {
 		
 		return sb.append( '}' ).toString();
 	}
+
+	@Override
+	public long getEncodedLength () {
+		long childLength = 0;
+		
+		for ( Map.Entry<String,Value<?>> me : value.entrySet() ) {
+			byte[] bytes = me.getKey().getBytes( Bencode.UTF8 );
+			childLength += bytes.length + 2 + (long) Math.log10( bytes.length );
+			childLength += me.getValue().getEncodedLength();
+		}
+		
+		return childLength + 2;
+	}
 }
