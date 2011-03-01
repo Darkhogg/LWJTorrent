@@ -83,7 +83,7 @@ public final class Sha1Hash {
 		// URL Encoded String
 		String str = new String( bytes, Charset.forName( "ISO-8859-1" ) );
 		try {
-			urlEncodedString = URLEncoder.encode( str, "UTF-8" );
+			urlEncodedString = URLEncoder.encode( str, "ISO-8859-1" );
 		} catch ( UnsupportedEncodingException e ) {
 			// Should not happen, as UTF-8 is always supported...
 			throw new AssertionError();

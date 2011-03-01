@@ -46,6 +46,11 @@ public final class TorrentInfoSection {
 	private final Sha1Hash hash;
 	
 	/**
+	 * The content of the <tt>name</tt> key
+	 */
+	private final String name;
+	
+	/**
 	 * Constructs this object using every piece of information needed.
 	 * 
 	 * @param pieceLength Nominal length of every piece
@@ -58,11 +63,12 @@ public final class TorrentInfoSection {
 	 *         contains a <tt>null</tt>
 	 * @throws IllegalArgumentException if <tt>pieceLength</tt> is negative
 	 */
-	protected TorrentInfoSection (
+	private TorrentInfoSection (
 		long pieceLength, List<Sha1Hash> pieceHashes, boolean priv,
-		String baseDir, List<TorrentFileInfo> files, Sha1Hash hash
+		String baseDir, List<TorrentFileInfo> files, Sha1Hash hash,
+		String name
 	) {
-		if ( baseDir == null | hash == null
+		if ( baseDir == null | hash == null | name == null
 		   | pieceHashes.contains( null ) | files.contains( null ) 
 		) {
 			throw new NullPointerException();
@@ -80,6 +86,7 @@ public final class TorrentInfoSection {
 			new ArrayList<Sha1Hash>( pieceHashes ) );
 		this.files = Collections.unmodifiableList(
 			new ArrayList<TorrentFileInfo>( files ) );
+		this.name = name;
 	}
 	
 	/**
@@ -144,6 +151,17 @@ public final class TorrentInfoSection {
 	}
 	
 	/**
+	 * Returns the value of the <tt>name</tt> entry. This can serve as a way
+	 * to identify the torrent in an user interface, but should never be used
+	 * as an identifier in any kind of data structure.
+	 * 
+	 * @return The <tt>name</tt> of this info section
+	 */
+	public String getName () {
+		return name;
+	}
+	
+	/**
 	 * Creates a new <tt>TorrentInfoSection</tt> object based on the
 	 * information contained on the passed <tt>value</tt> argument
 	 * 
@@ -185,6 +203,8 @@ public final class TorrentInfoSection {
 				pieceHashes.add( new Sha1Hash( hashbytes ) );
 			}
 			
+			String name = ( (StringValue) Bencode.getChildValue(
+				value, "name" ) ).getStringValue();
 			String baseDir;
 			List<TorrentFileInfo> files = new ArrayList<TorrentFileInfo>();
 			
@@ -230,7 +250,7 @@ public final class TorrentInfoSection {
 			Sha1Hash hash = Sha1Hash.forValue( value );
 			
 			return new TorrentInfoSection( pieceLength, pieceHashes,
-				priv, baseDir, files, hash );
+				priv, baseDir, files, hash, name );
 		} catch ( Exception e ) {
 			if ( e instanceof IllegalArgumentException ) {
 				throw ( (IllegalArgumentException) e );
@@ -256,6 +276,7 @@ public final class TorrentInfoSection {
 		TorrentInfoSection tis = (TorrentInfoSection) obj;
 		
 		return hash.equals( tis.hash )
+		    && name.equals( tis.name )
 			&& pieceLength == tis.pieceLength
 			&& priv == tis.priv
 			&& pieceHashes.equals( tis.pieceHashes )

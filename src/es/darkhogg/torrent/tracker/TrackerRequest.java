@@ -232,7 +232,8 @@ public final class TrackerRequest {
 	 * @return the tracker ID set for this request
 	 */
 	public byte[] getTrackerId () {
-		return Arrays.copyOf( trackerId, trackerId.length );
+		return ( trackerId==null )
+			? null : Arrays.copyOf( trackerId, trackerId.length );
 	}
 	
 	/**

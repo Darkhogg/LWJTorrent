@@ -1,6 +1,7 @@
 package es.darkhogg.torrent.tracker;
 
 import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
@@ -56,4 +57,20 @@ public class PeerInfo {
 		return Arrays.copyOf( peerId, peerId.length );
 	}
 	
+	@Override
+	public String toString () {
+		StringBuilder sb = new StringBuilder(
+			PeerInfo.class.getSimpleName() );
+		
+		sb.append( "{Address=" );
+		sb.append( address );
+		
+		if ( peerId != null ) {
+			sb.append( "; PeerID=\"" );
+			sb.append( new String( peerId, Charset.forName( "ISO-8859-1" ) ) );
+			sb.append( "\"" );
+		}
+		
+		return sb.append( "}" ).toString();
+	}
 }

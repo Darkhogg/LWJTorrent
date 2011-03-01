@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -112,7 +113,8 @@ public final class TrackerResponse {
 			this.warning = ( warning == null ) ? "" : warning;
 			this.interval = interval;
 			this.minInterval = minInterval;
-			this.trackerId = Arrays.copyOf( trackerId, trackerId.length );
+			this.trackerId = trackerId == null
+				? null : Arrays.copyOf( trackerId, trackerId.length );
 			this.complete = complete;
 			this.incomplete = incomplete;
 			this.peers = Collections.unmodifiableList(
@@ -347,5 +349,43 @@ public final class TrackerResponse {
 		} else {
 			throw new ClassCastException();
 		}
+	}
+
+	@Override
+	public String toString () {
+		StringBuilder sb = new StringBuilder(
+			TrackerResponse.class.getSimpleName() );
+		
+		sb.append( "{" );
+		
+		if ( failed ) {
+			sb.append( "FailureReason=\"" );
+			sb.append( failureReason );
+			sb.append( "\"" );
+		} else {
+			sb.append( "Warning=\"" );
+			sb.append( warning );
+			
+			sb.append( "\"; Interval=" );
+			sb.append( interval );
+			
+			sb.append( "; MinInterval=" );
+			sb.append( minInterval );
+			
+			sb.append( "; TrackerId=[" );
+			sb.append( ( trackerId == null ) ? null : new String( trackerId,
+				Charset.forName( "ISO-8859-1" ) ) );
+			
+			sb.append( "]; Complete=" );
+			sb.append( complete );
+			
+			sb.append( "; Incomplete=" );
+			sb.append( incomplete );
+			
+			sb.append( "; Peers=" );
+			sb.append( peers );
+		}
+		
+		return sb.append( "}" ).toString();
 	}
 }

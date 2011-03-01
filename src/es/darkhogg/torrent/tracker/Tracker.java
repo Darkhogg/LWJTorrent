@@ -55,7 +55,7 @@ public abstract class Tracker {
 			sb.append( "&peer_id=" );
 			String peerstr = new String( req.getPeerId(),
 				Charset.forName( "ISO-8859-1" ) );
-			sb.append( URLEncoder.encode( peerstr, "UTF-8" ) );
+			sb.append( URLEncoder.encode( peerstr, "ISO-8859-1" ) );
 			
 			sb.append( "&port=" );
 			sb.append( req.getPort() );
@@ -93,11 +93,11 @@ public abstract class Tracker {
 				sb.append( req.getKey() );
 			}
 			
-			if ( req.getKey() != null ) {
+			if ( req.getTrackerId() != null ) {
 				sb.append( "&trackerid=" );
 				String trstr = new String( req.getTrackerId(),
 					Charset.forName( "ISO-8859-1" ) );
-				sb.append( URLEncoder.encode( trstr, "UTF-8" ) );
+				sb.append( URLEncoder.encode( trstr, "ISO-8859-1" ) );
 			}
 			
 			return sb.toString();
@@ -139,17 +139,12 @@ public abstract class Tracker {
 	 * <p>
 	 * The passed object is treated as the <tt>announce-list</tt> key of a 
 	 * torrent, and behaves like it.
-	 * <p>
-	 * <i><b>Note:</b> This mehtod is currently unimplemented and returns
-	 * <tt>null</tt>. A <tt>Tacker</tt> implementation that matches the
-	 * requirements of this method is needed.</i>
 	 * 
 	 * @param announces List of announce URLs
 	 * @return A tracker which announces to the given URL list
 	 */
-	@SuppressWarnings( "unused" )
 	private static Tracker getMultiTracker ( List<Set<String>> announces ) {
-		return null;
+		return new MultiTracker( announces );
 	}
 	
 	/**
@@ -167,6 +162,10 @@ public abstract class Tracker {
 	 */
 	public static Tracker forTorrent ( TorrentMetaInfo torrent )
 	throws MalformedURLException {
-		return getSingleTracker( torrent.getAnnounce() );
+		if ( torrent.getAnnounceList().isEmpty() ) {
+			return getSingleTracker( torrent.getAnnounce() );
+		} else {
+			return getMultiTracker( torrent.getAnnounceList() );
+		}
 	}
 }
