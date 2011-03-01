@@ -3,6 +3,9 @@ package es.darkhogg.torrent.data;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -38,6 +41,11 @@ public final class Sha1Hash {
 	private final String string;
 	
 	/**
+	 * URL-Encoded <tt>String</tt> representation of this object
+	 */
+	private final String urlEncodedString;
+	
+	/**
 	 * Constructs a hash with the given byte array. The array passed must be of
 	 * length 20. If not, an <tt>IllegalArgumentException</tt> is thrown.
 	 * <p>
@@ -60,6 +68,7 @@ public final class Sha1Hash {
 		
 		hash = Arrays.hashCode( bytes );
 		
+		// Hex String
 		StringBuilder sb = new StringBuilder();
 		for ( byte b : bytes ) {
 			int ub = ((int)b) & 0xFF;
@@ -69,8 +78,16 @@ public final class Sha1Hash {
 			}
 			sb.append( Integer.toHexString( ub ).toUpperCase() );
 		}
-		
 		string = sb.toString();
+		
+		// URL Encoded String
+		String str = new String( bytes, Charset.forName( "ISO-8859-1" ) );
+		try {
+			urlEncodedString = URLEncoder.encode( str, "UTF-8" );
+		} catch ( UnsupportedEncodingException e ) {
+			// Should not happen, as UTF-8 is always supported...
+			throw new AssertionError();
+		}
 	}
 	
 	/**
@@ -111,6 +128,10 @@ public final class Sha1Hash {
 	@Override
 	public String toString () {
 		return string;
+	}
+	
+	public String toUrlEncodedString () {
+		return urlEncodedString;
 	}
 	
 	/**
