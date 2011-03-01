@@ -1,11 +1,17 @@
 package es.darkhogg.torrent.tracker;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import es.darkhogg.bencode.Value;
+import es.darkhogg.bencode.*;
 
 /**
  * Represents the response to a request to a {@link Tracker}. This class is
@@ -99,6 +105,9 @@ public final class TrackerResponse {
 			this.incomplete = 0;
 			this.peers = Collections.emptyList();
 		} else {
+			if ( peers == null ) {
+				throw new NullPointerException();
+			}
 			this.failureReason = "";
 			this.warning = ( warning == null ) ? "" : warning;
 			this.interval = interval;
@@ -166,7 +175,7 @@ public final class TrackerResponse {
 	/**
 	 * Returns the tracker ID that must be sent in subsequent announces. If
 	 * the request failed or the tracker didn't send this value, this method
-	 * returns <tt>null</tt>. Otherwise, it returns a 20-byte array.
+	 * returns <tt>null</tt>. Otherwise, it returns a byte array.
 	 * 
 	 * @return The tracker ID of the request
 	 */
@@ -221,11 +230,122 @@ public final class TrackerResponse {
 		}
 		
 		try {
-			// TODO Implement this
-			
-			return null;
+			Value<?> failReasV = Bencode.getChildValue(
+				value, "failure reason" );
+			if ( failReasV == null ) {
+				Value<?> warnV = Bencode.getChildValue( value,
+					"warning message" );
+				
+				String warning = "";
+				if ( warnV != null ) {
+					warning = ( (StringValue) warnV ).getStringValue();
+				}
+				
+				long interval = ( (IntegerValue) Bencode.getChildValue( value,
+					"interval" ) ).getValue().longValue();
+				
+				Value<?> minIntV = Bencode.getChildValue( value,
+					"min interval" );
+				long minInterval = interval;
+				if ( minIntV != null ) {
+					minInterval = ( (IntegerValue) minIntV )
+						.getValue().longValue();
+				}
+				
+				Value<?> trIdV = Bencode.getChildValue( value, "tracker id" );
+				byte[] trackerId = null;
+				if ( trIdV != null ) {
+					trackerId = ( (StringValue) trIdV ).getValue();
+				}
+				
+				long complete = ( (IntegerValue) Bencode.getChildValue( value,
+					"complete" ) ).getValue().longValue();
+				
+				long incomplete = ( (IntegerValue) Bencode.getChildValue( value,
+					"incomplete" ) ).getValue().longValue();
+				
+				List<PeerInfo> peers = readPeers( Bencode.getChildValue(
+					value, "peers" ) );
+				
+				return new TrackerResponse( false, "", warning, interval,
+					minInterval, trackerId, complete, incomplete, peers );
+			} else {
+				String failureReason = ( (StringValue) failReasV ).getStringValue();
+				return new TrackerResponse( true, failureReason,
+					"", 0, 0, null, 0, 0, null );
+			}
 		} catch ( Exception e ) {
 			throw new IllegalArgumentException( e );
+		}
+	}
+	
+	/**
+	 * Returns the {@link PeerInfo} list represented by the given value.
+	 * 
+	 * @param value Bencoded value containing a peer list
+	 * @return The peer list contained in the passed value
+	 */
+	private static List<PeerInfo> readPeers ( Value<?> value ) {
+		if ( value instanceof StringValue ) {
+			try {
+				byte[] str = ( (StringValue) value ).getValue();
+				
+				if ( ( str.length % 6 ) != 0 ) {
+					throw new IllegalArgumentException();
+				}
+				
+				DataInputStream is = new DataInputStream(
+					new ByteArrayInputStream( str ) );
+				byte[] ipbuf = new byte[ 4 ];
+				
+				List<PeerInfo> peers = new ArrayList<PeerInfo>();
+				
+				while ( is.available() > 0 ) {
+					is.readFully( ipbuf );
+					int port = is.readChar();
+					
+					InetSocketAddress addr = new InetSocketAddress(
+						InetAddress.getByAddress( ipbuf ), port );
+					PeerInfo pi = new PeerInfo( addr, null );
+					
+					peers.add( pi );
+				}
+				
+				return peers;
+			} catch ( IOException e ) {
+				// Should NEVER happen
+				throw new IllegalArgumentException( e );
+			}
+		} else if ( value instanceof ListValue ) {
+			ListValue list = (ListValue) value;
+			
+			List<PeerInfo> peers = new ArrayList<PeerInfo>();
+			
+			for ( Value<?> v : list.getValue() ) {
+				Value<?> pIdV = Bencode.getChildValue( v, "peer id" );
+				byte[] peerId = null;
+				if ( pIdV != null ) {
+					peerId = ( (StringValue) pIdV ).getValue();
+				}
+				
+				String host = ( (StringValue) Bencode.getChildValue(
+					v, "ip" ) ).getStringValue();
+				
+				int port = ( (IntegerValue) Bencode.getChildValue(
+					v, "port" ) ).getValue().intValue();
+				
+				try {
+					InetAddress addr = InetAddress.getByName( host );
+					peers.add( new PeerInfo(
+						new InetSocketAddress( addr, port ), peerId ) );
+				} catch ( UnknownHostException e ) {
+					// Don't add this peer
+				}
+			}
+			
+			return peers;
+		} else {
+			throw new ClassCastException();
 		}
 	}
 }
