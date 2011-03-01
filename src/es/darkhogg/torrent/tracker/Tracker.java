@@ -147,6 +147,7 @@ public abstract class Tracker {
 	 * @param announces List of announce URLs
 	 * @return A tracker which announces to the given URL list
 	 */
+	@SuppressWarnings( "unused" )
 	private static Tracker getMultiTracker ( List<Set<String>> announces ) {
 		return null;
 	}
@@ -164,7 +165,7 @@ public abstract class Tracker {
 	 * @return A tracker that announces to the corresponding URL
 	 * @throws MalformedURLException if the URL or URLs used are not valid
 	 */
-	public static Tracker getTrackerForTorrent ( TorrentMetaInfo torrent )
+	public static Tracker forTorrent ( TorrentMetaInfo torrent )
 	throws MalformedURLException {
 		return getSingleTracker( torrent.getAnnounce() );
 	}
