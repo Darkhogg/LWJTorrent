@@ -76,6 +76,33 @@ public class Bencode {
 	}
 	
 	/**
+	 * Gets a child element from the passed value using the strings as a path,
+	 * converted to an specific value type. If the value does not exist or is
+	 * not of that type, this method returns <tt>null</tt>.
+	 * <p>
+	 * See the description of {@link getchildValue(from,String...)} for more
+	 * information.
+	 * 
+	 * @param from Value to get the child from
+	 * @param type Expected type of the value returned
+	 * @param strings Path to the child
+	 * @return Child accessed from the path, or <tt>null</tt> if it doesn't
+	 *         exist or is not of the correct type.
+	 * @see getchildValue(from,String...)
+	 */
+	public static <T extends Value<?>> T getChildValue (
+		Value<?> from, Class<T> type, String... strings
+	) {
+		Value<?> val = getChildValue( from, strings );
+		
+		if ( type.isInstance( val ) ) {
+			return type.cast( val );
+		}
+		
+		return null;
+	}
+	
+	/**
 	 * Converts a bencode value to Java standard objects.
 	 * <p>
 	 * <i>NOTE: This method delegates its calls to its more concrete overloads.
