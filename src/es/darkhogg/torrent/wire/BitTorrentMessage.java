@@ -1,4 +1,4 @@
-package es.darkhogg.wire;
+package es.darkhogg.torrent.wire;
 
 /**
  * Represents a message in the BitTorrent peer protocol

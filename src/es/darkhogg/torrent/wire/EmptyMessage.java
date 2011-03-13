@@ -1,4 +1,4 @@
-package es.darkhogg.wire;
+package es.darkhogg.torrent.wire;
 
 /**
  * Represents a message with no payload. This class is used to represent

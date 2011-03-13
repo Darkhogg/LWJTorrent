@@ -1,4 +1,4 @@
-package es.darkhogg.wire;
+package es.darkhogg.torrent.wire;
 
 import java.util.BitSet;
 

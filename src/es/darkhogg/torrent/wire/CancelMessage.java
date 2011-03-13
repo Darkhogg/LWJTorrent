@@ -1,13 +1,13 @@
-package es.darkhogg.wire;
+package es.darkhogg.torrent.wire;
 
 /**
- * Represents a <i>Request</i> message of the BitTorrent protocol.
+ * Represents a <i>Cancel</i> message used by the BitTorrent protocol.
  * 
  * @author Daniel Escoz
  * @version 1.0
  */
-public final class RequestMessage extends BitTorrentMessage {
-	
+public final class CancelMessage extends BitTorrentMessage {
+
 	/**
 	 * Piece index
 	 */
@@ -24,13 +24,13 @@ public final class RequestMessage extends BitTorrentMessage {
 	private final int length;
 	
 	/**
-	 * Creates a <i>Request</i> message with the given index, offset and length.
+	 * Creates a <i>Cancel</i> message with the given index, offset and length.
 	 * 
 	 * @param index Index of the piece
 	 * @param offset Offset of the block within the piece
 	 * @param length Length of the block.
 	 */
-	public RequestMessage ( int index, int offset, int length ) {
+	public CancelMessage ( int index, int offset, int length ) {
 		if ( index < 0 | offset < 0 | length < 0 ) {
 			throw new IllegalArgumentException();
 		}
@@ -41,11 +41,11 @@ public final class RequestMessage extends BitTorrentMessage {
 	
 	@Override
 	public MessageType getMessageType () {
-		return MessageType.REQUEST;
+		return MessageType.CANCEL;
 	}
 	
 	/**
-	 * Returns the index of the piece being requested.
+	 * Returns the index of the piece being cancelled.
 	 * 
 	 * @return Index of the piece.
 	 */
@@ -54,7 +54,7 @@ public final class RequestMessage extends BitTorrentMessage {
 	}
 	
 	/**
-	 * Returns the offset of the block being requested.
+	 * Returns the offset of the block being cancelled.
 	 * 
 	 * @return Offset of the block
 	 */
@@ -63,7 +63,7 @@ public final class RequestMessage extends BitTorrentMessage {
 	}
 	
 	/**
-	 * Returns the length of the block being requested.
+	 * Returns the length of the block being cancelled.
 	 * 
 	 * @return Length of the block
 	 */
@@ -73,12 +73,11 @@ public final class RequestMessage extends BitTorrentMessage {
 	
 	@Override
 	public String toString () {
-		StringBuilder sb = new StringBuilder( "RequestMessage" );
-		sb.append( "{Type=" ).append( "Request" );
+		StringBuilder sb = new StringBuilder( "CancelMessage" );
+		sb.append( "{Type=" ).append( "Cancel" );
 		sb.append( "; Index=" ).append( index );
 		sb.append( "; Offset=" ).append( offset );
 		sb.append( "; Length=" ).append( length );
 		return sb.append( "}" ).toString();
 	}
-	
 }

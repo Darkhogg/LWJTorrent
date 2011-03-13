@@ -1,4 +1,4 @@
-package es.darkhogg.wire;
+package es.darkhogg.torrent.wire;
 
 /**
  * Represents a <i>Port</i> message used by the BitTorrent protocol.
