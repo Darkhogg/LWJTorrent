@@ -293,12 +293,13 @@ public final class TorrentInfoSection {
 	public String toString () {
 		StringBuilder sb = new StringBuilder( "TorrentInfoSection{{ " );
 
+		sb.append( "Name(" ).append( name ).append( "), " );
 		sb.append( "PieceLength(" ).append( pieceLength ).append( "), " );
 		sb.append( "Pieces(" ).append( pieceHashes.size() ).append( "), " );
 		sb.append( "Private(" ).append( priv ).append( "), " );
 		sb.append( "Hash(" ).append( hash ).append( "), " );
 		sb.append( "BaseDir(" ).append( baseDir ).append( "), " );
-		sb.append( "Files(" ).append( files ).append( "), " );
+		sb.append( "Files(" ).append( files ).append( ")" );
 		
 		return sb.toString();
 	}
