@@ -43,12 +43,19 @@ public final class HandShakeStart extends BitTorrentMessage {
 	/**
 	 * Constructs this object using the given <tt>protocol</tt>, <tt>flags</tt>
 	 * and info <tt>hash</tt>.
+	 * <p>
+	 * <i><b>Note:</b> The current bitTorrent version uses the protocol name
+	 * <tt>"BitTorrent protocol"</tt> as the protocol name in all situations.
+	 * This method is given for message decoders, but should not be used by
+	 * clients. See {@link HandShakeStart#HandShakeStart(BitSet,Sha1Hash) 
+	 * HandShakeStart(BitSet,Sha1Hash)} for a constructor
+	 * that uses the default protocol name by default.
 	 * 
 	 * @param protocol Protocol name of the handshake.
 	 * @param flags Flags of the handshake
 	 * @param hash Info hash of the torrent requested
 	 */
-	private HandShakeStart ( String protocol, BitSet flags, Sha1Hash hash ) {
+	public HandShakeStart ( String protocol, BitSet flags, Sha1Hash hash ) {
 		this.protocol = protocol;
 		this.flags = (BitSet) flags.clone();
 		this.hash = hash;

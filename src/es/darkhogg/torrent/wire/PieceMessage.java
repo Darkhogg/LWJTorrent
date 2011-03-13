@@ -1,5 +1,6 @@
 package es.darkhogg.torrent.wire;
 
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
 /**
@@ -27,8 +28,8 @@ public final class PieceMessage extends BitTorrentMessage {
 	private final ByteBuffer buffer;
 	
 	/**
-	 * Creates a <i>Request</i> message with the given index, offset and
-	 * length.
+	 * Creates a <i>Piece</i> message with the given index, offset and
+	 * buffer.
 	 * <p>
 	 * The passed buffer will be copied into a new buffer. The new buffer will
 	 * contain only the remaining contents of the original buffer.
@@ -40,16 +41,38 @@ public final class PieceMessage extends BitTorrentMessage {
 	public PieceMessage (
 		int index, int offset, ByteBuffer buf
 	) {
+		this( index, offset, buf, buf.remaining() );
+	}
+	
+	/**
+	 * Creates a <i>Piece</i> message with the given index, offset, buffer and
+	 * length.
+	 * <p>
+	 * The passed buffer will be copied into a new buffer. The new buffer will
+	 * contain only the first <tt>length</tt> bytes of the remaining contents
+	 * of the original buffer.
+	 * 
+	 * @param index Index of the piece
+	 * @param offset Offset of the block within the piece
+	 * @param buf Contents of the block
+	 * @param length Length of the block
+	 */
+	public PieceMessage (
+		int index, int offset, ByteBuffer buf, int length
+	) {
 		if ( index < 0 | offset < 0 ) {
 			throw new IllegalArgumentException();
 		}
 		if ( buf == null ) {
 			throw new NullPointerException();
 		}
+		if ( length > buf.remaining() ) {
+			throw new BufferUnderflowException();
+		}
 		this.index = index;
 		this.offset = offset;
 		
-		this.buffer = ByteBuffer.allocate( buf.remaining() );
+		this.buffer = ByteBuffer.allocate( length );
 		buffer.put( buf );
 		buffer.flip();
 	}
