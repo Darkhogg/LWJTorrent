@@ -19,7 +19,7 @@ public final class PortMessage extends BitTorrentMessage {
 	 * @param port Port passed
 	 */
 	public PortMessage ( int port ) {
-		if ( port < 0 ) {
+		if ( port < 0 | port > 65535 ) {
 			throw new IllegalArgumentException();
 		}
 		

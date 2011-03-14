@@ -16,6 +16,9 @@ import es.darkhogg.torrent.data.Sha1Hash;
  */
 public final class BitTorrentMessageDecoder {
 	
+	/**
+	 * ISO-8859-1 charset
+	 */
 	private final static Charset ISO_8859_1 = Charset.forName( "ISO-8859-1" );
 	
 	/**
@@ -181,13 +184,16 @@ public final class BitTorrentMessageDecoder {
 				
 			case CANCEL:
 				return decodeCancel( buffer );
+			
+			case PORT:
+				return decodePort( buffer );
 				
 			// In case of an unrecognized message...
 			default:
 				throw new IllegalArgumentException();
 		}
 	}
-	
+
 	/**
 	 * Decodes a <i>Have</i> message from the given <tt>buffer</tt>
 	 * 
@@ -266,4 +272,13 @@ public final class BitTorrentMessageDecoder {
 			buffer.getInt(), buffer.getInt() );
 	}
 	
+	/**
+	 * Decodes a <i>Port</i> message from the given <tt>buffer</tt>
+	 * 
+	 * @param buffer Buffer containing the message
+	 * @return Decoded message
+	 */
+	private static BitTorrentMessage decodePort ( ByteBuffer buffer ) {
+		return new PortMessage( (int)( buffer.getShort() ) & 0xFFFF );
+	}
 }
