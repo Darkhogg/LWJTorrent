@@ -1,0 +1,10 @@
+# Ignore binaries, build scripts and docs
+bin/
+doc/
+*.bat
+.GasTorrent
+
+# Ignore Eclipse files and dirs
+.project
+.classpath
+.settings/
