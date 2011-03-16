@@ -1,5 +1,6 @@
 package es.darkhogg.torrent.wire;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
@@ -17,6 +18,11 @@ public final class HandShakeEnd extends BitTorrentMessage {
 	private final byte[] peerId;
 	
 	/**
+	 * Cached peer ID as a String
+	 */
+	private final String strPeerId;
+	
+	/**
 	 * Constructs this message with the given peer ID.
 	 * 
 	 * @param peerId Peer ID of this handshake
@@ -30,6 +36,7 @@ public final class HandShakeEnd extends BitTorrentMessage {
 		}
 		
 		this.peerId = Arrays.copyOf( peerId, peerId.length );
+		strPeerId = new String( peerId, Charset.forName( "ISO-8859-1" ) );
 	}
 	
 	@Override
@@ -46,4 +53,11 @@ public final class HandShakeEnd extends BitTorrentMessage {
 		return Arrays.copyOf( peerId, peerId.length );
 	}
 
+	@Override
+	public String toString () {
+		StringBuilder sb = new StringBuilder( "HandShakeEnd" );
+		sb.append( "{Type=Handshake-End; " );
+		sb.append( "PeerID=" ).append( strPeerId );
+		return sb.append( "}" ).toString();
+	}
 }

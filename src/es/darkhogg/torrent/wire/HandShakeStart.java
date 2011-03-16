@@ -94,4 +94,13 @@ public final class HandShakeStart extends BitTorrentMessage {
 		return hash;
 	}
 	
+	@Override
+	public String toString () {
+		StringBuilder sb = new StringBuilder( "HandShakeStart" );
+		sb.append( "{Type=Handshake-Start; " );
+		sb.append( "Protocol=" ).append( protocol );
+		sb.append( "; Flags=" ).append( flags );
+		sb.append( "; Hash=" ).append( hash );
+		return sb.append( "}" ).toString();
+	}
 }

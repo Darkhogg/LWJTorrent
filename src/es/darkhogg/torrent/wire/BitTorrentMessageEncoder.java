@@ -37,7 +37,7 @@ public final class BitTorrentMessageEncoder {
 	 *         the full message
 	 * @throws IllegalArgumentException if <tt>msg</tt> is not a valid message
 	 */
-	public void encodeMessageToBuffer (
+	public static void encodeMessageToBuffer (
 		ByteBuffer buffer, BitTorrentMessage msg
 	) {
 		
@@ -100,7 +100,7 @@ public final class BitTorrentMessageEncoder {
 	 * @throws BufferOverflowException if there is not enough space to encode
 	 *         the full message
 	 */
-	private void encodeHandShakeStart ( ByteBuffer buffer, HandShakeStart msg ) {
+	private static void encodeHandShakeStart ( ByteBuffer buffer, HandShakeStart msg ) {
 		// Protocol
 		buffer.put( (byte) msg.getProtocolName().length() );
 		buffer.put( msg.getProtocolName().getBytes( ISO_8859_1 ) );
@@ -115,6 +115,7 @@ public final class BitTorrentMessageEncoder {
 				bits[ bInd ] |= bMask;
 			}
 		}
+		buffer.put( bits );
 		
 		// Hash
 		buffer.put( msg.getHash().getBytes() );
@@ -128,7 +129,7 @@ public final class BitTorrentMessageEncoder {
 	 * @throws BufferOverflowException if there is not enough space to encode
 	 *         the full message
 	 */
-	private void encodeHandShakeEnd ( ByteBuffer buffer, HandShakeEnd msg ) {
+	private static void encodeHandShakeEnd ( ByteBuffer buffer, HandShakeEnd msg ) {
 		buffer.put( msg.getPeerId() );
 	}
 
@@ -140,7 +141,7 @@ public final class BitTorrentMessageEncoder {
 	 * @throws BufferOverflowException if there is not enough space to encode
 	 *         the full message
 	 */
-	private void encodeHave ( ByteBuffer buffer, HaveMessage msg ) {
+	private static void encodeHave ( ByteBuffer buffer, HaveMessage msg ) {
 		buffer.putInt( 5 );
 		buffer.put( (byte) msg.getMessageType().getId() );
 		buffer.putInt( msg.getPieceIndex() );
@@ -154,7 +155,7 @@ public final class BitTorrentMessageEncoder {
 	 * @throws BufferOverflowException if there is not enough space to encode
 	 *         the full message
 	 */
-	private void encodeBitField ( ByteBuffer buffer, BitFieldMessage msg ) {
+	private static void encodeBitField ( ByteBuffer buffer, BitFieldMessage msg ) {
 		BitSet bitfield = msg.getBitField();
 		int nbytes = ( bitfield.size() + 7 ) / 8;
 		byte[] bytes = new byte[ nbytes ];
@@ -179,7 +180,7 @@ public final class BitTorrentMessageEncoder {
 	 * @throws BufferOverflowException if there is not enough space to encode
 	 *         the full message
 	 */
-	private void encodeRequest ( ByteBuffer buffer, RequestMessage msg ) {
+	private static void encodeRequest ( ByteBuffer buffer, RequestMessage msg ) {
 		buffer.putInt( 13 );
 		buffer.put( (byte) msg.getMessageType().getId() );
 		buffer.putInt( msg.getIndex() );
@@ -195,7 +196,7 @@ public final class BitTorrentMessageEncoder {
 	 * @throws BufferOverflowException if there is not enough space to encode
 	 *         the full message
 	 */
-	private void encodePiece ( ByteBuffer buffer, PieceMessage msg ) {
+	private static void encodePiece ( ByteBuffer buffer, PieceMessage msg ) {
 		ByteBuffer contents = msg.getPieceContents();
 		contents.rewind().limit( contents.capacity() );
 		
@@ -214,7 +215,7 @@ public final class BitTorrentMessageEncoder {
 	 * @throws BufferOverflowException if there is not enough space to encode
 	 *         the full message
 	 */
-	private void encodeCancel ( ByteBuffer buffer, CancelMessage msg ) {
+	private static void encodeCancel ( ByteBuffer buffer, CancelMessage msg ) {
 		buffer.putInt( 13 );
 		buffer.put( (byte) msg.getMessageType().getId() );
 		buffer.putInt( msg.getIndex() );
@@ -230,7 +231,7 @@ public final class BitTorrentMessageEncoder {
 	 * @throws BufferOverflowException if there is not enough space to encode
 	 *         the full message
 	 */
-	private void encodePort ( ByteBuffer buffer, PortMessage msg ) {
+	private static void encodePort ( ByteBuffer buffer, PortMessage msg ) {
 		buffer.putInt( 3 );
 		buffer.put( (byte) msg.getMessageType().getId() );
 		buffer.putShort( (short) msg.getPort() );
