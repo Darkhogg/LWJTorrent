@@ -85,7 +85,7 @@ public final class Sha1Hash {
 		try {
 			urlEncodedString = URLEncoder.encode( str, "ISO-8859-1" );
 		} catch ( UnsupportedEncodingException e ) {
-			// Should not happen, as UTF-8 is always supported...
+			// Should not happen, as LATIN-8 is always supported...
 			throw new AssertionError();
 		}
 	}
@@ -130,6 +130,11 @@ public final class Sha1Hash {
 		return string;
 	}
 	
+	/**
+	 * Returns the binary representation of this hash an URL-encoded string
+	 * 
+	 * @return An URL-encoded string representing this hash
+	 */
 	public String toUrlEncodedString () {
 		return urlEncodedString;
 	}

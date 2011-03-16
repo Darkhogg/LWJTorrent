@@ -53,9 +53,7 @@ public abstract class Tracker {
 			sb.append( req.getInfoHash().toUrlEncodedString() );
 			
 			sb.append( "&peer_id=" );
-			String peerstr = new String( req.getPeerId(),
-				Charset.forName( "ISO-8859-1" ) );
-			sb.append( URLEncoder.encode( peerstr, "ISO-8859-1" ) );
+			sb.append( req.getPeerId().toUrlEncodedString() );
 			
 			sb.append( "&port=" );
 			sb.append( req.getPort() );

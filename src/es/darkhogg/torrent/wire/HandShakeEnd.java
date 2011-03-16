@@ -1,7 +1,6 @@
 package es.darkhogg.torrent.wire;
 
-import java.nio.charset.Charset;
-import java.util.Arrays;
+import es.darkhogg.torrent.data.PeerID;
 
 /**
  * Represents the part of the BitTorrent protocol handshake that contains the
@@ -15,28 +14,20 @@ public final class HandShakeEnd extends BitTorrentMessage {
 	/**
 	 * Peer ID
 	 */
-	private final byte[] peerId;
-	
-	/**
-	 * Cached peer ID as a String
-	 */
-	private final String strPeerId;
+	private final PeerID peerId;
 	
 	/**
 	 * Constructs this message with the given peer ID.
 	 * 
 	 * @param peerId Peer ID of this handshake
 	 * @throws NullPointerException if <tt>peerId</tt> is <tt>null</tt>
-	 * @throws IllegalArgumentException if <tt>peerId</tt> has a length
-	 *         different than 20
 	 */
-	public HandShakeEnd ( byte[] peerId ) {
-		if ( peerId.length != 20 ) {
-			throw new IllegalArgumentException();
+	public HandShakeEnd ( PeerID peerId ) {
+		if ( peerId == null ) {
+			throw new NullPointerException();
 		}
 		
-		this.peerId = Arrays.copyOf( peerId, peerId.length );
-		strPeerId = new String( peerId, Charset.forName( "ISO-8859-1" ) );
+		this.peerId = peerId;
 	}
 	
 	@Override
@@ -45,19 +36,19 @@ public final class HandShakeEnd extends BitTorrentMessage {
 	}
 	
 	/**
-	 * Returns the 20-byte peer ID of this message.
+	 * Returns the peer ID of this message.
 	 * 
 	 * @return Peer ID of the handshake
 	 */
-	public byte[] getPeerId () {
-		return Arrays.copyOf( peerId, peerId.length );
+	public PeerID getPeerId () {
+		return peerId;
 	}
 
 	@Override
 	public String toString () {
 		StringBuilder sb = new StringBuilder( "HandShakeEnd" );
 		sb.append( "{Type=Handshake-End; " );
-		sb.append( "PeerID=" ).append( strPeerId );
+		sb.append( "PeerID=" ).append( peerId );
 		return sb.append( "}" ).toString();
 	}
 }

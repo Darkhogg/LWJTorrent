@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.BitSet;
 
+import es.darkhogg.torrent.data.PeerID;
 import es.darkhogg.torrent.data.Sha1Hash;
 
 /**
@@ -86,7 +87,7 @@ public final class BitTorrentMessageDecoder {
 		buffer.get( peerId );
 		
 		// Return
-		return new HandShakeEnd( peerId );
+		return new HandShakeEnd( new PeerID( peerId ) );
 	}
 	
 	/**

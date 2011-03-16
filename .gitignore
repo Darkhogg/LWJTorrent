@@ -1,10 +1,14 @@
+##
 # Ignore binaries, build scripts and docs
+##
 bin/
 doc/
 *.bat
-.GasTorrent
+*.sh
 
+##
 # Ignore Eclipse files and dirs
+##
 .project
 .classpath
 .settings/

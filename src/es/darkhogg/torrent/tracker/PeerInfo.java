@@ -1,8 +1,8 @@
 package es.darkhogg.torrent.tracker;
 
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
-import java.util.Arrays;
+
+import es.darkhogg.torrent.data.PeerID;
 
 /**
  * Stores information about a peer, such as its peer ID and its IP/port.
@@ -20,7 +20,7 @@ public class PeerInfo {
 	/**
 	 * Peer ID
 	 */
-	private final byte[] peerId;
+	private final PeerID peerId;
 	
 	/**
 	 * Construct an object using the given <tt>address</tt> and <tt>peerId</tt>
@@ -31,10 +31,9 @@ public class PeerInfo {
 	 * @param address The IP and port of the peer
 	 * @param peerId The peer ID, or <tt>null</tt> if not known
 	 */
-	public PeerInfo ( InetSocketAddress address, byte[] peerId ) {
+	public PeerInfo ( InetSocketAddress address, PeerID peerId ) {
 		this.address = address;
-		this.peerId = peerId==null
-			? null : Arrays.copyOf( peerId, peerId.length );
+		this.peerId = peerId;
 	}
 	
 	/**
@@ -53,8 +52,8 @@ public class PeerInfo {
 	 * 
 	 * @return The peer ID of this peer, or <tt>null</tt> if unknown
 	 */
-	public byte[] getPeerId () {
-		return Arrays.copyOf( peerId, peerId.length );
+	public PeerID getPeerId () {
+		return peerId;
 	}
 	
 	@Override
@@ -67,7 +66,7 @@ public class PeerInfo {
 		
 		if ( peerId != null ) {
 			sb.append( "; PeerID=\"" );
-			sb.append( new String( peerId, Charset.forName( "ISO-8859-1" ) ) );
+			sb.append( peerId );
 			sb.append( "\"" );
 		}
 		

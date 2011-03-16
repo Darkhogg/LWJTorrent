@@ -3,6 +3,7 @@ package es.darkhogg.torrent.tracker;
 import java.net.InetAddress;
 import java.util.Arrays;
 
+import es.darkhogg.torrent.data.PeerID;
 import es.darkhogg.torrent.data.Sha1Hash;
 
 /**
@@ -28,7 +29,7 @@ public final class TrackerRequest {
 	/**
 	 * Peer ID of the client
 	 */
-	private final byte[] peerId;
+	private final PeerID peerId;
 	
 	/**
 	 * Port used to receive incoming connections
@@ -104,12 +105,11 @@ public final class TrackerRequest {
 	 * @throws NullPointerException if <tt>infoHash</tt>, <tt>peerId</tt> or
 	 *         <tt>event</tt> are <tt>null</tt>
 	 * @throws IllegalArgumentException if <tt>port</tt> is not in the range
-	 *         0-65535, <tt>peerId</tt> is not a 20-byte length array or
-	 *         any of <tt>uploaded</tt>, <tt>downloaded</tt> or <tt>left</tt>
-	 *         is less than 0.
+	 *         0-65535 or any of <tt>uploaded</tt>, <tt>downloaded</tt> or
+	 *         <tt>left</tt> is less than 0.
 	 */
 	private TrackerRequest (
-		Sha1Hash infoHash, byte[] peerId, int port, long uploaded,
+		Sha1Hash infoHash, PeerID peerId, int port, long uploaded,
 		long downloaded, long left, Boolean compact, boolean noPeerId, 
 		Event event, InetAddress ip, int numWant, String key,
 		byte[] trackerId
@@ -119,14 +119,14 @@ public final class TrackerRequest {
 		}
 		
 		if (
-			port < 0 | port >= 65535 | peerId.length != 20 |
+			port < 0 | port >= 65535 |
 			uploaded < 0 | downloaded < 0 | left < 0
 		) {
 			throw new IllegalArgumentException();
 		}
 		
 		this.infoHash = infoHash;
-		this.peerId = Arrays.copyOf( peerId, peerId.length );
+		this.peerId = peerId;
 		this.port = port;
 		this.uploaded = uploaded;
 		this.downloaded = downloaded;
@@ -152,8 +152,8 @@ public final class TrackerRequest {
 	/**
 	 * @return the peer ID set for this request
 	 */
-	public byte[] getPeerId () {
-		return Arrays.copyOf( peerId, peerId.length );
+	public PeerID getPeerId () {
+		return peerId;
 	}
 	
 	/**
@@ -289,7 +289,7 @@ public final class TrackerRequest {
 		/**
 		 * Peer Id of this builer
 		 */
-		private byte[] peerId = null;
+		private PeerID peerId = null;
 		
 		/**
 		 * Port of this builder
@@ -379,7 +379,7 @@ public final class TrackerRequest {
 		 * @param peerId New peer ID for this builder
 		 * @return The <tt>this</tt> reference.
 		 */
-		public Builder peerId ( byte[] peerId ) {
+		public Builder peerId ( PeerID peerId ) {
 			this.peerId = peerId;
 			return this;
 		}

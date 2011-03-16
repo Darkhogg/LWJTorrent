@@ -130,7 +130,7 @@ public final class BitTorrentMessageEncoder {
 	 *         the full message
 	 */
 	private static void encodeHandShakeEnd ( ByteBuffer buffer, HandShakeEnd msg ) {
-		buffer.put( msg.getPeerId() );
+		buffer.put( msg.getPeerId().getBytes() );
 	}
 
 	/**
