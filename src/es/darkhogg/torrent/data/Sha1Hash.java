@@ -85,7 +85,7 @@ public final class Sha1Hash {
 		try {
 			urlEncodedString = URLEncoder.encode( str, "ISO-8859-1" );
 		} catch ( UnsupportedEncodingException e ) {
-			// Should not happen, as LATIN-8 is always supported...
+			// Should not happen, as LATIN-1 is always supported...
 			throw new AssertionError();
 		}
 	}
