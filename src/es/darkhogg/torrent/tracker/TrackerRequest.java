@@ -3,7 +3,7 @@ package es.darkhogg.torrent.tracker;
 import java.net.InetAddress;
 import java.util.Arrays;
 
-import es.darkhogg.torrent.data.PeerID;
+import es.darkhogg.torrent.data.PeerId;
 import es.darkhogg.torrent.data.Sha1Hash;
 
 /**
@@ -29,7 +29,7 @@ public final class TrackerRequest {
 	/**
 	 * Peer ID of the client
 	 */
-	private final PeerID peerId;
+	private final PeerId peerId;
 	
 	/**
 	 * Port used to receive incoming connections
@@ -109,7 +109,7 @@ public final class TrackerRequest {
 	 *         <tt>left</tt> is less than 0.
 	 */
 	private TrackerRequest (
-		Sha1Hash infoHash, PeerID peerId, int port, long uploaded,
+		Sha1Hash infoHash, PeerId peerId, int port, long uploaded,
 		long downloaded, long left, Boolean compact, boolean noPeerId, 
 		Event event, InetAddress ip, int numWant, String key,
 		byte[] trackerId
@@ -152,7 +152,7 @@ public final class TrackerRequest {
 	/**
 	 * @return the peer ID set for this request
 	 */
-	public PeerID getPeerId () {
+	public PeerId getPeerId () {
 		return peerId;
 	}
 	
@@ -289,7 +289,7 @@ public final class TrackerRequest {
 		/**
 		 * Peer Id of this builer
 		 */
-		private PeerID peerId = null;
+		private PeerId peerId = null;
 		
 		/**
 		 * Port of this builder
@@ -379,7 +379,7 @@ public final class TrackerRequest {
 		 * @param peerId New peer ID for this builder
 		 * @return The <tt>this</tt> reference.
 		 */
-		public Builder peerId ( PeerID peerId ) {
+		public Builder peerId ( PeerId peerId ) {
 			this.peerId = peerId;
 			return this;
 		}

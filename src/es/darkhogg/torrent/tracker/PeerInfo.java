@@ -2,7 +2,7 @@ package es.darkhogg.torrent.tracker;
 
 import java.net.InetSocketAddress;
 
-import es.darkhogg.torrent.data.PeerID;
+import es.darkhogg.torrent.data.PeerId;
 
 /**
  * Stores information about a peer, such as its peer ID and its IP/port.
@@ -20,7 +20,7 @@ public class PeerInfo {
 	/**
 	 * Peer ID
 	 */
-	private final PeerID peerId;
+	private final PeerId peerId;
 	
 	/**
 	 * Construct an object using the given <tt>address</tt> and <tt>peerId</tt>
@@ -31,7 +31,7 @@ public class PeerInfo {
 	 * @param address The IP and port of the peer
 	 * @param peerId The peer ID, or <tt>null</tt> if not known
 	 */
-	public PeerInfo ( InetSocketAddress address, PeerID peerId ) {
+	public PeerInfo ( InetSocketAddress address, PeerId peerId ) {
 		this.address = address;
 		this.peerId = peerId;
 	}
@@ -52,7 +52,7 @@ public class PeerInfo {
 	 * 
 	 * @return The peer ID of this peer, or <tt>null</tt> if unknown
 	 */
-	public PeerID getPeerId () {
+	public PeerId getPeerId () {
 		return peerId;
 	}
 	

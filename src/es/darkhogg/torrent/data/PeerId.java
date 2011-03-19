@@ -12,7 +12,7 @@ import java.util.Arrays;
  * @author Daniel Escoz
  * @version 1.0
  */
-public final class PeerID {
+public final class PeerId {
 	
 	/**
 	 * LATIN-1 charset
@@ -47,7 +47,7 @@ public final class PeerID {
 	 * @throws IllegalArgumentException if <tt>bytes</tt> has a different
 	 *         length than 20
 	 */
-	public PeerID ( byte[] bytes ) {
+	public PeerId ( byte[] bytes ) {
 		if ( bytes == null ) {
 			throw new NullPointerException();
 		}
@@ -77,7 +77,7 @@ public final class PeerID {
 	 * @throws IllegalArgumentException if <tt>string</tt> has a different
 	 *         length than 20
 	 */
-	public PeerID ( String string ) {
+	public PeerId ( String string ) {
 		if ( string == null ) {
 			throw new NullPointerException();
 		}
@@ -116,11 +116,11 @@ public final class PeerID {
 	 */
 	@Override
 	public boolean equals ( Object obj ) {
-		if ( !(obj instanceof PeerID) ) {
+		if ( !(obj instanceof PeerId) ) {
 			return false;
 		}
 		
-		PeerID p = (PeerID) obj;
+		PeerId p = (PeerId) obj;
 		return Arrays.equals( p.bytes, bytes );
 	}
 	

@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import es.darkhogg.bencode.*;
-import es.darkhogg.torrent.data.PeerID;
+import es.darkhogg.torrent.data.PeerId;
 
 /**
  * Represents the response to a request to a {@link Tracker}. This class is
@@ -340,7 +340,7 @@ public final class TrackerResponse {
 				try {
 					InetAddress addr = InetAddress.getByName( host );
 					peers.add( new PeerInfo( new InetSocketAddress(
-						addr, port ), new PeerID( peerId ) ) );
+						addr, port ), new PeerId( peerId ) ) );
 				} catch ( UnknownHostException e ) {
 					// Don't add this peer
 				}

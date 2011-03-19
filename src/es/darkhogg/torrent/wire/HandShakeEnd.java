@@ -1,6 +1,6 @@
 package es.darkhogg.torrent.wire;
 
-import es.darkhogg.torrent.data.PeerID;
+import es.darkhogg.torrent.data.PeerId;
 
 /**
  * Represents the part of the BitTorrent protocol handshake that contains the
@@ -14,7 +14,7 @@ public final class HandShakeEnd extends BitTorrentMessage {
 	/**
 	 * Peer ID
 	 */
-	private final PeerID peerId;
+	private final PeerId peerId;
 	
 	/**
 	 * Constructs this message with the given peer ID.
@@ -22,7 +22,7 @@ public final class HandShakeEnd extends BitTorrentMessage {
 	 * @param peerId Peer ID of this handshake
 	 * @throws NullPointerException if <tt>peerId</tt> is <tt>null</tt>
 	 */
-	public HandShakeEnd ( PeerID peerId ) {
+	public HandShakeEnd ( PeerId peerId ) {
 		if ( peerId == null ) {
 			throw new NullPointerException();
 		}
@@ -40,7 +40,7 @@ public final class HandShakeEnd extends BitTorrentMessage {
 	 * 
 	 * @return Peer ID of the handshake
 	 */
-	public PeerID getPeerId () {
+	public PeerId getPeerId () {
 		return peerId;
 	}
 
