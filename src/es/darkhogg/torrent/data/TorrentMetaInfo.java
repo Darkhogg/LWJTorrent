@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
-import es.darkhogg.bencode.Bencode;
-import es.darkhogg.bencode.BencodeInputStream;
-import es.darkhogg.bencode.IntegerValue;
-import es.darkhogg.bencode.ListValue;
-import es.darkhogg.bencode.StringValue;
-import es.darkhogg.bencode.Value;
+import es.darkhogg.torrent.bencode.Bencode;
+import es.darkhogg.torrent.bencode.BencodeInputStream;
+import es.darkhogg.torrent.bencode.IntegerValue;
+import es.darkhogg.torrent.bencode.ListValue;
+import es.darkhogg.torrent.bencode.StringValue;
+import es.darkhogg.torrent.bencode.Value;
 
 /**
  * Represents the contents of a .torrent file.

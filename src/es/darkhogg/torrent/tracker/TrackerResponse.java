@@ -12,7 +12,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import es.darkhogg.bencode.*;
+import es.darkhogg.torrent.bencode.Bencode;
+import es.darkhogg.torrent.bencode.IntegerValue;
+import es.darkhogg.torrent.bencode.ListValue;
+import es.darkhogg.torrent.bencode.StringValue;
+import es.darkhogg.torrent.bencode.Value;
 import es.darkhogg.torrent.data.PeerId;
 
 /**

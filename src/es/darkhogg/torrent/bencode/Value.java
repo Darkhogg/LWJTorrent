@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this package.  If not, see <http://www.gnu.org/licenses/>.
  */
-package es.darkhogg.bencode;
+package es.darkhogg.torrent.bencode;
 
 /**
  * Represents a value that can be bencoded.

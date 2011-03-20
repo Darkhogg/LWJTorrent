@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import es.darkhogg.bencode.BencodeInputStream;
+import es.darkhogg.torrent.bencode.BencodeInputStream;
 
 /**
  * A tracker that sends announces to a single URL.

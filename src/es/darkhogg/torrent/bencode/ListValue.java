@@ -12,11 +12,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this package.  If not, see <http://www.gnu.org/licenses/>.
  */
-package es.darkhogg.bencode;
+package es.darkhogg.torrent.bencode;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import es.darkhogg.torrent.bencode.Value;
 
 /**
  * Wraps the bencode list type as a List of Values

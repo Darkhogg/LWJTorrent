@@ -11,8 +11,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-import es.darkhogg.bencode.BencodeOutputStream;
-import es.darkhogg.bencode.Value;
+import es.darkhogg.torrent.bencode.BencodeOutputStream;
+import es.darkhogg.torrent.bencode.Value;
 import es.darkhogg.util.VoidOutputStream;
 
 /**

@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import es.darkhogg.bencode.BencodeInputStream;
+import es.darkhogg.torrent.bencode.BencodeInputStream;
 
 final class MultiTracker extends Tracker {
 

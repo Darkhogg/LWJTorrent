@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this package.  If not, see <http://www.gnu.org/licenses/>.
  */
-package es.darkhogg.bencode;
+package es.darkhogg.torrent.bencode;
 
 import java.io.Closeable;
 import java.io.File;
@@ -23,6 +23,12 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Map;
+
+import es.darkhogg.torrent.bencode.DictionaryValue;
+import es.darkhogg.torrent.bencode.IntegerValue;
+import es.darkhogg.torrent.bencode.ListValue;
+import es.darkhogg.torrent.bencode.StringValue;
+import es.darkhogg.torrent.bencode.Value;
 
 /**
  * An object that pushes bencoded values into a stream.

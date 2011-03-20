@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this package.  If not, see <http://www.gnu.org/licenses/>.
  */
-package es.darkhogg.bencode;
+package es.darkhogg.torrent.bencode;
 
 import java.io.Closeable;
 import java.io.EOFException;
@@ -26,6 +26,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import es.darkhogg.torrent.bencode.Bencode;
+import es.darkhogg.torrent.bencode.DictionaryValue;
+import es.darkhogg.torrent.bencode.IntegerValue;
+import es.darkhogg.torrent.bencode.ListValue;
+import es.darkhogg.torrent.bencode.StringValue;
+import es.darkhogg.torrent.bencode.Value;
 
 /**
  * An object that can pull complete values from a stream. Composite values

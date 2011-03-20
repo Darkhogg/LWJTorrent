@@ -12,7 +12,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this package.  If not, see <http://www.gnu.org/licenses/>.
  */
-package es.darkhogg.bencode;
+package es.darkhogg.torrent.bencode;
+
+import es.darkhogg.torrent.bencode.Value;
 
 /**
  * Wraps the bencode integer type as long primitives

@@ -12,9 +12,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this package.  If not, see <http://www.gnu.org/licenses/>.
  */
-package es.darkhogg.bencode;
+package es.darkhogg.torrent.bencode;
 
 import java.util.Arrays;
+
+import es.darkhogg.torrent.bencode.Bencode;
+import es.darkhogg.torrent.bencode.Value;
 
 /**
  * Wraps the bencoded strin value as an array of bytes. This object represents
