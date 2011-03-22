@@ -166,9 +166,9 @@ public final class PeerConnection implements Closeable {
 		}
 
 		inputBuffer = ByteBuffer.allocate( ibufSize + 32 );
-		inputBuffer.order( ByteOrder.BIG_ENDIAN );
+		inputBuffer.order( ByteOrder.BIG_ENDIAN ).clear().limit( 1 );
 		outputBuffer = ByteBuffer.allocate( obufSize + 32 );
-		outputBuffer.order( ByteOrder.BIG_ENDIAN );
+		outputBuffer.order( ByteOrder.BIG_ENDIAN ).clear();
 		
 		this.channel = channel;
 		channel.configureBlocking( false );
@@ -390,75 +390,197 @@ public final class PeerConnection implements Closeable {
 	public BitTorrentMessage receiveMessage () {
 		return inputQueue.poll();
 	}
-
+	
+	/**
+	 * Returns the peer ID sent with the handshake end, or <tt>null</tt> if it
+	 * has not been sent yet
+	 * 
+	 * @return The local peer ID, or <tt>null</tt> if it hasn't been sent
+	 */
 	public PeerId getLocalPeerId () {
 		return localPeerId;
 	}
 	
+	/**
+	 * Returns the peer ID received with the handshake end, or <tt>null</tt> if
+	 * it has not been received yet.
+	 * 
+	 * @return The remote peer ID, or <tt>null</tt> if it hasn't been received
+	 */
 	public PeerId getRemotePeerId () {
 		return remotePeerId;
 	}
 	
+	/**
+	 * Returns the protocol name sent with the handshake start, or
+	 * <tt>null</tt> if it has not been sent yet.
+	 * 
+	 * @return The local protocol name, or <tt>null</tt> if it hasn't been sent
+	 */
 	public String getLocalProtocol () {
 		return localProtocol;
 	}
 	
+	/**
+	 * Returns the protocol name received with the handshake start, or
+	 * <tt>null</tt> if it has not been received yet.
+	 * 
+	 * @return The remote protocol name, or <tt>null</tt> if it hasn't been
+	 *         received
+	 */
 	public String getRemoteProtocol () {
 		return remoteProtocol;
 	}
 	
+	/**
+	 * Returns the info hash sent with the handshake start, or <tt>null</tt> if
+	 * it has not been sent yet.
+	 * 
+	 * @return The local info hash, or <tt>null</tt> if it hasn't been sent
+	 */
 	public Sha1Hash getLocalHash () {
 		return localHash;
 	}
 	
+	/**
+	 * Returns the info hash received with the handshake start, or
+	 * <tt>null</tt> if it has not been received yet.
+	 * 
+	 * @return The remote info hash, or <tt>null</tt> if it hasn't been received
+	 */
 	public Sha1Hash getRemoteHash () {
 		return remoteHash;
 	}
 
+	/**
+	 * Returns the reserved bits sent with the handshake start, or
+	 * <tt>null</tt> if it hasn't been sent yet.
+	 * 
+	 * @return The local reserved bits, or <tt>null</tt> if it hasn't been sent
+	 */
 	public BitSet getLocalFlags () {
 		return localFlags;
 	}
 	
+	/**
+	 * Returns the reserved bits received with the handshake start, or
+	 * <tt>null</tt> if it hasn't been received yet.
+	 * 
+	 * @return The remote reserved bits, or <tt>null</tt> if it hasn't been
+	 *         received
+	 */
 	public BitSet getRemoteFlags () {
 		return remoteFlags;
 	}
-
+	
+	/**
+	 * Returns a bit set which set bits indicate that the local end of this
+	 * connection has claimed to have that part, either using the
+	 * <i>BitField</i> message or using subsequent <i>Have</i> messages.
+	 * <p>
+	 * The returned object is a copy and will not change if new messages are
+	 * sent.
+	 * 
+	 * @return The claimed local parts
+	 */
 	public BitSet getLocalClaimedPieces () {
 		return localClaimedPieces;
 	}
 	
+	/**
+	 * Returns a bit set which set bits indicate that the remote end of this
+	 * connection has claimed to have that part, either using the
+	 * <i>BitField</i> message or using subsequent <i>Have</i> messages.
+	 * <p>
+	 * The returned object is a copy and will not change if new messages are
+	 * received.
+	 * 
+	 * @return The claimed remote parts
+	 */
 	public BitSet getRemoteClaimedPieces () {
 		return remoteClaimedPieces;
 	}
 	
+	/**
+	 * Returns whether the local end of this connection is choking.
+	 * 
+	 * @return Whether the local end is choking
+	 */
 	public boolean isLocalChoking () {
 		return localChoking;
 	}
 	
+	/**
+	 * Returns whether the remote end of this connection is choking.
+	 * 
+	 * @return Whether the remote end is choking
+	 */
 	public boolean isRemoteChoking () {
 		return remoteChoking;
 	}
 	
+	/**
+	 * Returns whether the local end of this connection is interested in the
+	 * remote end.
+	 * 
+	 * @return Whether the local end is interested
+	 */
 	public boolean isLocalInterested () {
 		return localInterested;
 	}
 	
+	/**
+	 * Returns whether the remote end of this connection is interested in the
+	 * local end.
+	 * 
+	 * @return Whether the remote end is interested
+	 */
 	public boolean isRemoteInterested () {
 		return remoteInterested;
 	}
 	
+	/**
+	 * Returns <tt>true</tt> if and only if a <i>HandShake Start</i> message
+	 * has been sent using both the {@link sendMessage} and {@link process}
+	 * methods.
+	 * 
+	 * @return Whether the handshake start has been sent
+	 */
 	public boolean isLocalHandShakeStarted () {
 		return localHandShakeStarted;
 	}
 	
+	/**
+	 * Returns <tt>true</tt> if and only if a <i>HandShake Start</i> message
+	 * has been received using the {@link process} method. Whether the message
+	 * has been actually read using {@link readMessage} is not relevant to the
+	 * returned value of this method.
+	 * 
+	 * @return Whether the handshake start has been received
+	 */
 	public boolean isRemoteHandShakeStarted () {
 		return remoteHandShakeStarted;
 	}
 	
+	/**
+	 * Returns <tt>true</tt> if and only if a <i>HandShake End</i> message
+	 * has been sent using both the {@link sendMessage} and {@link process}
+	 * methods.
+	 * 
+	 * @return Whether the handshake end has been sent
+	 */
 	public boolean isLocalHandShakeFinished () {
 		return localHandShakeFinished;
 	}
 	
+	/**
+	 * Returns <tt>true</tt> if and only if a <i>HandShake End</i> message
+	 * has been received using the {@link process} method. Whether the message
+	 * has been actually read using {@link readMessage} is not relevant to the
+	 * returned value of this method.
+	 * 
+	 * @return Whether the handshake end has been received
+	 */
 	public boolean isRemoteHandShakeFinished () {
 		return remoteHandShakeFinished;
 	}
