@@ -56,6 +56,11 @@ public final class TorrentInfoSection {
 	private final String name;
 	
 	/**
+	 * The total length of this torrent
+	 */
+	private final long totalLength;
+	
+	/**
 	 * Constructs this object using every piece of information needed.
 	 * 
 	 * @param pieceLength Nominal length of every piece
@@ -92,6 +97,12 @@ public final class TorrentInfoSection {
 		this.files = Collections.unmodifiableList(
 			new ArrayList<TorrentFileInfo>( files ) );
 		this.name = name;
+		
+		long totalLength = 0;
+		for ( TorrentFileInfo tfi : files ) {
+			totalLength += tfi.getLength();
+		}
+		this.totalLength = totalLength;
 	}
 	
 	/**
@@ -164,6 +175,18 @@ public final class TorrentInfoSection {
 	 */
 	public String getName () {
 		return name;
+	}
+	
+	/**
+	 * Returns the total length of the torrent.
+	 * <p>
+	 * This value is calculated once by adding the lengths of all files in the
+	 * file list.
+	 * 
+	 * @return The total length of this torrent
+	 */
+	public long getTotalLength () {
+		return totalLength;
 	}
 	
 	/**
