@@ -14,6 +14,7 @@
  */
 package es.darkhogg.torrent.bencode;
 
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.File;
@@ -21,18 +22,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import es.darkhogg.torrent.bencode.Bencode;
-import es.darkhogg.torrent.bencode.DictionaryValue;
-import es.darkhogg.torrent.bencode.IntegerValue;
-import es.darkhogg.torrent.bencode.ListValue;
-import es.darkhogg.torrent.bencode.StringValue;
-import es.darkhogg.torrent.bencode.Value;
 
 /**
  * An object that can pull complete values from a stream. Composite values
@@ -134,15 +129,32 @@ public final class BencodeInputStream implements Closeable {
 		} else if ( first == DICTIONARY_VALUE ) {
 			SortedMap<String,Value<?>> map = new TreeMap<String,Value<?>>();
 			
+			String lastKeyStr = null;
+			
 			boolean end = false;
 			while ( !end ) {
 				Value<?> key = readValue();
 				if ( key != null && !(key instanceof StringValue) ) {
 					throw new IOException( "Invalid key type" );
 				}
+				
 				if ( key == null ) {
 					end = true;
 				} else {
+					// Imposes key ordering when reading
+					String currKeyStr = ( (StringValue) key ).getStringValue();
+					
+					if ( lastKeyStr != null ) {
+						int cmp = lastKeyStr.compareTo( currKeyStr );
+						if ( cmp > 0 ) {
+							throw new IOException( "Unordered dictionary" );
+						} else if ( cmp == 0 ) {
+							throw new IOException(
+								"Repeated key in dictionary" );
+						}
+					}
+					lastKeyStr = currKeyStr;
+					
 					Value<?> val = readValue();
 					if ( val == null ) {
 						throw new IOException(
