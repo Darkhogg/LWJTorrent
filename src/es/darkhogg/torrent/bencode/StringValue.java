@@ -16,9 +16,6 @@ package es.darkhogg.torrent.bencode;
 
 import java.util.Arrays;
 
-import es.darkhogg.torrent.bencode.Bencode;
-import es.darkhogg.torrent.bencode.Value;
-
 /**
  * Wraps the bencoded strin value as an array of bytes. This object represents
  * bencoded string as bytes to simplify handling of binary data. The

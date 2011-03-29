@@ -19,9 +19,6 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import es.darkhogg.torrent.bencode.Bencode;
-import es.darkhogg.torrent.bencode.Value;
-
 /**
  * Wraps the bencode dictionary type as a SortedMap from String to Values
  * 

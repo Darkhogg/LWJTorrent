@@ -24,12 +24,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Map;
 
-import es.darkhogg.torrent.bencode.DictionaryValue;
-import es.darkhogg.torrent.bencode.IntegerValue;
-import es.darkhogg.torrent.bencode.ListValue;
-import es.darkhogg.torrent.bencode.StringValue;
-import es.darkhogg.torrent.bencode.Value;
-
 /**
  * An object that pushes bencoded values into a stream.
  * 

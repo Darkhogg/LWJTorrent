@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import es.darkhogg.torrent.bencode.Value;
-
 /**
  * Wraps the bencode list type as a List of Values
  * 

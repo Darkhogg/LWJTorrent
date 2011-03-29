@@ -14,8 +14,6 @@
  */
 package es.darkhogg.torrent.bencode;
 
-import es.darkhogg.torrent.bencode.Value;
-
 /**
  * Wraps the bencode integer type as long primitives
  * 

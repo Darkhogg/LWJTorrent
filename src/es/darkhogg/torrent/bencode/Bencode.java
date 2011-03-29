@@ -20,12 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import es.darkhogg.torrent.bencode.DictionaryValue;
-import es.darkhogg.torrent.bencode.IntegerValue;
-import es.darkhogg.torrent.bencode.ListValue;
-import es.darkhogg.torrent.bencode.StringValue;
-import es.darkhogg.torrent.bencode.Value;
-
 /**
  * Namespace for global constants and functions of this package
  * 
