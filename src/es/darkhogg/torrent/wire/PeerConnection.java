@@ -175,18 +175,36 @@ public final class PeerConnection implements Closeable {
 	}
 	
 	/**
-	 * TODO Document this
+	 * Shortcut method for {@link process(long,TimeUnit,boolean)} called with
+	 * a value of <tt>false</tt> as the <tt>returnOnMsg</tt> argument.
 	 * 
 	 * @param timeout Maximum time to execute this method
 	 * @param unit Time unit of the <tt>timeout</tt> argument
 	 * @throws IOException if an I/O error occurs
+	 * @see PeerConnection#process(long, TimeUnit, boolean)
 	 */
 	public void process ( long timeout, TimeUnit unit )
+	throws IOException {
+		process( timeout, unit, false );
+	}
+	
+	/**
+	 * TODO Document this
+	 * 
+	 * @param timeout Maximum time to execute this method
+	 * @param unit Time unit of the <tt>timeout</tt> argument
+	 * @param returnOnMsg Whether receivig a message should end this method call
+	 * @return <tt>true</tt> if, and only if, this method returns after waiting
+	 *         the whole timeout
+	 * @throws IOException if an I/O error occurs
+	 */
+	public boolean process ( long timeout, TimeUnit unit, boolean returnOnMsg )
 	throws IOException {
 		long ndTime = System.nanoTime() + unit.toNanos( timeout );
 		
 		try {
-			while ( System.nanoTime() < ndTime ) {
+			boolean quit = false;
+			while ( !quit | System.nanoTime() < ndTime ) {
 				
 				// Send the full output
 				while ( !outputQueue.isEmpty() ) {
@@ -258,14 +276,18 @@ public final class PeerConnection implements Closeable {
 						inputQueue.add( msg );
 						inputBuffer.clear().limit( 4 );
 						inputState = 4;
+						quit = returnOnMsg;
 					}
 				}
 				
 				Thread.sleep( 16 );
 			}
+			
+			return !quit;
 		} catch ( InterruptedException e ) {
 			// Close the connection
 			close();
+			return false;
 		}
 	}
 	
