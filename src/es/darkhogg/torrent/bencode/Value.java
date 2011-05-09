@@ -51,10 +51,11 @@ public abstract class Value<T> {
 	public abstract void setValue ( T value );
 	
 	/**
-	 * Returns the length, in bytes, this values will take up when encoded using
+	 * Returns the length, in bytes, this value will take up when encoded using
 	 * UTF-8 as the encoding character set.
 	 * <p>
-	 * If the size cannot be specified, an upper bound must be returned.
+	 * If the size cannot be determined accurately, an upper bound must be
+	 * returned.
 	 * 
 	 * @return The length of the encoded byte stream for this value
 	 */
