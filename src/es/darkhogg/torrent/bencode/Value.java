@@ -32,7 +32,7 @@ public abstract class Value<T> {
 	 * 
 	 * @param value Initial value
 	 */
-	protected Value ( T value ) {
+	/*package-private*/ Value ( T value ) {
 		setValue( value );
 	}
 	
