@@ -17,7 +17,7 @@ import es.darkhogg.torrent.data.Sha1Hash;
 /**
  * Represents a connection with a peer using the BitTorrent wire protocol.
  * <p>
- * TODO Finish documenting it
+ * TODO Document this
  * 
  * @author Daniel Escoz
  * @version 1.0
@@ -189,7 +189,11 @@ public final class PeerConnection implements Closeable {
 	}
 	
 	/**
-	 * TODO Document this
+	 * Reads and writes messages from/to the remote end of this connection for
+	 * the time specified in <tt>timeout</tt> and <tt>unit</tt>. If the
+	 * <tt>returnOnMsg</tt> argument is <tt>true</tt>, this method returns
+	 * <tt>false</tt>as soon as it receives a message. In any other case, this
+	 * method returns <tt>true</tt> when the specified time has passed.
 	 * 
 	 * @param timeout Maximum time to execute this method
 	 * @param unit Time unit of the <tt>timeout</tt> argument
@@ -617,6 +621,14 @@ public final class PeerConnection implements Closeable {
 		} catch ( IOException e ) {
 			// Do nothing
 		}
+	}
+	
+	/**
+	 * Fallback for unclosed connections.
+	 */
+	@Override
+	public void finalize () {
+		close();
 	}
 	
 	/**

@@ -13,6 +13,11 @@ import java.util.List;
 public final class TorrentFileInfo {
 	
 	/**
+	 * Current Directory
+	 */
+	private static final File FILE_CURR_DIR = new File( "." );
+	
+	/**
 	 * Length of the file
 	 */
 	private final long length;
@@ -76,7 +81,8 @@ public final class TorrentFileInfo {
 	 * @return The path of this file, as a <tt>File</tt> object
 	 */
 	public File getPathAsFile () {
-		File f = new File( "." );
+		File f = FILE_CURR_DIR;
+		
 		for ( String node : path ) {
 			f = new File( f, node );
 		}
