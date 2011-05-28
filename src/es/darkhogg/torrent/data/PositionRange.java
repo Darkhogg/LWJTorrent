@@ -66,4 +66,23 @@ public final class PositionRange {
 		return upper-lower;
 	}
 	
+	@Override
+	public String toString () {
+		return lower + "~" + upper;
+	}
+
+	@Override
+	public boolean equals ( Object obj ) {
+		if ( !(obj instanceof PositionRange) ) {
+			return false;
+		}
+		
+		PositionRange pr = (PositionRange) obj;
+		return ( upper == pr.upper ) & ( lower == pr.lower );
+	}
+	
+	@Override
+	public int hashCode () {
+		return (int)( upper * 11 + lower * 27 );
+	}
 }
