@@ -93,16 +93,16 @@ public final class BitTorrentMessageDecoder {
 	/**
 	 * Decodes a regular message from the given <tt>buffer</tt>. This method
 	 * just read 4 bytes as an <tt>int</tt> and then calls
-	 * {@link decodeMessageFromBuffer(buffer,int)} with the read integer as
-	 * the <tt>length</tt>.
+	 * {@link #decodeMessageFromBuffer(ByteBuffer,int)}
+	 * with the read integer as the <tt>length</tt>.
 	 * <p>
 	 * If there are not enough bytes in this buffer, a
-	 * {@link BufferUnderflowException} is thrown. If at least four bytes are
-	 * available, four bytes will be read. Whether more bytes are read depends
-	 * on the specification of the <tt>decodeMessageFromBuffer(buffer,int)</tt>
-	 * method. If there are less than four bytes, the number of bytes
-	 * actually read depends on the specification of the 
-	 * {@link ByteBuffer#getInt} method.
+	 * {@link BufferUnderflowException} is thrown. If at least four
+	 * bytes are available, four bytes will be read. Whether more bytes are
+	 * read depends on the specification of the
+	 * <tt>decodeMessageFromBuffer(buffer,int)</tt> method. If there are less
+	 * than four bytes, the number of bytes actually read depends on the
+	 * specification of the {@link ByteBuffer#getInt} method.
 	 * 
 	 * @param buffer Buffer containing a full BitTorrent message
 	 * @return A <tt>BitTorrentMessage</tt> representing the read message
@@ -123,9 +123,9 @@ public final class BitTorrentMessageDecoder {
 	 * <tt>buffer</tt>.
 	 * <p>
 	 * If there are not <tt>length</tt> bytes available, this method
-	 * immediately throws a {@link BufferUnderflowException}, and no bytes from
-	 * the buffer are consumed. In any other case, exactly <tt>length</tt>
-	 * bytes are consumed.
+	 * immediately throws a {@link java.io.BufferUnderflowException}, and no
+	 * bytes from the buffer are consumed. In any other case, exactly
+	 * <tt>length</tt> bytes are consumed.
 	 * 
 	 * @param buffer The buffer containing the message
 	 * @param length The length, in bytes, of the message

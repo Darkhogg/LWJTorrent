@@ -129,7 +129,7 @@ public final class TrackerResponse {
 	
 	/**
 	 * Returns whther the reques failed. If this method returns <tt>true/<tt>,
-	 * the {@link getFailureReason} method returns a human-readable message
+	 * the {@link #getFailureReason} method returns a human-readable message
 	 * describing the error.
 	 * 
 	 * @return <tt>true</tt> if the request failed, <tt>false</tt> otherwise

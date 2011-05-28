@@ -80,15 +80,15 @@ public class Bencode {
 	 * converted to an specific value type. If the value does not exist or is
 	 * not of that type, this method returns <tt>null</tt>.
 	 * <p>
-	 * See the description of {@link getchildValue(from,String...)} for more
-	 * information.
+	 * See the description of {@link #getChildValue(Value,String...)} for
+	 * more information.
 	 * 
 	 * @param from Value to get the child from
 	 * @param type Expected type of the value returned
 	 * @param strings Path to the child
 	 * @return Child accessed from the path, or <tt>null</tt> if it doesn't
 	 *         exist or is not of the correct type.
-	 * @see getchildValue(from,String...)
+	 * @see #getChildValue(Value,String...)
 	 */
 	public static <T extends Value<?>> T getChildValue (
 		Value<?> from, Class<T> type, String... strings
@@ -126,6 +126,11 @@ public class Bencode {
 			return convertFromValue( (DictionaryValue) val );
 			
 		} else {
+			// This exception is here for completeness
+			// As Value cannot be subclassed out of this package, no other
+			// classes should ever extend Value than those listed in this
+			// method. This is also the reason why it is not documented
+			// in a @throws tag.
 			throw new IllegalArgumentException();
 			
 		}
@@ -241,7 +246,7 @@ public class Bencode {
 	
 	/**
 	 * Converts a char array to a bencode string value by creating a new 
-	 * <tt>StringValue</tt> from a new String creted from the given array
+	 * <tt>StringValue</tt> from a new String created from the given array
 	 * 
 	 * @param obj Object to convert into a <tt>Value</tt>
 	 * @return a value that represents the same information that the given
@@ -278,7 +283,7 @@ public class Bencode {
 	
 	/**
 	 * Converts any <tt>Iterable</tt> to a <tt>ListValue</tt> by converting the
-	 * elements in the iterable using {@link convertToValue(Object)}.
+	 * elements in the iterable using {@link Bencode#convertToValue(Object)}.
 	 * 
 	 * @param obj Object to convert into a <tt>Value</tt>
 	 * @return a value that represents the same information that the given
@@ -299,7 +304,7 @@ public class Bencode {
 	/**
 	 * Converts a <tt>Map</tt> to a <tt>DirectoryValue</tt> by converting the
 	 * keys to Strings and converting the values using
-	 * {@link convertToValue(Object)}
+	 * {@link Bencode#convertToValue(Object)}
 	 * 
 	 * @param obj Object to convert into a <tt>Value</tt>
 	 * @return a value that represents the same information that the given
@@ -318,13 +323,14 @@ public class Bencode {
 	}
 
 	/**
-	 * Returns a copy of the given <tt>value</tt>. The returned copy is
+	 * Returns a copy of the given <tt>Value</tt>. The returned copy is
 	 * guaranteed to be independent from the passed object, in that no
 	 * references to child <tt>Value</tt>s or other mutable objects are held
 	 * by the copy.
 	 * <p>
-	 * <i>NOTE: This method delagates its calls to its more specific overloads.
-	 * See them for details on how <tt>Value</tt>s are copied.</i>
+	 * <i>NOTE: This method delegates its calls to its more specific
+	 * overloadings. See them for details on how <tt>Value</tt>s
+	 * are copied.</i>
 	 * 
 	 * @param value Bencode value to copy
 	 * @return A copy of the given <tt>value</tt>
@@ -343,6 +349,11 @@ public class Bencode {
 			return copyOf( (DictionaryValue) value );
 			
 		} else {
+			// This exception is here for completeness
+			// As Value cannot be subclassed out of this package, no other
+			// classes should ever extend Value than those listed in this
+			// method. This is also the reason why it is not documented
+			// in a @throws tag.
 			throw new IllegalArgumentException();
 			
 		}

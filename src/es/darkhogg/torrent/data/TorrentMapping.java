@@ -165,7 +165,7 @@ public final class TorrentMapping {
 	 * Returns information about which sections of which files are bound to the
 	 * piece with the given index
 	 * 
-	 * @param partIndex Index of the piece to retrieve information from
+	 * @param pieceIndex Index of the piece to retrieve information from
 	 * @return The information about which files contains the requested piece,
 	 *         or <tt>null</tt> if the index is not valid.
 	 */
@@ -221,7 +221,7 @@ public final class TorrentMapping {
 	 * Returns a new mapping for this torrent. The returned object contains
 	 * information about all the pieces and all the files, fully covering them.
 	 * 
-	 * @param tmi The torrent to read the mapping from
+	 * @param tis The torrent to read the mapping from
 	 * @return A new mapping for the given torrent
 	 */
 	public static TorrentMapping fromTorrent ( TorrentInfoSection tis ) {
@@ -298,7 +298,7 @@ public final class TorrentMapping {
 		/**
 		 * Returns the range of positions mapped in the piece. This range is
 		 * guaranteed to be of the same size as the one returned by
-		 * {@link getFileRange}.
+		 * {@link #getFileRange}.
 		 * 
 		 * @return Range of positions mapped in the piece
 		 */
@@ -318,7 +318,7 @@ public final class TorrentMapping {
 		/**
 		 * Returns the range of positions mapped in the file. This range is
 		 * guaranteed to be of the same size as the one returned by
-		 * {@link getPieceRange}.
+		 * {@link #getPieceRange}.
 		 * 
 		 * @return Range of positions mapped in the file
 		 */

@@ -71,8 +71,8 @@ public final class PeerId {
 	
 	/**
 	 * Constructs a peer ID using a string.
-	 * 
-	 * @param bytes Peer ID
+	 *
+	 * @param string Peer ID
 	 * @throws NullPointerException if <tt>string</tt> is <tt>null</tt>
 	 * @throws IllegalArgumentException if <tt>string</tt> has a different
 	 *         length than 20
@@ -138,7 +138,7 @@ public final class PeerId {
 	}
 	
 	/**
-	 * Returns the same string as {@link toString}, but URL-encoded.
+	 * Returns the same string as {@link #toString}, but URL-encoded.
 	 * 
 	 * @return This peer ID as an URL-encoded string
 	 */

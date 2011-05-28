@@ -16,7 +16,7 @@ import es.darkhogg.torrent.data.TorrentMetaInfo;
  * 
  * @author Daniel Escoz
  * @version 1.0
- * @see Tracker#getTrackerForTorrent
+ * @see #forTorrent
  */
 public abstract class Tracker {
 	

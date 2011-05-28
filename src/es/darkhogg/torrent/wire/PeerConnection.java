@@ -175,13 +175,14 @@ public final class PeerConnection implements Closeable {
 	}
 	
 	/**
-	 * Shortcut method for {@link process(long,TimeUnit,boolean)} called with
-	 * a value of <tt>false</tt> as the <tt>returnOnMsg</tt> argument.
+	 * Shortcut method for {@link #process(long,TimeUnit,boolean)}
+	 * called with a value of <tt>false</tt> as the <tt>returnOnMsg</tt>
+	 * argument.
 	 * 
 	 * @param timeout Maximum time to execute this method
 	 * @param unit Time unit of the <tt>timeout</tt> argument
 	 * @throws IOException if an I/O error occurs
-	 * @see PeerConnection#process(long, TimeUnit, boolean)
+	 * @see #process(long, TimeUnit, boolean)
 	 */
 	public void process ( long timeout, TimeUnit unit )
 	throws IOException {
@@ -395,7 +396,7 @@ public final class PeerConnection implements Closeable {
 
 	/**
 	 * Adds a message to the output queue, that will be sent the next time
-	 * {@link process} is called.
+	 * {@link #process} is called.
 	 * 
 	 * @param msg Message to be sent
 	 */
@@ -567,8 +568,8 @@ public final class PeerConnection implements Closeable {
 	
 	/**
 	 * Returns <tt>true</tt> if and only if a <i>HandShake Start</i> message
-	 * has been sent using both the {@link sendMessage} and {@link process}
-	 * methods.
+	 * has been sent using both the {@link #sendMessage} and
+	 * {@link #process} methods.
 	 * 
 	 * @return Whether the handshake start has been sent
 	 */
@@ -578,9 +579,10 @@ public final class PeerConnection implements Closeable {
 	
 	/**
 	 * Returns <tt>true</tt> if and only if a <i>HandShake Start</i> message
-	 * has been received using the {@link process} method. Whether the message
-	 * has been actually read using {@link readMessage} is not relevant to the
-	 * returned value of this method.
+	 * has been received using the {@link #process} method.
+	 * Whether the message has been actually read using
+	 * {@link #receiveMessage} is not relevant to the returned value
+	 * of this method.
 	 * 
 	 * @return Whether the handshake start has been received
 	 */
@@ -590,8 +592,8 @@ public final class PeerConnection implements Closeable {
 	
 	/**
 	 * Returns <tt>true</tt> if and only if a <i>HandShake End</i> message
-	 * has been sent using both the {@link sendMessage} and {@link process}
-	 * methods.
+	 * has been sent using both the {@link #sendMessage} and
+	 * {@link #process} methods.
 	 * 
 	 * @return Whether the handshake end has been sent
 	 */
@@ -601,9 +603,10 @@ public final class PeerConnection implements Closeable {
 	
 	/**
 	 * Returns <tt>true</tt> if and only if a <i>HandShake End</i> message
-	 * has been received using the {@link process} method. Whether the message
-	 * has been actually read using {@link readMessage} is not relevant to the
-	 * returned value of this method.
+	 * has been received using the {@link #process} method.
+	 * Whether the message has been actually read using
+	 * {@link #receiveMessage} is not relevant to the returned value
+	 * of this method.
 	 * 
 	 * @return Whether the handshake end has been received
 	 */

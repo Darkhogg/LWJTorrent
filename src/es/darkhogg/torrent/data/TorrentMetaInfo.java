@@ -262,7 +262,7 @@ public final class TorrentMetaInfo {
 	 * the given <tt>file</tt>.
 	 * <p>
 	 * This method first reads a value from the file and then pass it to
-	 * {@link fromValue} to create the <tt>TorrentMetaInfo</tt>. If client code
+	 * {@link #fromValue} to create the <tt>TorrentMetaInfo</tt>. If client code
 	 * is going to use the <tt>Value</tt> object returned from the file, it is
 	 * recommended to do it manually using a <tt>BencodeInputStream</tt> and the
 	 * call <tt>fromValue</tt> instead of use this method, which will reparse

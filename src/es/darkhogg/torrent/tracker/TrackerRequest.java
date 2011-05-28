@@ -11,13 +11,13 @@ import es.darkhogg.torrent.data.Sha1Hash;
  * can be reused.
  * <p>
  * Note that the only public way to instantiate this class is using the
- * {@link builder} method, which returns a {@link TrackerRequest.Builder}
+ * {@link #builder} method, which returns a {@link TrackerRequest.Builder}
  * object. See its documentation for more information.
  * 
  * @author Daniel Escoz
  * @version 1.0
  * @see TrackerRequest.Builder
- * @see Tacker
+ * @see Tracker
  */
 public final class TrackerRequest {
 	
@@ -253,7 +253,7 @@ public final class TrackerRequest {
 	 * To create an object of this class, use the {@link TrackerRequest#builder}
 	 * method. After that, you can call methods in this class to set the values
 	 * and then construct the <tt>TrackerRequest</tt> object using the
-	 * {@link build} method.
+	 * {@link #build} method.
 	 * <p>
 	 * This class is implemented using a fluent interface. Every method, except
 	 * for the final <tt>build</tt>, returns the caller object, so you can chain
@@ -418,7 +418,7 @@ public final class TrackerRequest {
 		 * <p>
 		 * If this method is never called, the downloaded amount is 0 by default.
 		 * 
-		 * @param uploaded Total amount of data downloaded
+		 * @param downloaded Total amount of data downloaded
 		 * @return The <tt>this</tt> reference.
 		 */
 		public Builder bytesDownloaded ( long downloaded ) {
@@ -432,7 +432,7 @@ public final class TrackerRequest {
 		 * <p>
 		 * If this method is never called, the port is 0 by default.
 		 * 
-		 * @param uploaded Total amount of data left to download
+		 * @param left Total amount of data left to download
 		 * @return The <tt>this</tt> reference.
 		 */
 		public Builder bytesLeft ( long left ) {

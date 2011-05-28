@@ -94,7 +94,7 @@ public final class TorrentFileInfo {
 	 * Checks whether this object is equal to <tt>obj</tt>.
 	 * <p>
 	 * This object is equal to another <tt>TorrentFileInfo</tt> with the same
-	 * {@link getLength length} and an equal {@link getPath path}. In
+	 * {@link #getLength length} and an equal {@link #getPath path}. In
 	 * particular, two objects that represent the same file but with different
 	 * <tt>path</tt>s are not equal.
 	 */

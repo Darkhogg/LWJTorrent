@@ -57,8 +57,8 @@ public final class PositionRange {
 	/**
 	 * Gets the length of this range. This value is the result of
 	 * <tt>upper - lower</tt>, where <tt>upper</tt> and <tt>lower</tt> are the
-	 * upper and lower bounds, respectively, returned by {@link getUpper} and
-	 * {@link getLower}.
+	 * upper and lower bounds, respectively, returned by {@link #getUpper} and
+	 * {@link #getLower}.
 	 * 
 	 * @return The number of elements included in the range
 	 */
