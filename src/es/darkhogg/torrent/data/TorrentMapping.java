@@ -205,6 +205,28 @@ public final class TorrentMapping {
 		
 		return sb.append( "}" ).toString();
 	}
+
+	/**
+	 * Returns a new mapping for this torrent. The returned object contains
+	 * information about all the pieces and all the files, fully covering them.
+	 * 
+	 * @param tmi The torrent to read the mapping from
+	 * @return A new mapping for the given torrent
+	 */
+	public static TorrentMapping fromTorrent ( TorrentMetaInfo tmi ) {
+		return fromTorrent( tmi.getInfoSection() );
+	}
+	
+	/**
+	 * Returns a new mapping for this torrent. The returned object contains
+	 * information about all the pieces and all the files, fully covering them.
+	 * 
+	 * @param tmi The torrent to read the mapping from
+	 * @return A new mapping for the given torrent
+	 */
+	public static TorrentMapping fromTorrent ( TorrentInfoSection tis ) {
+		return new TorrentMapping( tis.getFiles(), tis.getPieceLength() );
+	}
 	
 	/**
 	 * A class that represents a single mapping between a section of a piece
