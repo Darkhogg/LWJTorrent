@@ -90,9 +90,9 @@ public class Bencode {
 	 *         exist or is not of the correct type.
 	 * @see #getChildValue(Value,String...)
 	 */
-	public static <T extends Value<?>> T getChildValue (
-		Value<?> from, Class<T> type, String... strings
-	) {
+	public static <T extends Value<?>> T getChildValue ( Value<?> from,
+		Class<T> type, String... strings )
+	{
 		Value<?> val = getChildValue( from, strings );
 		
 		if ( type.isInstance( val ) ) {
@@ -103,7 +103,7 @@ public class Bencode {
 	}
 	
 	/**
-	 * Converts a bencode value to Java standard objects.
+	 * Converts a bencode value to a Java standard objects.
 	 * <p>
 	 * <i>NOTE: This method delegates its calls to its more concrete overloads.
 	 * See them for details on how <tt>Value</tt>s are converted</i>
@@ -112,7 +112,7 @@ public class Bencode {
 	 * @return An object from the standard Java API that represents the same
 	 *         information
 	 */
-	public Object convertFromValue ( Value<?> val ) {
+	public static Object convertFromValue ( Value<?> val ) {
 		if ( val instanceof IntegerValue ) {
 			return convertFromValue( (IntegerValue) val );
 			
@@ -142,7 +142,7 @@ public class Bencode {
 	 * @param val The value to be converted
 	 * @return A <tt>Long</tt> object that represents the given value
 	 */
-	public Long convertFromValue ( IntegerValue val ) {
+	public static Long convertFromValue ( IntegerValue val ) {
 		return val.getValue();
 	}
 	
@@ -152,7 +152,7 @@ public class Bencode {
 	 * @param val The value to be converted
 	 * @return A <tt>String</tt> object that represents the given value
 	 */
-	public String convertFromValue ( StringValue val ) {
+	public static String convertFromValue ( StringValue val ) {
 		return val.toString();
 	}
 	
@@ -162,7 +162,7 @@ public class Bencode {
 	 * @param val The value to be converted
 	 * @return A <tt>List</tt> object that represents the given value
 	 */
-	public List<Object> convertFromValue ( ListValue val ) {
+	public static List<Object> convertFromValue ( ListValue val ) {
 		List<Object> retList = new ArrayList<Object>();
 		List<Value<?>> valList = val.getValue();
 		
@@ -180,7 +180,7 @@ public class Bencode {
 	 * @param val The value to be converted
 	 * @return A <tt>SortedMap</tt> object that represents the given value
 	 */
-	public Map<String,Object> convertFromValue ( DictionaryValue val ) {
+	public static Map<String,Object> convertFromValue ( DictionaryValue val ) {
 		Map<String,Object> retMap = new HashMap<String,Object>();
 		Map<String,Value<?>> valMap = val.getValue();
 		
@@ -205,7 +205,7 @@ public class Bencode {
 	 * @throws ClassCastException if the object cannot be converted to
 	 *         <tt>Value</tt>
 	 */
-	public Value<?> convertToValue ( Object obj ) {
+	public static Value<?> convertToValue ( Object obj ) {
 		if ( obj instanceof Value<?> ) {
 			return (Value<?>) obj;
 			
@@ -240,7 +240,7 @@ public class Bencode {
 	 * @return a value that represents the same information that the given
 	 *         object
 	 */
-	public StringValue convertToValue ( byte[] obj ) {
+	public static StringValue convertToValue ( byte[] obj ) {
 		return new StringValue( obj );
 	}
 	
@@ -252,7 +252,7 @@ public class Bencode {
 	 * @return a value that represents the same information that the given
 	 *         object
 	 */
-	public StringValue convertToValue ( char[] obj ) {
+	public static StringValue convertToValue ( char[] obj ) {
 		return new StringValue( new String( obj ) );
 	}
 	
@@ -265,7 +265,7 @@ public class Bencode {
 	 * @return a value that represents the same information that the given
 	 *         object
 	 */
-	public StringValue convertToValue ( CharSequence obj ) {
+	public static StringValue convertToValue ( CharSequence obj ) {
 		return new StringValue( obj.toString() );
 	}
 	
@@ -277,7 +277,7 @@ public class Bencode {
 	 * @return a value that represents the same information that the given
 	 *         object
 	 */
-	public IntegerValue convertToValue ( Number obj ) {
+	public static IntegerValue convertToValue ( Number obj ) {
 		return new IntegerValue( obj.longValue() );
 	}
 	
@@ -291,7 +291,7 @@ public class Bencode {
 	 * @throws ClassCastException if some element of the <tt>Iterable</tt>
 	 *         cannot be converted to <tt>Value</tt>
 	 */
-	public ListValue convertToValue ( Iterable<?> obj ) {
+	public static ListValue convertToValue ( Iterable<?> obj ) {
 		List<Value<?>> list = new ArrayList<Value<?>>();
 		
 		for ( Object o : obj ) {
@@ -312,7 +312,7 @@ public class Bencode {
 	 * @throws ClassCastException if some value in the mapping cannot be
 	 *         converted to <tt>Value</tt>
 	 */
-	public DictionaryValue convertToValue ( Map<?,?> obj ) {
+	public static DictionaryValue convertToValue ( Map<?,?> obj ) {
 		Map<String,Value<?>> map = new HashMap<String,Value<?>>();
 		
 		for ( Map.Entry<?,?> me : obj.entrySet() ) {
@@ -335,7 +335,7 @@ public class Bencode {
 	 * @param value Bencode value to copy
 	 * @return A copy of the given <tt>value</tt>
 	 */
-	public Value<?> copyOf ( Value<?> value ) {
+	public static Value<?> copyOf ( Value<?> value ) {
 		if ( value instanceof IntegerValue ) {
 			return copyOf( (IntegerValue) value );
 			
@@ -367,7 +367,7 @@ public class Bencode {
 	 * @param value Bencode integer value to copy
 	 * @return A copy of the given <tt>value</tt>
 	 */
-	public IntegerValue copyOf ( IntegerValue value ) {
+	public static IntegerValue copyOf ( IntegerValue value ) {
 		return new IntegerValue( value.getValue() );
 	}
 	
@@ -379,7 +379,7 @@ public class Bencode {
 	 * @param value Bencode string value to copy
 	 * @return A copy of the given <tt>value</tt>
 	 */
-	public StringValue copyOf ( StringValue value ) {
+	public static StringValue copyOf ( StringValue value ) {
 		return new StringValue( value.getValue() );
 	}
 	
@@ -395,7 +395,7 @@ public class Bencode {
 	 * @param value Bencode list value to copy
 	 * @return A copy of the given <tt>value</tt>
 	 */
-	public ListValue copyOf ( ListValue value ) {
+	public static ListValue copyOf ( ListValue value ) {
 		List<Value<?>> lv = new ArrayList<Value<?>>();
 		for ( Value<?> v : value.getValue() ) {
 			lv.add( copyOf( v ) );
@@ -416,7 +416,7 @@ public class Bencode {
 	 * @param value Bencode dictionary value to copy
 	 * @return A copy of the given <tt>value</tt>
 	 */
-	public DictionaryValue copyOf ( DictionaryValue value ) {
+	public static DictionaryValue copyOf ( DictionaryValue value ) {
 		Map<String,Value<?>> mv = new HashMap<String,Value<?>>();
 		for ( Map.Entry<String,Value<?>> me : value.getValue().entrySet() ) {
 			mv.put( me.getKey(), copyOf( me.getValue() ) );
