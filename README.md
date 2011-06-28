@@ -27,7 +27,7 @@ outside the JDK, which can be used completely on its own.
 
 Consists entirely of classes that models BitTorrent-related data. The most
 important class here is the `TorrentMetaInfo` class, which models a meta info
-file, or in more common terms, a `.torrent` file.
+file, or in more common terms, a `*.torrent` file.
 
 
 ### es.darkhogg.torrent.tracker

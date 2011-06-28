@@ -1,9 +1,12 @@
 package es.darkhogg.torrent.data;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import es.darkhogg.torrent.bencode.Bencode;
 import es.darkhogg.torrent.bencode.DictionaryValue;
@@ -46,6 +49,12 @@ public final class TorrentInfoSection {
 	private final List<TorrentFileInfo> files;
 	
 	/**
+	 * Mapping from files to their infos
+	 */
+	private final Map<File,TorrentFileInfo> fileInfos =
+		new HashMap<File,TorrentFileInfo>();
+	
+	/**
 	 * SHA-1 hash of the info section
 	 */
 	private final Sha1Hash hash;
@@ -63,24 +72,30 @@ public final class TorrentInfoSection {
 	/**
 	 * Constructs this object using every piece of information needed.
 	 * 
-	 * @param pieceLength Nominal length of every piece
-	 * @param pieceHashes List of SHA-1 hashes of all pieces
-	 * @param priv Whether this is a private torrent
-	 * @param baseDir The advised base directory name
-	 * @param files List of file information
-	 * @param hash SHA-1 hash of the info section
-	 * @throws NullPointerException if some argument is <tt>null</tt> or
-	 *         contains a <tt>null</tt>
-	 * @throws IllegalArgumentException if <tt>pieceLength</tt> is negative
+	 * @param pieceLength
+	 *            Nominal length of every piece
+	 * @param pieceHashes
+	 *            List of SHA-1 hashes of all pieces
+	 * @param priv
+	 *            Whether this is a private torrent
+	 * @param baseDir
+	 *            The advised base directory name
+	 * @param files
+	 *            List of file information
+	 * @param hash
+	 *            SHA-1 hash of the info section
+	 * @throws NullPointerException
+	 *             if some argument is <tt>null</tt> or contains a <tt>null</tt>
+	 * @throws IllegalArgumentException
+	 *             if <tt>pieceLength</tt> is negative
 	 */
-	private TorrentInfoSection (
-		long pieceLength, List<Sha1Hash> pieceHashes, boolean priv,
-		String baseDir, List<TorrentFileInfo> files, Sha1Hash hash,
-		String name
-	) {
+	private TorrentInfoSection ( long pieceLength, List<Sha1Hash> pieceHashes,
+		boolean priv, String baseDir, List<TorrentFileInfo> files,
+		Sha1Hash hash, String name )
+	{
 		if ( baseDir == null | hash == null | name == null
-		   | pieceHashes.contains( null ) | files.contains( null ) 
-		) {
+			| pieceHashes.contains( null ) | files.contains( null ) )
+		{
 			throw new NullPointerException();
 		}
 		
@@ -92,14 +107,17 @@ public final class TorrentInfoSection {
 		this.priv = priv;
 		this.baseDir = baseDir;
 		this.hash = hash;
-		this.pieceHashes = Collections.unmodifiableList(
-			new ArrayList<Sha1Hash>( pieceHashes ) );
-		this.files = Collections.unmodifiableList(
-			new ArrayList<TorrentFileInfo>( files ) );
+		this.pieceHashes =
+			Collections
+				.unmodifiableList( new ArrayList<Sha1Hash>( pieceHashes ) );
+		this.files =
+			Collections
+				.unmodifiableList( new ArrayList<TorrentFileInfo>( files ) );
 		this.name = name;
 		
 		long totalLength = 0;
 		for ( TorrentFileInfo tfi : files ) {
+			fileInfos.put( tfi.getPathAsFile(), tfi );
 			totalLength += tfi.getLength();
 		}
 		this.totalLength = totalLength;
@@ -125,8 +143,8 @@ public final class TorrentInfoSection {
 	}
 	
 	/**
-	 * Returns whether this torrent is private, that is, if the only way
-	 * clients should obtain peer information is using the tracker.
+	 * Returns whether this torrent is private, that is, if the only way clients
+	 * should obtain peer information is using the tracker.
 	 * 
 	 * @return Whether this is a private torrent
 	 */
@@ -157,6 +175,21 @@ public final class TorrentInfoSection {
 	}
 	
 	/**
+	 * Returns the information about the specified file. The given <tt>file</tt>
+	 * must be <i>equals to</i> the value returned by the
+	 * {@link TorrentFileInfo#getPathAsFile} method to be recognized. Otherwise,
+	 * this method returns <tt>null</tt>.
+	 * 
+	 * @param file
+	 *            File which information is to be returned
+	 * @return The information about the given <tt>file</tt>, or <tt>null</tt>
+	 *         if it don't exist.
+	 */
+	public TorrentFileInfo getInfoForFile ( File file ) {
+		return fileInfos.get( file );
+	}
+	
+	/**
 	 * Returns the SHA-1 hash of the original bencode value used to create this
 	 * object.
 	 * 
@@ -167,9 +200,9 @@ public final class TorrentInfoSection {
 	}
 	
 	/**
-	 * Returns the value of the <tt>name</tt> entry. This can serve as a way
-	 * to identify the torrent in an user interface, but should never be used
-	 * as an identifier in any kind of data structure.
+	 * Returns the value of the <tt>name</tt> entry. This can serve as a way to
+	 * identify the torrent in an user interface, but should never be used as an
+	 * identifier in any kind of data structure.
 	 * 
 	 * @return The <tt>name</tt> of this info section
 	 */
@@ -190,15 +223,18 @@ public final class TorrentInfoSection {
 	}
 	
 	/**
-	 * Creates a new <tt>TorrentInfoSection</tt> object based on the
-	 * information contained on the passed <tt>value</tt> argument
+	 * Creates a new <tt>TorrentInfoSection</tt> object based on the information
+	 * contained on the passed <tt>value</tt> argument
 	 * 
-	 * @param value A bencode value containing the info section
+	 * @param value
+	 *            A bencode value containing the info section
 	 * @return A new <tt>TorrentInfoSection</tt> that represents the
 	 *         <tt>value</tt> parameter
-	 * @throws NullPointerException if <tt>value</tt> is <tt>null</tt>
-	 * @throws IllegalArgumentException if <tt>value</tt> is not a bencode
-	 *         dictionary that holds the information in a torrent info section
+	 * @throws NullPointerException
+	 *             if <tt>value</tt> is <tt>null</tt>
+	 * @throws IllegalArgumentException
+	 *             if <tt>value</tt> is not a bencode dictionary that holds the
+	 *             information in a torrent info section
 	 */
 	public static TorrentInfoSection fromValue ( Value<?> value ) {
 		if ( value == null ) {
@@ -206,17 +242,17 @@ public final class TorrentInfoSection {
 		}
 		
 		try {
-			long pieceLength = ( (IntegerValue) Bencode.getChildValue(
-				value, "piece length" ) ).getValue().longValue();
+			long pieceLength =
+				( (IntegerValue) Bencode.getChildValue( value, "piece length" ) )
+					.getValue().longValue();
 			
-			IntegerValue privv = (IntegerValue) Bencode.getChildValue(
-				value, "private" );
-			boolean priv = privv==null
-						 ? false
-						 : ( privv.getValue().longValue() == 1L );
+			IntegerValue privv =
+				(IntegerValue) Bencode.getChildValue( value, "private" );
+			boolean priv =
+				privv == null ? false : ( privv.getValue().longValue() == 1L );
 			
-			StringValue piecesv = (StringValue) Bencode.getChildValue(
-				value, "pieces" );
+			StringValue piecesv =
+				(StringValue) Bencode.getChildValue( value, "pieces" );
 			byte[] piecesa = piecesv.getValue();
 			if ( piecesa.length % 20 != 0 ) {
 				throw new IllegalArgumentException();
@@ -225,45 +261,50 @@ public final class TorrentInfoSection {
 			for ( int i = 0; i < piecesa.length; i += 20 ) {
 				byte[] hashbytes = new byte[ 20 ];
 				for ( int j = 0; j < 20; j++ ) {
-					hashbytes[ j ] = piecesa[ i+j ];
+					hashbytes[ j ] = piecesa[ i + j ];
 				}
 				
 				pieceHashes.add( new Sha1Hash( hashbytes ) );
 			}
 			
-			String name = ( (StringValue) Bencode.getChildValue(
-				value, "name" ) ).getStringValue();
+			String name =
+				( (StringValue) Bencode.getChildValue( value, "name" ) )
+					.getStringValue();
 			String baseDir;
 			List<TorrentFileInfo> files = new ArrayList<TorrentFileInfo>();
 			
-			ListValue filesv = (ListValue) Bencode.getChildValue(
-				value, "files" );
+			ListValue filesv =
+				(ListValue) Bencode.getChildValue( value, "files" );
 			if ( filesv == null ) {
 				// SingleFile Mode
 				baseDir = ".";
-
-				long length = ( (IntegerValue) Bencode.getChildValue(
-					value, "length" ) ).getValue().longValue();
-				String fname = ( (StringValue) Bencode.getChildValue(
-					value, "name" ) ).getStringValue();
 				
-				TorrentFileInfo file = new TorrentFileInfo(
-					length, Arrays.asList( fname ) );
+				long length =
+					( (IntegerValue) Bencode.getChildValue( value, "length" ) )
+						.getValue().longValue();
+				String fname =
+					( (StringValue) Bencode.getChildValue( value, "name" ) )
+						.getStringValue();
+				
+				TorrentFileInfo file =
+					new TorrentFileInfo( length, Arrays.asList( fname ) );
 				
 				files.add( file );
 			} else {
 				// MultiFile Mode
-				baseDir = ( (StringValue) Bencode.getChildValue(
-					value, "name" ) ).getStringValue();
+				baseDir =
+					( (StringValue) Bencode.getChildValue( value, "name" ) )
+						.getStringValue();
 				
 				List<Value<?>> filesvl = filesv.getValue();
 				for ( Value<?> val : filesvl ) {
 					DictionaryValue dval = (DictionaryValue) val;
 					
-					long length = ( (IntegerValue) Bencode.getChildValue(
-						dval, "length" ) ).getValue().longValue();
-					ListValue pathv = (ListValue) Bencode.getChildValue(
-						dval, "path" );
+					long length =
+						( (IntegerValue) Bencode.getChildValue( dval, "length" ) )
+							.getValue().longValue();
+					ListValue pathv =
+						(ListValue) Bencode.getChildValue( dval, "path" );
 					List<String> path = new ArrayList<String>();
 					
 					for ( Value<?> pathpiece : pathv.getValue() ) {
@@ -277,8 +318,8 @@ public final class TorrentInfoSection {
 			
 			Sha1Hash hash = Sha1Hash.forValue( value );
 			
-			return new TorrentInfoSection( pieceLength, pieceHashes,
-				priv, baseDir, files, hash, name );
+			return new TorrentInfoSection( pieceLength, pieceHashes, priv,
+				baseDir, files, hash, name );
 		} catch ( Exception e ) {
 			if ( e instanceof IllegalArgumentException ) {
 				throw ( (IllegalArgumentException) e );
@@ -297,19 +338,16 @@ public final class TorrentInfoSection {
 	 */
 	@Override
 	public boolean equals ( Object obj ) {
-		if ( !(obj instanceof TorrentInfoSection) ) {
+		if ( !( obj instanceof TorrentInfoSection ) ) {
 			return false;
 		}
 		
 		TorrentInfoSection tis = (TorrentInfoSection) obj;
 		
-		return hash.equals( tis.hash )
-		    && name.equals( tis.name )
-			&& pieceLength == tis.pieceLength
-			&& priv == tis.priv
+		return hash.equals( tis.hash ) && name.equals( tis.name )
+			&& pieceLength == tis.pieceLength && priv == tis.priv
 			&& pieceHashes.equals( tis.pieceHashes )
-			&& baseDir.equals( tis.baseDir )
-			&& files.equals( tis.files );
+			&& baseDir.equals( tis.baseDir ) && files.equals( tis.files );
 	}
 	
 	@Override
@@ -320,7 +358,7 @@ public final class TorrentInfoSection {
 	@Override
 	public String toString () {
 		StringBuilder sb = new StringBuilder( "TorrentInfoSection{{ " );
-
+		
 		sb.append( "Name(" ).append( name ).append( "), " );
 		sb.append( "PieceLength(" ).append( pieceLength ).append( "), " );
 		sb.append( "Pieces(" ).append( pieceHashes.size() ).append( "), " );

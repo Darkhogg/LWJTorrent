@@ -12,8 +12,8 @@ import es.darkhogg.torrent.bencode.BencodeInputStream;
  * @author Daniel Escoz
  * @version 1.0
  */
-final class SingleTracker extends Tracker {
-
+/* package */final class SingleTracker extends Tracker {
+	
 	/**
 	 * URL to send announces
 	 */
@@ -21,7 +21,9 @@ final class SingleTracker extends Tracker {
 	
 	/**
 	 * Construct a tracker with a given <tt>URL</tt>
-	 * @param url URL to send announces
+	 * 
+	 * @param url
+	 *            URL to send announces
 	 */
 	public SingleTracker ( URL url ) {
 		this.url = url;
@@ -32,7 +34,8 @@ final class SingleTracker extends Tracker {
 		try {
 			URL requestUrl = getRequestUrl( url.toString(), request );
 			
-			BencodeInputStream bis = new BencodeInputStream( requestUrl.openStream() );
+			BencodeInputStream bis =
+				new BencodeInputStream( requestUrl.openStream() );
 			return TrackerResponse.fromValue( bis.readValue() );
 			
 		} catch ( MalformedURLException e ) {
@@ -41,5 +44,5 @@ final class SingleTracker extends Tracker {
 			return null;
 		}
 	}
-
+	
 }

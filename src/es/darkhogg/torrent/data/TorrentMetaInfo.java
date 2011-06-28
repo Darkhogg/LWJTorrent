@@ -57,32 +57,47 @@ public final class TorrentMetaInfo {
 	private final TorrentInfoSection info;
 	
 	/**
+	 * Cached hash for {@link #hashCode}
+	 */
+	private final int cachedHashCode;
+	
+	/**
+	 * Cached string for {@link #toString}
+	 */
+	private final String chachedToString;
+	
+	/**
 	 * Constructs a <tt>TorrentMetaInfo</tt> object specifying all its
 	 * attributes.
 	 * 
-	 * @param info Info dictionary
-	 * @param announce Announce URL
-	 * @param announceList List of Announce URLs
-	 * @param creationDate Time of creation
-	 * @param comment Comment of this torrent
-	 * @param createdBy Author of this comment
-	 * @throws NullPointerException if <tt>info</tt> or <tt>announce</tt> are
-	 *         <tt>null</tt>
-	 * @throws IllegalArgumentException if some argument is not valid.
+	 * @param info
+	 *            Info dictionary
+	 * @param announce
+	 *            Announce URL
+	 * @param announceList
+	 *            List of Announce URLs
+	 * @param creationDate
+	 *            Time of creation
+	 * @param comment
+	 *            Comment of this torrent
+	 * @param createdBy
+	 *            Author of this comment
+	 * @throws NullPointerException
+	 *             if <tt>info</tt> or <tt>announce</tt> are <tt>null</tt>
+	 * @throws IllegalArgumentException
+	 *             if some argument is not valid.
 	 */
-	protected TorrentMetaInfo (
-		TorrentInfoSection info, String announce,
+	protected TorrentMetaInfo ( TorrentInfoSection info, String announce,
 		List<Set<String>> announceList, DateTime creationDate, String comment,
-		String createdBy
-	) {
-		if ( announce == null | info == null ) {
+		String createdBy )
+	{
+		if ( announce == null | info == null )
 			throw new NullPointerException();
-		}
 		
 		this.announce = announce;
 		this.creationDate = creationDate;
-		this.comment = comment==null ? "" : comment;
-		this.createdBy = createdBy==null ? "" : createdBy;
+		this.comment = comment == null ? "" : comment;
+		this.createdBy = createdBy == null ? "" : createdBy;
 		this.info = info;
 		
 		if ( announceList == null ) {
@@ -98,6 +113,22 @@ public final class TorrentMetaInfo {
 			}
 			this.announceList = Collections.unmodifiableList( ual );
 		}
+		
+		// hashCode
+		cachedHashCode = announce.hashCode() ^ info.hashCode();
+		
+		// toString
+		StringBuilder sb = new StringBuilder( 128 );
+		sb.append( "TorrentMetaInfo{{ " );
+		
+		sb.append( "CreationDate(" ).append( this.creationDate ).append( "), " )
+			.append( "Comment(\"" ).append( this.comment ).append( "\"), " )
+			.append( "Announce(" ).append( this.announce ).append( "), " )
+			.append( "AnnounceList(" ).append( this.announceList )
+			.append( "), " ).append( "Info(" ).append( this.info )
+			.append( "), " ).append( " }}" );
+		
+		chachedToString = sb.toString();
 	}
 	
 	/**
@@ -138,8 +169,8 @@ public final class TorrentMetaInfo {
 	}
 	
 	/**
-	 * Returns the comment of the torrent file. If the comment was not
-	 * specified in the original torrent file, this method returns an empty
+	 * Returns the comment of the torrent file. If the comment was not specified
+	 * in the original torrent file, this method returns an empty
 	 * <tt>String</tt>.
 	 * <p>
 	 * This method never returns <tt>null</tt>
@@ -172,7 +203,7 @@ public final class TorrentMetaInfo {
 	public TorrentInfoSection getInfoSection () {
 		return info;
 	}
-
+	
 	/**
 	 * Returns the SHA-1 hash of this torrent's info dictionary.
 	 * <p>
@@ -188,60 +219,66 @@ public final class TorrentMetaInfo {
 	 * Creates a new <tt>TorrentMetaInfo</tt> object using the information
 	 * contained in the <tt>value</tt> argument.
 	 * 
-	 * @param value A bencode value containing the torrent metadata
-	 * @return A new <tt>TorrentMetaInfo</tt> that represents the
-	 *         <tt>value</tt> parameter
-	 * @throws NullPointerException if <tt>value</tt> is <tt>null</tt>
-	 * @throws IllegalArgumentException if <tt>value</tt> is not a bencode
-	 *         dictionary that holds the information in a torrent info section
+	 * @param value
+	 *            A bencode value containing the torrent metadata
+	 * @return A new <tt>TorrentMetaInfo</tt> that represents the <tt>value</tt>
+	 *         parameter
+	 * @throws NullPointerException
+	 *             if <tt>value</tt> is <tt>null</tt>
+	 * @throws IllegalArgumentException
+	 *             if <tt>value</tt> is not a bencode dictionary that holds the
+	 *             information in a torrent info section
 	 */
 	public static TorrentMetaInfo fromValue ( Value<?> value ) {
-		if ( value == null ) {
+		if ( value == null )
 			throw new NullPointerException();
-		}
 		
 		try {
 			// Announce
-			String announce = ( (StringValue) Bencode.getChildValue(
-				value, "announce" ) ).getStringValue();
+			String announce =
+				( (StringValue) Bencode.getChildValue( value, "announce" ) )
+					.getStringValue();
 			
 			// Creation Date (Optional)
-			IntegerValue datev = (IntegerValue) Bencode.getChildValue(
-				value, "creation date" );
+			IntegerValue datev =
+				(IntegerValue) Bencode.getChildValue( value, "creation date" );
 			DateTime creationDate = null;
 			if ( datev != null ) {
 				long dateInstant = datev.getValue().longValue();
-				creationDate = DateTime.forInstant( dateInstant*1000,
-					TimeZone.getTimeZone( "UTC" ) );
+				creationDate =
+					DateTime.forInstant( dateInstant * 1000,
+						TimeZone.getTimeZone( "UTC" ) );
 			}
 			
 			// Comment (Optional)
-			StringValue commv = (StringValue) Bencode.getChildValue(
-				value, "comment" );
-			String comment = commv==null ? null : commv.getStringValue();
+			StringValue commv =
+				(StringValue) Bencode.getChildValue( value, "comment" );
+			String comment = commv == null ? null : commv.getStringValue();
 			
 			// Created By (Optional)
-			StringValue crbyv = (StringValue) Bencode.getChildValue(
-				value, "created by" );
-			String createdBy = crbyv==null ? null : crbyv.getStringValue();
+			StringValue crbyv =
+				(StringValue) Bencode.getChildValue( value, "created by" );
+			String createdBy = crbyv == null ? null : crbyv.getStringValue();
 			
 			// Info Section
-			TorrentInfoSection info = TorrentInfoSection.fromValue(
-				Bencode.getChildValue( value, "info" ) );
+			TorrentInfoSection info =
+				TorrentInfoSection.fromValue( Bencode.getChildValue( value,
+					"info" ) );
 			
 			// Announce List (Optional)
-			ListValue annlVal = (ListValue) Bencode.getChildValue(
-				value, "announce-list" );
+			ListValue annlVal =
+				(ListValue) Bencode.getChildValue( value, "announce-list" );
 			List<Set<String>> announceList = null;
 			if ( annlVal != null ) {
 				announceList = new ArrayList<Set<String>>();
 				if ( annlVal != null ) {
 					List<Value<?>> annList = annlVal.getValue();
 					for ( Value<?> annsVal : annList ) {
-						List<Value<?>> annSet = ((ListValue) annsVal).getValue();
+						List<Value<?>> annSet =
+							( (ListValue) annsVal ).getValue();
 						Set<String> set = new HashSet<String>();
-						for ( Value<?> anneVal :annSet ) {
-							set.add( ((StringValue) anneVal).getStringValue() );
+						for ( Value<?> anneVal : annSet ) {
+							set.add( ( (StringValue) anneVal ).getStringValue() );
 						}
 						announceList.add( Collections.unmodifiableSet( set ) );
 					}
@@ -258,8 +295,8 @@ public final class TorrentMetaInfo {
 	}
 	
 	/**
-	 * Creates a new <tt>TorrentMetaInfo</tt> object using the contents of
-	 * the given <tt>file</tt>.
+	 * Creates a new <tt>TorrentMetaInfo</tt> object using the contents of the
+	 * given <tt>file</tt>.
 	 * <p>
 	 * This method first reads a value from the file and then pass it to
 	 * {@link #fromValue} to create the <tt>TorrentMetaInfo</tt>. If client code
@@ -268,21 +305,24 @@ public final class TorrentMetaInfo {
 	 * call <tt>fromValue</tt> instead of use this method, which will reparse
 	 * the file.
 	 * 
-	 * @param file File used to create the new object
+	 * @param file
+	 *            File used to create the new object
 	 * @return A new <tt>TorrentMetaInfo</tt> that represents the contents of
 	 *         <tt>file</tt>
-	 * @throws IOException If some I/O error occurs
-	 * @throws IllegalArgumentException if the given file is not a valid torrent
-	 *         metadata file
+	 * @throws IOException
+	 *             If some I/O error occurs
+	 * @throws IllegalArgumentException
+	 *             if the given file is not a valid torrent metadata file
 	 */
-	public static TorrentMetaInfo fromFile ( File file )
-	throws IOException {
+	public static TorrentMetaInfo fromFile ( File file ) throws IOException {
 		BencodeInputStream bin = null;
 		try {
 			bin = new BencodeInputStream( file );
 			return fromValue( bin.readValue() );
 		} finally {
-			if ( bin != null ) bin.close();
+			if ( bin != null ) {
+				bin.close();
+			}
 		}
 	}
 	
@@ -294,40 +334,31 @@ public final class TorrentMetaInfo {
 	 */
 	@Override
 	public boolean equals ( Object obj ) {
-		if ( !(obj instanceof TorrentMetaInfo) ) {
+		if ( !( obj instanceof TorrentMetaInfo ) )
 			return false;
-		}
 		
 		TorrentMetaInfo tmi = (TorrentMetaInfo) obj;
 		
-		boolean dateEq = ( creationDate == null && tmi.creationDate == null )
-			|| ( creationDate != null && creationDate.equals(tmi.creationDate)
-		);
+		boolean dateEq =
+			( creationDate == null && tmi.creationDate == null )
+				|| ( creationDate != null && creationDate
+					.equals( tmi.creationDate ) );
 		
-		return ( dateEq )
-			&& ( announce.equals( tmi.announce ) )
-		    && ( announceList.equals( tmi.announceList ) )
-		    && ( comment.equals( tmi.comment ) )
-		    && ( createdBy.equals( tmi.createdBy ) )
-		    && ( info.equals( tmi.info ) );
+		return ( dateEq ) && ( announce.equals( tmi.announce ) )
+			&& ( announceList.equals( tmi.announceList ) )
+			&& ( comment.equals( tmi.comment ) )
+			&& ( createdBy.equals( tmi.createdBy ) )
+			&& ( info.equals( tmi.info ) );
 	}
 	
 	@Override
 	public int hashCode () {
-		return announce.hashCode() ^ info.hashCode();
+		return cachedHashCode;
 	}
 	
 	@Override
 	public String toString () {
-		StringBuilder sb = new StringBuilder( "TorrentMetaInfo{{ " );
-
-		sb.append( "CreationDate(" ).append( creationDate ).append( "), " );
-		sb.append( "Comment(" ).append( comment ).append( "), " );
-		sb.append( "Announce(" ).append( announce ).append( "), " );
-		sb.append( "AnnounceList(" ).append( announceList ).append( "), " );
-		sb.append( "Info(" ).append( info ).append( "), " );
-		
-		return sb.append( " }}" ).toString();
+		return chachedToString;
 	}
-
+	
 }

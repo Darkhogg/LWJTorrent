@@ -110,20 +110,20 @@ public final class TrackerRequest {
 	 */
 	private TrackerRequest (
 		Sha1Hash infoHash, PeerId peerId, int port, long uploaded,
-		long downloaded, long left, Boolean compact, boolean noPeerId, 
+		long downloaded, long left, Boolean compact, boolean noPeerId,
 		Event event, InetAddress ip, int numWant, String key,
 		byte[] trackerId
 	) {
-		if ( infoHash == null | peerId == null | event == null ) {
-			throw new NullPointerException();
-		}
+		if ( infoHash == null ) throw new NullPointerException( "Null Hash" );
+		if ( peerId == null ) throw new NullPointerException( "Null PeerId" );
+		if ( event == null ) throw new NullPointerException( "Null Event" );
+			
 		
 		if (
 			port < 0 | port >= 65535 |
 			uploaded < 0 | downloaded < 0 | left < 0
-		) {
+		)
 			throw new IllegalArgumentException();
-		}
 		
 		this.infoHash = infoHash;
 		this.peerId = peerId;
@@ -263,7 +263,7 @@ public final class TrackerRequest {
 	 *     TreackerRequest tr = TrackerRequest.builder()
 	 *         .infoHash( h ).numWant( 33 ).compact( true )
 	 *         .build();
-	 *     
+	 * 
 	 *     // ...are equivalent to this
 	 *     TrackerRequest.Builder trb = TrackerRequest.builder();
 	 *     trb.infoHash( h );
@@ -466,7 +466,7 @@ public final class TrackerRequest {
 		 * @return The <tt>this</tt> reference.
 		 */
 		public Builder wantPeerId ( boolean wantPeerId ) {
-			this.noPeerId = !wantPeerId;
+			noPeerId = !wantPeerId;
 			return this;
 		}
 		
@@ -608,7 +608,7 @@ public final class TrackerRequest {
 		 * @param str The string of the event
 		 */
 		private Event ( String str ) {
-			this.string = str;
+			string = str;
 		}
 		
 		/**
