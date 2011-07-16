@@ -7,8 +7,8 @@ import es.darkhogg.torrent.data.PeerId;
 import es.darkhogg.torrent.data.Sha1Hash;
 
 /**
- * Represents a request to a {@link Tracker}. This class is immutable, so it
- * can be reused.
+ * Represents a request to a {@link Tracker}. This class is immutable, so it can
+ * be reused.
  * <p>
  * Note that the only public way to instantiate this class is using the
  * {@link #builder} method, which returns a {@link TrackerRequest.Builder}
@@ -87,42 +87,56 @@ public final class TrackerRequest {
 	private final byte[] trackerId;
 	
 	/**
-	 * Constructs a  TrackerRequest using all the information needed.
+	 * Constructs a TrackerRequest using all the information needed.
 	 * 
-	 * @param infoHash Info hash of the torrent
-	 * @param peerId Peer ID for this client
-	 * @param port Port of this client
-	 * @param uploaded Total bytes uploaded
-	 * @param downloaded Total bytes downloaded
-	 * @param left Bytes left to complete the torrent
-	 * @param compact Compact peer list
-	 * @param noPeerId No-Peer-Id in non-compact peer list
-	 * @param event Event of this request
-	 * @param ip True IP address of this machine
-	 * @param numWant Number of peers wanted
-	 * @param key Unique, private, identification key
-	 * @param trackerId Tracker ID returned in previous announces
-	 * @throws NullPointerException if <tt>infoHash</tt>, <tt>peerId</tt> or
-	 *         <tt>event</tt> are <tt>null</tt>
-	 * @throws IllegalArgumentException if <tt>port</tt> is not in the range
-	 *         0-65535 or any of <tt>uploaded</tt>, <tt>downloaded</tt> or
-	 *         <tt>left</tt> is less than 0.
+	 * @param infoHash
+	 *            Info hash of the torrent
+	 * @param peerId
+	 *            Peer ID for this client
+	 * @param port
+	 *            Port of this client
+	 * @param uploaded
+	 *            Total bytes uploaded
+	 * @param downloaded
+	 *            Total bytes downloaded
+	 * @param left
+	 *            Bytes left to complete the torrent
+	 * @param compact
+	 *            Compact peer list
+	 * @param noPeerId
+	 *            No-Peer-Id in non-compact peer list
+	 * @param event
+	 *            Event of this request
+	 * @param ip
+	 *            True IP address of this machine
+	 * @param numWant
+	 *            Number of peers wanted
+	 * @param key
+	 *            Unique, private, identification key
+	 * @param trackerId
+	 *            Tracker ID returned in previous announces
+	 * @throws NullPointerException
+	 *             if <tt>infoHash</tt>, <tt>peerId</tt> or <tt>event</tt> are
+	 *             <tt>null</tt>
+	 * @throws IllegalArgumentException
+	 *             if <tt>port</tt> is not in the range 0-65535 or any of
+	 *             <tt>uploaded</tt>, <tt>downloaded</tt> or <tt>left</tt> is
+	 *             less than 0.
 	 */
-	private TrackerRequest (
-		Sha1Hash infoHash, PeerId peerId, int port, long uploaded,
-		long downloaded, long left, Boolean compact, boolean noPeerId,
-		Event event, InetAddress ip, int numWant, String key,
-		byte[] trackerId
-	) {
-		if ( infoHash == null ) throw new NullPointerException( "Null Hash" );
-		if ( peerId == null ) throw new NullPointerException( "Null PeerId" );
-		if ( event == null ) throw new NullPointerException( "Null Event" );
-			
+	private TrackerRequest ( Sha1Hash infoHash, PeerId peerId, int port,
+		long uploaded, long downloaded, long left, Boolean compact,
+		boolean noPeerId, Event event, InetAddress ip, int numWant, String key,
+		byte[] trackerId )
+	{
+		if ( infoHash == null )
+			throw new NullPointerException( "Null Hash" );
+		if ( peerId == null )
+			throw new NullPointerException( "Null PeerId" );
+		if ( event == null )
+			throw new NullPointerException( "Null Event" );
 		
-		if (
-			port < 0 | port >= 65535 |
-			uploaded < 0 | downloaded < 0 | left < 0
-		)
+		if ( port < 0 | port >= 65535 | uploaded < 0 | downloaded < 0
+			| left < 0 )
 			throw new IllegalArgumentException();
 		
 		this.infoHash = infoHash;
@@ -137,9 +151,9 @@ public final class TrackerRequest {
 		this.ip = ip;
 		this.numWant = numWant;
 		this.key = key;
-		this.trackerId = ( trackerId == null )
-			? null
-			: Arrays.copyOf( trackerId, trackerId.length );
+		this.trackerId =
+			( trackerId == null ) ? null : Arrays.copyOf( trackerId,
+				trackerId.length );
 	}
 	
 	/**
@@ -232,8 +246,8 @@ public final class TrackerRequest {
 	 * @return the tracker ID set for this request
 	 */
 	public byte[] getTrackerId () {
-		return ( trackerId==null )
-			? null : Arrays.copyOf( trackerId, trackerId.length );
+		return ( trackerId == null ) ? null : Arrays.copyOf( trackerId,
+			trackerId.length );
 	}
 	
 	/**
@@ -258,23 +272,24 @@ public final class TrackerRequest {
 	 * This class is implemented using a fluent interface. Every method, except
 	 * for the final <tt>build</tt>, returns the caller object, so you can chain
 	 * statements:
-	 * <pre>
-	 *     // These simple lines of code...
-	 *     TreackerRequest tr = TrackerRequest.builder()
-	 *         .infoHash( h ).numWant( 33 ).compact( true )
-	 *         .build();
 	 * 
-	 *     // ...are equivalent to this
-	 *     TrackerRequest.Builder trb = TrackerRequest.builder();
-	 *     trb.infoHash( h );
-	 *     trb.numWant( 33 );
-	 *     trb.compact( true );
-	 *     TreackerRequest tr = trb.build();
+	 * <pre>
+	 * // These simple lines of code...
+	 * TreackerRequest tr =
+	 * 	TrackerRequest.builder().infoHash( h ).numWant( 33 ).compact( true )
+	 * 		.build();
+	 * 
+	 * // ...are equivalent to this
+	 * TrackerRequest.Builder trb = TrackerRequest.builder();
+	 * trb.infoHash( h );
+	 * trb.numWant( 33 );
+	 * trb.compact( true );
+	 * TreackerRequest tr = trb.build();
 	 * </pre>
 	 * <p>
 	 * This class provides no means to know the state of values and it doesn't
-	 * check or copy them at all. When calling to the <tt>build</tt> method,
-	 * the constructor from <tt>TrackerRequest</tt> takes care of all that.
+	 * check or copy them at all. When calling to the <tt>build</tt> method, the
+	 * constructor from <tt>TrackerRequest</tt> takes care of all that.
 	 * 
 	 * @author Daniel Escoz
 	 * @version 1.0
@@ -359,11 +374,12 @@ public final class TrackerRequest {
 		 * If this method is never called, the info hash is <tt>null</tt> by
 		 * default.
 		 * 
-		 * @param infoHash New info hash for this builder
+		 * @param infoHash
+		 *            New info hash for this builder
 		 * @return The <tt>this</tt> reference.
 		 */
 		public Builder infoHash ( Sha1Hash infoHash ) {
-			this.infoHash = infoHash ;
+			this.infoHash = infoHash;
 			return this;
 		}
 		
@@ -376,7 +392,8 @@ public final class TrackerRequest {
 		 * If this method is never called, the peer ID is <tt>null</tt> by
 		 * default.
 		 * 
-		 * @param peerId New peer ID for this builder
+		 * @param peerId
+		 *            New peer ID for this builder
 		 * @return The <tt>this</tt> reference.
 		 */
 		public Builder peerId ( PeerId peerId ) {
@@ -390,21 +407,23 @@ public final class TrackerRequest {
 		 * <p>
 		 * If this method is never called, the port is 6881 by default.
 		 * 
-		 * @param port New port for this builder
+		 * @param port
+		 *            New port for this builder
 		 * @return The <tt>this</tt> reference.
 		 */
 		public Builder port ( int port ) {
 			this.port = port;
 			return this;
 		}
-
+		
 		/**
-		 * Stores the given long as the total number of bytes uploaded by
-		 * this client.
+		 * Stores the given long as the total number of bytes uploaded by this
+		 * client.
 		 * <p>
 		 * If this method is never called, the uploaded amount is 0 by default.
 		 * 
-		 * @param uploaded Total amount of data uploaded
+		 * @param uploaded
+		 *            Total amount of data uploaded
 		 * @return The <tt>this</tt> reference.
 		 */
 		public Builder bytesUploaded ( long uploaded ) {
@@ -413,12 +432,14 @@ public final class TrackerRequest {
 		}
 		
 		/**
-		 * Stores the given long as the total number of bytes downloaded by
-		 * this client.
+		 * Stores the given long as the total number of bytes downloaded by this
+		 * client.
 		 * <p>
-		 * If this method is never called, the downloaded amount is 0 by default.
+		 * If this method is never called, the downloaded amount is 0 by
+		 * default.
 		 * 
-		 * @param downloaded Total amount of data downloaded
+		 * @param downloaded
+		 *            Total amount of data downloaded
 		 * @return The <tt>this</tt> reference.
 		 */
 		public Builder bytesDownloaded ( long downloaded ) {
@@ -432,7 +453,8 @@ public final class TrackerRequest {
 		 * <p>
 		 * If this method is never called, the port is 0 by default.
 		 * 
-		 * @param left Total amount of data left to download
+		 * @param left
+		 *            Total amount of data left to download
 		 * @return The <tt>this</tt> reference.
 		 */
 		public Builder bytesLeft ( long left ) {
@@ -447,7 +469,8 @@ public final class TrackerRequest {
 		 * <p>
 		 * If this method is never called, compact is <tt>null</tt> by default
 		 * 
-		 * @param compact New compactness setting for this builder
+		 * @param compact
+		 *            New compactness setting for this builder
 		 * @return The <tt>this</tt> reference.
 		 */
 		public Builder compact ( Boolean compact ) {
@@ -456,13 +479,14 @@ public final class TrackerRequest {
 		}
 		
 		/**
-		 * Stores the given boolean as whether this builder wants the peer ID
-		 * of the returned peers or not.
+		 * Stores the given boolean as whether this builder wants the peer ID of
+		 * the returned peers or not.
 		 * <p>
 		 * If this method is never called, this setting is <tt>false</tt> by
 		 * default.
 		 * 
-		 * @param wantPeerId New value for this setting
+		 * @param wantPeerId
+		 *            New value for this setting
 		 * @return The <tt>this</tt> reference.
 		 */
 		public Builder wantPeerId ( boolean wantPeerId ) {
@@ -476,21 +500,23 @@ public final class TrackerRequest {
 		 * If this method is never called, the event is <tt>REGULAR</tt> by
 		 * default.
 		 * 
-		 * @param event New event type for this builder
+		 * @param event
+		 *            New event type for this builder
 		 * @return The <tt>this</tt> reference.
 		 */
 		public Builder event ( Event event ) {
 			this.event = event;
 			return this;
 		}
-
+		
 		/**
 		 * Stores the passed {@link InetAddress} as the real IP of this client
 		 * <p>
 		 * If this method is never called, the real IP is <tt>null</tt>, which
 		 * means it is not specified.
 		 * 
-		 * @param ip New real IP for this builder
+		 * @param ip
+		 *            New real IP for this builder
 		 * @return The <tt>this</tt> reference.
 		 */
 		public Builder ip ( InetAddress ip ) {
@@ -505,7 +531,8 @@ public final class TrackerRequest {
 		 * If this method is never called, the wanted number of peers is 32 by
 		 * default.
 		 * 
-		 * @param numWant New number of wanted peers for this builder
+		 * @param numWant
+		 *            New number of wanted peers for this builder
 		 * @return The <tt>this</tt> reference
 		 */
 		public Builder numWant ( int numWant ) {
@@ -518,7 +545,8 @@ public final class TrackerRequest {
 		 * <p>
 		 * If this method is never called, the client key is unspecified
 		 * 
-		 * @param key New client key for this builder
+		 * @param key
+		 *            New client key for this builder
 		 * @return The <tt>this</tt> reference
 		 */
 		public Builder key ( String key ) {
@@ -535,7 +563,8 @@ public final class TrackerRequest {
 		 * If this method is never called, the tracker ID is <tt>null</tt> by
 		 * default, meaning it's not specified.
 		 * 
-		 * @param trackerId New tracker ID for this builder
+		 * @param trackerId
+		 *            New tracker ID for this builder
 		 * @return The <tt>this</tt> reference
 		 */
 		public Builder trackerId ( byte[] trackerId ) {
@@ -565,8 +594,8 @@ public final class TrackerRequest {
 		 */
 		public TrackerRequest build () {
 			return new TrackerRequest( infoHash, peerId, port, uploaded,
-				downloaded, left, compact, noPeerId, event, ip, numWant,
-				key, trackerId );
+				downloaded, left, compact, noPeerId, event, ip, numWant, key,
+				trackerId );
 		}
 	}
 	
@@ -580,22 +609,22 @@ public final class TrackerRequest {
 		/**
 		 * Event for the first announce
 		 */
-		STARTED( "started" ),
-		
+		STARTED ( "started" ),
+
 		/**
 		 * Event to send when a torrent stops gracefully
 		 */
-		STOPPED( "stopped" ),
-		
+		STOPPED ( "stopped" ),
+
 		/**
 		 * Event for a completed torrent. Should only be sent once per torrent
 		 */
-		COMPLETED( "completed" ),
-		
+		COMPLETED ( "completed" ),
+
 		/**
 		 * Event for regular announces
 		 */
-		REGULAR( "" );
+		REGULAR ( "" );
 		
 		/**
 		 * String that must be sent to the tracker
@@ -605,7 +634,8 @@ public final class TrackerRequest {
 		/**
 		 * Constructs an event with the given string
 		 * 
-		 * @param str The string of the event
+		 * @param str
+		 *            The string of the event
 		 */
 		private Event ( String str ) {
 			string = str;
@@ -621,5 +651,5 @@ public final class TrackerRequest {
 			return string;
 		}
 	}
-
+	
 }

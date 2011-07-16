@@ -1,6 +1,7 @@
 package es.darkhogg.torrent.data;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,31 +34,33 @@ public final class TorrentMapping {
 	/**
 	 * Mapping from files to pieces
 	 */
-	private final Map<File,List<Entry>> filesToPieces;
+	private final Map<Path,List<Entry>> filesToPieces;
 	
 	/**
 	 * List of files mapped in this object
 	 */
-	private final List<File> fileList;
+	private final List<Path> fileList;
 	
 	/**
 	 * Constructs a <tt>TorrentMapping</tt> by generating the mapping from the
 	 * given list of files and piece size.
 	 * <p>
 	 * Note that this constructor is private, but a static factory exists with
-	 * the same purpose that just calls this. It would be a bad idea to
-	 * expose this constructor, as it is not really intuitive that a
+	 * the same purpose that just calls this. It would be a bad idea to expose
+	 * this constructor, as it is not really intuitive that a
 	 * <tt>TorrentMapping</tt> is <i>constructed from</i> a list of files and a
 	 * piece size.
 	 * 
-	 * @param files Lit of files to map
-	 * @param pieceSize Size of the piece
+	 * @param files
+	 *            Lit of files to map
+	 * @param pieceSize
+	 *            Size of the piece
 	 */
 	private TorrentMapping ( List<TorrentFileInfo> files, long pieceSize ) {
 		List<Entry> allMappings = new ArrayList<Entry>( files.size() );
-		List<File> allFiles = new ArrayList<File>( files.size() );
+		List<Path> allFiles = new ArrayList<Path>( files.size() );
 		final List<List<Entry>> pToF = new ArrayList<List<Entry>>();
-		final Map<File,List<Entry>> fToP = new HashMap<File,List<Entry>>();
+		final Map<Path,List<Entry>> fToP = new HashMap<Path,List<Entry>>();
 		
 		int numPieces = 0;
 		
@@ -67,23 +70,22 @@ public final class TorrentMapping {
 		List<Entry> thisPieceMappings = new ArrayList<Entry>();
 		
 		for ( TorrentFileInfo file : files ) {
-			List<Entry> thisFileMappings = new ArrayList<Entry>(
-				(int)( file.getLength()/pieceSize + 1 ) );
+			List<Entry> thisFileMappings =
+				new ArrayList<Entry>( (int) ( file.getLength() / pieceSize + 1 ) );
 			
 			long remFileLen = file.getLength();
 			long initFilePos = 0;
 			
 			// While this file is not fully mapped...
-			while ( remFileLen > 0 ) { 
+			while ( remFileLen > 0 ) {
 				
 				// If the remaining piece fits entirely in this file...
 				if ( remFileLen >= remPieceLen ) {
-					Entry entry = new Entry(
-						numPieces, new PositionRange(
-							initPiecePos, (initPiecePos+remPieceLen) ),
-						file.getPathAsFile(), new PositionRange(
-							initFilePos, (initFilePos+remPieceLen) )
-					);
+					Entry entry =
+						new Entry( numPieces, new PositionRange( initPiecePos,
+							( initPiecePos + remPieceLen ) ), file.getPath(),
+							new PositionRange( initFilePos,
+								( initFilePos + remPieceLen ) ) );
 					allMappings.add( entry );
 					thisFileMappings.add( entry );
 					thisPieceMappings.add( entry );
@@ -98,12 +100,11 @@ public final class TorrentMapping {
 					pToF.add( thisPieceMappings );
 					thisPieceMappings = new ArrayList<Entry>();
 				} else {
-					Entry entry = new Entry(
-						numPieces, new PositionRange(
-							initPiecePos, (initPiecePos+remFileLen) ),
-						file.getPathAsFile(), new PositionRange(
-							initFilePos, (initFilePos+remFileLen) )
-					);
+					Entry entry =
+						new Entry( numPieces, new PositionRange( initPiecePos,
+							( initPiecePos + remFileLen ) ), file.getPath(),
+							new PositionRange( initFilePos,
+								( initFilePos + remFileLen ) ) );
 					allMappings.add( entry );
 					thisFileMappings.add( entry );
 					thisPieceMappings.add( entry );
@@ -116,8 +117,8 @@ public final class TorrentMapping {
 				
 			}
 			
-			allFiles.add( file.getPathAsFile() );
-			fToP.put( file.getPathAsFile(), thisFileMappings );
+			allFiles.add( file.getPath() );
+			fToP.put( file.getPath(), thisFileMappings );
 		}
 		
 		// If the last piece was not of regular size...
@@ -134,8 +135,8 @@ public final class TorrentMapping {
 	}
 	
 	/**
-	 * Returns the total number of pieces. Valid piece indices are integers
-	 * from <tt>0</tt> (inclusive) to <tt>partCount</tt> (exclusive).
+	 * Returns the total number of pieces. Valid piece indices are integers from
+	 * <tt>0</tt> (inclusive) to <tt>partCount</tt> (exclusive).
 	 * 
 	 * @return The number of pieces mapped in this object
 	 */
@@ -157,7 +158,7 @@ public final class TorrentMapping {
 	 * 
 	 * @return All the files in the mapping
 	 */
-	public List<File> getFiles () {
+	public List<Path> getFiles () {
 		return fileList;
 	}
 	
@@ -165,7 +166,8 @@ public final class TorrentMapping {
 	 * Returns information about which sections of which files are bound to the
 	 * piece with the given index
 	 * 
-	 * @param pieceIndex Index of the piece to retrieve information from
+	 * @param pieceIndex
+	 *            Index of the piece to retrieve information from
 	 * @return The information about which files contains the requested piece,
 	 *         or <tt>null</tt> if the index is not valid.
 	 */
@@ -178,10 +180,11 @@ public final class TorrentMapping {
 	}
 	
 	/**
-	 * Returns information about which sections of which pieces are bound to
-	 * the specified file.
+	 * Returns information about which sections of which pieces are bound to the
+	 * specified file.
 	 * 
-	 * @param file The file to retrieve which pieces covers it
+	 * @param file
+	 *            The file to retrieve which pieces covers it
 	 * @return The information about which pieces covers the requested file, or
 	 *         <tt>null</tt> if the file is not valid.
 	 */
@@ -196,6 +199,7 @@ public final class TorrentMapping {
 	/**
 	 * Returns a <tt>String</tt> representation of this mapping.
 	 */
+	@Override
 	public String toString () {
 		StringBuilder sb = new StringBuilder( "TorrentMapping{\n" );
 		
@@ -205,12 +209,13 @@ public final class TorrentMapping {
 		
 		return sb.append( "}" ).toString();
 	}
-
+	
 	/**
 	 * Returns a new mapping for this torrent. The returned object contains
 	 * information about all the pieces and all the files, fully covering them.
 	 * 
-	 * @param tmi The torrent to read the mapping from
+	 * @param tmi
+	 *            The torrent to read the mapping from
 	 * @return A new mapping for the given torrent
 	 */
 	public static TorrentMapping fromTorrent ( TorrentMetaInfo tmi ) {
@@ -221,7 +226,8 @@ public final class TorrentMapping {
 	 * Returns a new mapping for this torrent. The returned object contains
 	 * information about all the pieces and all the files, fully covering them.
 	 * 
-	 * @param tis The torrent to read the mapping from
+	 * @param tis
+	 *            The torrent to read the mapping from
 	 * @return A new mapping for the given torrent
 	 */
 	public static TorrentMapping fromTorrent ( TorrentInfoSection tis ) {
@@ -229,8 +235,8 @@ public final class TorrentMapping {
 	}
 	
 	/**
-	 * A class that represents a single mapping between a section of a piece
-	 * and a section of a file.
+	 * A class that represents a single mapping between a section of a piece and
+	 * a section of a file.
 	 * 
 	 * @author Daniel Escoz
 	 * @version 1.0
@@ -250,7 +256,7 @@ public final class TorrentMapping {
 		/**
 		 * File mapped
 		 */
-		private final File file;
+		private final Path file;
 		
 		/**
 		 * Range of positions mapped from the file
@@ -261,17 +267,22 @@ public final class TorrentMapping {
 		 * Creates a new bidirectional mapping from a section of a piece to an
 		 * equally sized section of a file.
 		 * 
-		 * @param piece Index of the piece to be mapped
-		 * @param pieceRange Range of positions mapped in the piece
-		 * @param file File to be mapped
-		 * @param fileRange Range of positions mapped in the piece
-		 * @throws NullPointerException if any of the arguments is <tt>null</tt>
-		 * @throws IllegalArgumentException if <tt>piece</tt> is negative or
-		 *         <tt>pieceRange</tt> and <tt>fileRange</tt> have different
-		 *         lengths
+		 * @param piece
+		 *            Index of the piece to be mapped
+		 * @param pieceRange
+		 *            Range of positions mapped in the piece
+		 * @param file
+		 *            File to be mapped
+		 * @param fileRange
+		 *            Range of positions mapped in the piece
+		 * @throws NullPointerException
+		 *             if any of the arguments is <tt>null</tt>
+		 * @throws IllegalArgumentException
+		 *             if <tt>piece</tt> is negative or <tt>pieceRange</tt> and
+		 *             <tt>fileRange</tt> have different lengths
 		 */
-		public Entry ( int piece, PositionRange pieceRange,
-			File file, PositionRange fileRange )
+		public Entry ( int piece, PositionRange pieceRange, Path file,
+			PositionRange fileRange )
 		{
 			if ( piece < 0 | pieceRange.getLength() != fileRange.getLength() ) {
 				throw new IllegalArgumentException();
@@ -285,7 +296,7 @@ public final class TorrentMapping {
 			this.file = file;
 			this.fileRange = fileRange;
 		}
-
+		
 		/**
 		 * Returns the index of the piece mapped in this object
 		 * 
@@ -309,9 +320,9 @@ public final class TorrentMapping {
 		/**
 		 * Returns the file mapped in this object
 		 * 
-		 * @return The file mapped  piece
+		 * @return The file mapped piece
 		 */
-		public File getFile () {
+		public Path getFile () {
 			return file;
 		}
 		
@@ -328,20 +339,18 @@ public final class TorrentMapping {
 		
 		@Override
 		public String toString () {
-			return "(#" + getPiece() + ": " + getPieceRange()
-			     + ") <=> ('"
-			     + getFile() + "': " + getFileRange() + ")";
+			return "(#" + getPiece() + ": " + getPieceRange() + ") <=> ('"
+				+ getFile() + "': " + getFileRange() + ")";
 		}
-	
+		
 		@Override
 		public boolean equals ( Object obj ) {
-			if ( !(obj instanceof Entry) ) {
+			if ( !( obj instanceof Entry ) ) {
 				return false;
 			}
 			
 			Entry e = (Entry) obj;
-			return ( piece == e.piece )
-				&& ( pieceRange.equals( e.pieceRange ) )
+			return ( piece == e.piece ) && ( pieceRange.equals( e.pieceRange ) )
 				&& ( file.equals( e.file ) )
 				&& ( fileRange.equals( e.fileRange ) );
 		}

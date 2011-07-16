@@ -1,8 +1,8 @@
 package es.darkhogg.torrent.data;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -51,8 +51,8 @@ public final class TorrentInfoSection {
 	/**
 	 * Mapping from files to their infos
 	 */
-	private final Map<File,TorrentFileInfo> fileInfos =
-		new HashMap<File,TorrentFileInfo>();
+	private final Map<Path,TorrentFileInfo> fileInfos =
+		new HashMap<Path,TorrentFileInfo>();
 	
 	/**
 	 * SHA-1 hash of the info section
@@ -117,10 +117,19 @@ public final class TorrentInfoSection {
 		
 		long totalLength = 0;
 		for ( TorrentFileInfo tfi : files ) {
-			fileInfos.put( tfi.getPathAsFile(), tfi );
+			fileInfos.put( tfi.getPath(), tfi );
 			totalLength += tfi.getLength();
 		}
 		this.totalLength = totalLength;
+	}
+	
+	/**
+	 * Returns the number of pieces in this torrent
+	 * 
+	 * @return Number of pieces in this torrent
+	 */
+	public int getNumPieces () {
+		return pieceHashes.size();
 	}
 	
 	/**
@@ -131,6 +140,36 @@ public final class TorrentInfoSection {
 	 */
 	public long getPieceLength () {
 		return pieceLength;
+	}
+	
+	/**
+	 * Returns the length of the <tt>n</tt>-th piece.
+	 * <p>
+	 * If <tt>n</tt> corresponds to the last piece (
+	 * <tt>{@link #getNumPieces numPieces}-1</tt>), this method returns
+	 * <tt>{@link #getTotalLength totalLength} %
+	 * {@link #getPieceLength() pieceLength}</tt>, unless that value is 0, in
+	 * which case it returns the nominal piece length.
+	 * <p>
+	 * If <tt>n</tt> is between 0 (inclusive) and <tt>numPieces-1</tt>
+	 * (exclusive), it returns the nominal piece length.
+	 * <p>
+	 * On any other case, it returns <tt>0</tt>.
+	 * 
+	 * @param n
+	 *            Piece index
+	 * @return The length of the <tt>n</tt>-th piece
+	 */
+	public long getPieceLength ( int n ) {
+		int numPieces = getNumPieces();
+		if ( n == numPieces - 1 ) {
+			long len = totalLength % pieceLength;
+			return len == 0 ? pieceLength : len;
+		} else if ( n >= 0 && n < numPieces - 1 ) {
+			return pieceLength;
+		} else {
+			return 0;
+		}
 	}
 	
 	/**
@@ -185,7 +224,7 @@ public final class TorrentInfoSection {
 	 * @return The information about the given <tt>file</tt>, or <tt>null</tt>
 	 *         if it don't exist.
 	 */
-	public TorrentFileInfo getInfoForFile ( File file ) {
+	public TorrentFileInfo getInfoForFile ( Path file ) {
 		return fileInfos.get( file );
 	}
 	
@@ -287,7 +326,7 @@ public final class TorrentInfoSection {
 						.getStringValue();
 				
 				TorrentFileInfo file =
-					new TorrentFileInfo( length, Arrays.asList( fname ) );
+					new TorrentFileInfo( length, Paths.get( fname ) );
 				
 				files.add( file );
 			} else {
@@ -301,18 +340,22 @@ public final class TorrentInfoSection {
 					DictionaryValue dval = (DictionaryValue) val;
 					
 					long length =
-						( (IntegerValue) Bencode.getChildValue( dval, "length" ) )
+						Bencode
+							.getChildValue( dval, IntegerValue.class, "length" )
 							.getValue().longValue();
 					ListValue pathv =
 						(ListValue) Bencode.getChildValue( dval, "path" );
-					List<String> path = new ArrayList<String>();
+					StringBuilder path = new StringBuilder();
 					
+					String pSep = System.getProperty( "file.separator" );
 					for ( Value<?> pathpiece : pathv.getValue() ) {
 						StringValue pps = (StringValue) pathpiece;
-						path.add( pps.getStringValue() );
+						path.append( pSep );
+						path.append( pps.getStringValue() );
 					}
 					
-					files.add( new TorrentFileInfo( length, path ) );
+					files.add( new TorrentFileInfo( length, Paths.get( path
+						.toString() ) ) );
 				}
 			}
 			

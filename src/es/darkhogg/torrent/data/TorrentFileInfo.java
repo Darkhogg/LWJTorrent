@@ -1,21 +1,14 @@
 package es.darkhogg.torrent.data;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
+import java.nio.file.Path;
 
 /**
- * Represents one file from a torrent file. 
+ * Represents one file from a torrent file.
  * 
  * @author Daniel Escoz
  * @version 1.0
  */
 public final class TorrentFileInfo {
-	
-	/**
-	 * Current Directory
-	 */
-	private static final File FILE_CURR_DIR = new File( "." );
 	
 	/**
 	 * Length of the file
@@ -25,27 +18,31 @@ public final class TorrentFileInfo {
 	/**
 	 * Path of the file, including the filename
 	 */
-	private final List<String> path;
+	private final Path path;
 	
 	/**
 	 * Constructs an object using the given <tt>length</tt> and <tt>path</tt>
 	 * 
-	 * @param length Length of the file, in bytes
-	 * @param path Path of the file, including its name
-	 * @throws NullPointerException if <tt>path</tt> or any of its childs is
-	 *         <tt>null</tt>
-	 * @throws IllegalArgumentException if <tt>length</tt> is less than 0
+	 * @param length
+	 *            Length of the file, in bytes
+	 * @param path
+	 *            Path of the file, including its name
+	 * @throws NullPointerException
+	 *             if <tt>path</tt> or any of its childs is <tt>null</tt>
+	 * @throws IllegalArgumentException
+	 *             if <tt>length</tt> is less than 0 or the passed path is not
+	 *             relative
 	 */
-	public TorrentFileInfo ( long length, List<String> path ) {
-		if ( path == null | path.contains( null ) ) {
+	public TorrentFileInfo ( long length, Path path ) {
+		if ( path == null ) {
 			throw new NullPointerException();
 		}
-		if ( length < 0 ) {
+		if ( length < 0 | path.isAbsolute() ) {
 			throw new IllegalArgumentException();
 		}
 		
 		this.length = length;
-		this.path = Collections.unmodifiableList( path );
+		this.path = path;
 	}
 	
 	/**
@@ -66,30 +63,10 @@ public final class TorrentFileInfo {
 	 * 
 	 * @return The path of this file
 	 */
-	public List<String> getPath () {
+	public Path getPath () {
 		return path;
 	}
 	
-	/**
-	 * Returns the path of the file represented by this object, converted to a
-	 * <tt>File</tt> object.
-	 * <p>
-	 * Note that the returned file is guaranteed to be relative. It is
-	 * recommended that files returned by this method are used only by
-	 * appending them to an absolute <tt>File</tt> object.
-	 * 
-	 * @return The path of this file, as a <tt>File</tt> object
-	 */
-	public File getPathAsFile () {
-		File f = FILE_CURR_DIR;
-		
-		for ( String node : path ) {
-			f = new File( f, node );
-		}
-		
-		return f;
-	}
-
 	/**
 	 * Checks whether this object is equal to <tt>obj</tt>.
 	 * <p>
@@ -110,16 +87,15 @@ public final class TorrentFileInfo {
 	
 	@Override
 	public int hashCode () {
-		return (int)( length ) ^ path.hashCode();
+		return (int) ( length ) ^ path.hashCode();
 	}
 	
 	@Override
 	public String toString () {
 		StringBuilder sb = new StringBuilder( "TorrentFileInfo{{ " );
-
+		
 		sb.append( "Length(" ).append( length ).append( "), " );
 		sb.append( "Path(" ).append( path ).append( "), " );
-		
 		
 		return sb.toString();
 	}
