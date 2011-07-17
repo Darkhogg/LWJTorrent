@@ -1,13 +1,8 @@
 package es.darkhogg.torrent.tracker;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-
-import es.darkhogg.torrent.bencode.BencodeInputStream;
 
 /**
  * A tracker that sends announces to different URLs until one of them responds.
@@ -23,7 +18,7 @@ import es.darkhogg.torrent.bencode.BencodeInputStream;
 	/**
 	 * List of URL's of the tracker
 	 */
-	private final List<String> urls;
+	private final List<Tracker> trackers;
 	
 	/**
 	 * Constructs the tracker from a given list of sets of announce strings
@@ -31,29 +26,18 @@ import es.darkhogg.torrent.bencode.BencodeInputStream;
 	 * @param announces
 	 *            List of sets of announce strings
 	 */
-	public MultiTracker ( List<Set<String>> announces ) {
-		urls = new LinkedList<String>();
-		
-		for ( Set<String> set : announces ) {
-			urls.addAll( set );
-		}
+	public MultiTracker ( List<Tracker> announces ) {
+		trackers = Collections.unmodifiableList( new LinkedList<Tracker>() );
 	}
 	
 	@Override
 	public TrackerResponse sendRequest ( TrackerRequest request ) {
 		
-		for ( String str : urls ) {
-			try {
-				URL requestUrl = getRequestUrl( str, request );
-				
-				BencodeInputStream bis =
-					new BencodeInputStream( requestUrl.openStream() );
-				return TrackerResponse.fromValue( bis.readValue() );
-				
-			} catch ( MalformedURLException e ) {
-				// Nothing
-			} catch ( IOException e ) {
-				// Nothing
+		for ( Tracker tracker : trackers ) {
+			TrackerResponse resp = tracker.sendRequest( request );
+			
+			if ( resp != null ) {
+				return resp;
 			}
 		}
 		

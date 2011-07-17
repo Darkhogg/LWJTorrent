@@ -2,9 +2,11 @@ package es.darkhogg.torrent.tracker;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +25,7 @@ public abstract class Tracker {
 	/**
 	 * Default package-private constructor, to avoid external inheritance
 	 */
-	Tracker () {
+	/* package */Tracker () {
 		// Do nothing
 	}
 	
@@ -33,16 +35,17 @@ public abstract class Tracker {
 	 * If the HTTP request fails, this method must return null, rather than
 	 * throw an exception.
 	 * 
-	 * @param request Request to send to this tracker
-	 * @return The response of this tracker, or <tt>null</tt> if an error
-	 *         occurs
+	 * @param request
+	 *            Request to send to this tracker
+	 * @return The response of this tracker, or <tt>null</tt> if an error occurs
 	 */
 	public abstract TrackerResponse sendRequest ( TrackerRequest request );
 	
 	/**
 	 * Constructs the query string of the announce request.
 	 * 
-	 * @param req Request to build the string from
+	 * @param req
+	 *            Request to build the string from
 	 * @return The query string to send to the tracker
 	 */
 	protected static String getUrlParams ( TrackerRequest req ) {
@@ -57,7 +60,7 @@ public abstract class Tracker {
 			
 			sb.append( "&port=" );
 			sb.append( req.getPort() );
-	
+			
 			sb.append( "&uploaded=" );
 			sb.append( req.getBytesUploaded() );
 			
@@ -85,7 +88,7 @@ public abstract class Tracker {
 			
 			sb.append( "&numwant=" );
 			sb.append( req.getNumWant() );
-	
+			
 			if ( req.getKey() != null ) {
 				sb.append( "&key=" );
 				sb.append( req.getKey() );
@@ -93,8 +96,9 @@ public abstract class Tracker {
 			
 			if ( req.getTrackerId() != null ) {
 				sb.append( "&trackerid=" );
-				String trstr = new String( req.getTrackerId(),
-					Charset.forName( "ISO-8859-1" ) );
+				String trstr =
+					new String( req.getTrackerId(),
+						Charset.forName( "ISO-8859-1" ) );
 				sb.append( URLEncoder.encode( trstr, "ISO-8859-1" ) );
 			}
 			
@@ -108,41 +112,74 @@ public abstract class Tracker {
 	/**
 	 * Creates the URL used to make the announce to the tracker.
 	 * 
-	 * @param announce announce URL of the tracker
-	 * @param req Request to build the URL from
+	 * @param announce
+	 *            announce URL of the tracker
+	 * @param req
+	 *            Request to build the URL from
 	 * @return The full URL
-	 * @throws MalformedURLException should never happen
+	 * @throws MalformedURLException
+	 *             should never happen
 	 */
-	protected static URL getRequestUrl (
-		String announce, TrackerRequest req
-	) throws MalformedURLException {
-		return new URL( announce + getUrlParams( req ) );
+	protected static String
+		getRequestUrl ( String announce, TrackerRequest req )
+	{
+		return announce + getUrlParams( req );
 	}
 	
 	/**
 	 * Returns a <tt>Tracker</tt> object that send its requests to the given
 	 * announce URL.
 	 * 
-	 * @param announce The URL of the announce service
+	 * @param announce
+	 *            The URL of the announce service
 	 * @return A tracker which announces to the given URL
+	 * @throws URISyntaxException
+	 *             if the announce is not a valid URI
+	 * @throws MalformedURLException
+	 *             if the announce is not a valid URL
 	 */
-	private static Tracker getSingleTracker ( String announce )
-	throws MalformedURLException {
-		return new SingleTracker( new URL( announce ) );
+	protected static Tracker getSingleTracker ( String announce )
+		throws URISyntaxException, MalformedURLException
+	{
+		URI uri = new URI( announce );
+		
+		if ( uri.getScheme().equals( "udp" ) ) {
+			return new UdpTracker( uri );
+		} else {
+			// Create URL tracker
+			return new UrlTracker( uri.toURL() );
+		}
 	}
 	
 	/**
 	 * Returns a <tt>Tracker</tt> object that send its request to the given
 	 * announce URLs, in order, until one of them is successfull.
 	 * <p>
-	 * The passed object is treated as the <tt>announce-list</tt> key of a 
+	 * The passed object is treated as the <tt>announce-list</tt> key of a
 	 * torrent, and behaves like it.
 	 * 
-	 * @param announces List of announce URLs
+	 * @param announces
+	 *            List of announce URLs
 	 * @return A tracker which announces to the given URL list
 	 */
-	private static Tracker getMultiTracker ( List<Set<String>> announces ) {
-		return new MultiTracker( announces );
+	/* package */static Tracker getMultiTracker ( List<Set<String>> announces )
+	{
+		List<Tracker> trackers = new ArrayList<Tracker>();
+		
+		for ( Set<String> set : announces ) {
+			for ( String str : set ) {
+				try {
+					Tracker tracker = getSingleTracker( str );
+					trackers.add( tracker );
+				} catch ( MalformedURLException e ) {
+					// Just don't add it
+				} catch ( URISyntaxException e ) {
+					// Again, just don't add it
+				}
+			}
+		}
+		
+		return new MultiTracker( trackers );
 	}
 	
 	/**
@@ -154,12 +191,17 @@ public abstract class Tracker {
 	 * implementation availability. In general, the best possible method is
 	 * chosen for each torrent.
 	 * 
-	 * @param torrent Torrent meta-info used to build the tracker
+	 * @param torrent
+	 *            Torrent meta-info used to build the tracker
 	 * @return A tracker that announces to the corresponding URL
-	 * @throws MalformedURLException if the URL or URLs used are not valid
+	 * @throws MalformedURLException
+	 *             if the URL or URLs used are not valid
+	 * @throws URISyntaxException
+	 *             if the URI or URIs used are not valid
 	 */
 	public static Tracker forTorrent ( TorrentMetaInfo torrent )
-	throws MalformedURLException {
+		throws MalformedURLException, URISyntaxException
+	{
 		if ( torrent.getAnnounceList().isEmpty() ) {
 			return getSingleTracker( torrent.getAnnounce() );
 		} else {
