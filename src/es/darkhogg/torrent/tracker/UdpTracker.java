@@ -13,6 +13,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A tracker that sends its requests using the UDP Tracker protocol.
@@ -53,7 +54,9 @@ import java.util.Random;
 	}
 	
 	@Override
-	public TrackerResponse sendRequest ( TrackerRequest request ) {
+	public TrackerResponse sendRequest ( TrackerRequest request, long time,
+		TimeUnit unit )
+	{
 		String host = uri.getHost();
 		int port = uri.getPort();
 		
@@ -63,7 +66,7 @@ import java.util.Random;
 			
 			// UDP Socket - already bound
 			socket = new DatagramSocket();
-			socket.setSoTimeout( 3000 );
+			socket.setSoTimeout( (int) ( unit.toMillis( time ) / 2 ) );
 			
 			// UDP Datagram - setup of address/port
 			DatagramPacket packet = new DatagramPacket( EMPTY_BYTE_ARR, 0 );

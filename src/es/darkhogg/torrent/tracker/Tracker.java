@@ -9,12 +9,13 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import es.darkhogg.torrent.data.TorrentMetaInfo;
 
 /**
- * Represents an service capable of handling announce requests, commonly
- * known as a <i>tracker</i>.
+ * Represents an service capable of handling announce requests, commonly known
+ * as a <i>tracker</i>.
  * 
  * @author Daniel Escoz
  * @version 1.0
@@ -32,14 +33,37 @@ public abstract class Tracker {
 	/**
 	 * Sends a request to this tracker and returns its response.
 	 * <p>
-	 * If the HTTP request fails, this method must return null, rather than
-	 * throw an exception.
+	 * This method delegates its calls to
+	 * {@link #sendRequest(TrackerRequest, long, TimeUnit)}, passing it a value
+	 * that corresponds to a minute.
 	 * 
 	 * @param request
 	 *            Request to send to this tracker
 	 * @return The response of this tracker, or <tt>null</tt> if an error occurs
 	 */
-	public abstract TrackerResponse sendRequest ( TrackerRequest request );
+	public final TrackerResponse sendRequest ( TrackerRequest request ) {
+		return sendRequest( request, 1, TimeUnit.MINUTES );
+	}
+	
+	/**
+	 * Sends a request to this tracker and returns its response.
+	 * <p>
+	 * This method provides a best-effort guarantee that it won't take more than
+	 * the specified time. No guarantees are made.
+	 * <p>
+	 * If the request fails, this method must return null, rather than throw an
+	 * exception.
+	 * 
+	 * @param request
+	 *            Request to send to this tracker
+	 * @param time
+	 *            Maximum time for the whole request
+	 * @param unit
+	 *            Time unit in which the <tt>time</tt> argument is expressed
+	 * @return The response of this tracker, or <tt>null</tt> if an error occurs
+	 */
+	public abstract TrackerResponse sendRequest ( TrackerRequest request,
+		long time, TimeUnit unit );
 	
 	/**
 	 * Constructs the query string of the announce request.
@@ -191,19 +215,20 @@ public abstract class Tracker {
 	 * 
 	 * @param torrent
 	 *            Torrent meta-info used to build the tracker
-	 * @return A tracker that announces to the corresponding URL
-	 * @throws MalformedURLException
-	 *             if the URL or URLs used are not valid
-	 * @throws URISyntaxException
-	 *             if the URI or URIs used are not valid
+	 * @return A tracker that announces to the corresponding URL, or
+	 *         <tt>null</tt> if an error occurs
 	 */
-	public static Tracker forTorrent ( TorrentMetaInfo torrent )
-		throws MalformedURLException, URISyntaxException
-	{
-		if ( torrent.getAnnounceList().isEmpty() ) {
-			return getSingleTracker( torrent.getAnnounce() );
-		} else {
-			return getMultiTracker( torrent.getAnnounceList() );
+	public static Tracker forTorrent ( TorrentMetaInfo torrent ) {
+		try {
+			if ( torrent.getAnnounceList().isEmpty() ) {
+				return getSingleTracker( torrent.getAnnounce() );
+			} else {
+				return getMultiTracker( torrent.getAnnounceList() );
+			}
+		} catch ( MalformedURLException e ) {
+			return null;
+		} catch ( URISyntaxException e ) {
+			return null;
 		}
 	}
 }

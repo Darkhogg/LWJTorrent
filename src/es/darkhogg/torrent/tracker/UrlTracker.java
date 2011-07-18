@@ -3,6 +3,8 @@ package es.darkhogg.torrent.tracker;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.concurrent.TimeUnit;
 
 import es.darkhogg.torrent.bencode.BencodeInputStream;
 
@@ -30,12 +32,17 @@ import es.darkhogg.torrent.bencode.BencodeInputStream;
 	}
 	
 	@Override
-	public TrackerResponse sendRequest ( TrackerRequest request ) {
+	public TrackerResponse sendRequest ( TrackerRequest request, long time,
+		TimeUnit unit )
+	{
 		try {
 			URL reqUrl = new URL( getRequestUrl( url.toString(), request ) );
+			URLConnection conn = reqUrl.openConnection();
+			conn.setConnectTimeout( (int) unit.toMillis( time ) );
+			conn.setReadTimeout( (int) ( unit.toMillis( time ) / 5L ) );
 			
 			BencodeInputStream bis =
-				new BencodeInputStream( reqUrl.openStream() );
+				new BencodeInputStream( conn.getInputStream() );
 			return TrackerResponse.fromValue( bis.readValue() );
 			
 		} catch ( MalformedURLException e ) {
