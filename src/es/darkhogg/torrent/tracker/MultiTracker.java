@@ -1,6 +1,6 @@
 package es.darkhogg.torrent.tracker;
 
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,7 +18,7 @@ import java.util.List;
 	/**
 	 * List of URL's of the tracker
 	 */
-	private final List<Tracker> trackers;
+	private final LinkedList<Tracker> trackers;
 	
 	/**
 	 * Constructs the tracker from a given list of sets of announce strings
@@ -27,16 +27,19 @@ import java.util.List;
 	 *            List of sets of announce strings
 	 */
 	public MultiTracker ( List<Tracker> announces ) {
-		trackers =
-			Collections.unmodifiableList( new LinkedList<Tracker>( announces ) );
+		trackers = new LinkedList<Tracker>( announces );
 	}
 	
 	@Override
 	public TrackerResponse sendRequest ( TrackerRequest request ) {
-		for ( Tracker tracker : trackers ) {
+		
+		for ( Iterator<Tracker> it = trackers.iterator(); it.hasNext(); ) {
+			Tracker tracker = it.next();
 			TrackerResponse resp = tracker.sendRequest( request );
 			
 			if ( resp != null ) {
+				it.remove();
+				trackers.addFirst( tracker );
 				return resp;
 			}
 		}

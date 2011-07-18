@@ -160,7 +160,6 @@ import java.util.Random;
 			return new TrackerResponse( false, null, "", interval, interval,
 				EMPTY_BYTE_ARR, seeders, leechers, peers );
 		} catch ( IOException e ) {
-			System.out.println( e );
 			return null;
 		} finally {
 			if ( socket != null ) {
