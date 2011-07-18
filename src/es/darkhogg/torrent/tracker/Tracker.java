@@ -13,7 +13,7 @@ import java.util.Set;
 import es.darkhogg.torrent.data.TorrentMetaInfo;
 
 /**
- * Represents an HTTP service capable of handling announce requests, commonly
+ * Represents an service capable of handling announce requests, commonly
  * known as a <i>tracker</i>.
  * 
  * @author Daniel Escoz

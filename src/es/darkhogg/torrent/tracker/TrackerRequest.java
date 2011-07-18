@@ -275,21 +275,23 @@ public final class TrackerRequest {
 	 * 
 	 * <pre>
 	 * // These simple lines of code...
-	 * TreackerRequest tr =
+	 * TrackerRequest tr =
 	 * 	TrackerRequest.builder().infoHash( h ).numWant( 33 ).compact( true )
 	 * 		.build();
 	 * 
-	 * // ...are equivalent to this
+	 * // ...are equivalent to these
 	 * TrackerRequest.Builder trb = TrackerRequest.builder();
 	 * trb.infoHash( h );
 	 * trb.numWant( 33 );
 	 * trb.compact( true );
-	 * TreackerRequest tr = trb.build();
+	 * TrackerRequest tr = trb.build();
 	 * </pre>
 	 * <p>
 	 * This class provides no means to know the state of values and it doesn't
-	 * check or copy them at all. When calling to the <tt>build</tt> method, the
-	 * constructor from <tt>TrackerRequest</tt> takes care of all that.
+	 * check or copy them at all. When calling the <tt>build</tt> method, the
+	 * constructor from <tt>TrackerRequest</tt> takes care of all. A single
+	 * builder object may be reused to build multiple requests that share
+	 * information.
 	 * 
 	 * @author Daniel Escoz
 	 * @version 1.0
