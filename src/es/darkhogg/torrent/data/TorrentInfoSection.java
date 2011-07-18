@@ -216,7 +216,7 @@ public final class TorrentInfoSection {
 	/**
 	 * Returns the information about the specified file. The given <tt>file</tt>
 	 * must be <i>equals to</i> the value returned by the
-	 * {@link TorrentFileInfo#getPathAsFile} method to be recognized. Otherwise,
+	 * {@link TorrentFileInfo#getPath} method to be recognized. Otherwise,
 	 * this method returns <tt>null</tt>.
 	 * 
 	 * @param file

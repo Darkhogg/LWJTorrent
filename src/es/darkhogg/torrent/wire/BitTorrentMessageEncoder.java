@@ -27,7 +27,7 @@ public final class BitTorrentMessageEncoder {
 	 * Encodes the given message into the given <tt>buffer</tt> in the format
 	 * specified in the BitTorrent protocol specification.
 	 * <p>
-	 * If this method throws a {@link java.io.BufferOverflowException}, the
+	 * If this method throws a {@link java.nio.BufferOverflowException}, the
 	 * actual amount of bytes written into the buffer is not determined.
 	 * 
 	 * @param buffer Destination buffer

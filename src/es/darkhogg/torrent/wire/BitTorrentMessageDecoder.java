@@ -42,7 +42,7 @@ public final class BitTorrentMessageDecoder {
 		ByteBuffer buffer
 	) {
 		// Protocol name
-		int pNameLen = (int)(buffer.get()) & 0xFF;
+		int pNameLen = (buffer.get()) & 0xFF;
 		
 		byte[] pNameBytes = new byte[ pNameLen ];
 		buffer.get( pNameBytes );
@@ -123,7 +123,7 @@ public final class BitTorrentMessageDecoder {
 	 * <tt>buffer</tt>.
 	 * <p>
 	 * If there are not <tt>length</tt> bytes available, this method
-	 * immediately throws a {@link java.io.BufferUnderflowException}, and no
+	 * immediately throws a {@link java.nio.BufferUnderflowException}, and no
 	 * bytes from the buffer are consumed. In any other case, exactly
 	 * <tt>length</tt> bytes are consumed.
 	 * 
@@ -154,7 +154,7 @@ public final class BitTorrentMessageDecoder {
 		}
 		
 		// Get the message ID and type
-		int msgId = (int)( buffer.get() ) & 0xFF;
+		int msgId = ( buffer.get() ) & 0xFF;
 		MessageType mt = MessageType.forId( msgId );
 		
 		// Decode the specific type
@@ -280,6 +280,6 @@ public final class BitTorrentMessageDecoder {
 	 * @return Decoded message
 	 */
 	private static BitTorrentMessage decodePort ( ByteBuffer buffer ) {
-		return new PortMessage( (int)( buffer.getShort() ) & 0xFFFF );
+		return new PortMessage( ( buffer.getShort() ) & 0xFFFF );
 	}
 }
