@@ -89,10 +89,8 @@ public abstract class Tracker {
 			sb.append( "&numwant=" );
 			sb.append( req.getNumWant() );
 			
-			if ( req.getKey() != null ) {
-				sb.append( "&key=" );
-				sb.append( req.getKey() );
-			}
+			sb.append( "&key=" );
+			sb.append( req.getKey() );
 			
 			if ( req.getTrackerId() != null ) {
 				sb.append( "&trackerid=" );

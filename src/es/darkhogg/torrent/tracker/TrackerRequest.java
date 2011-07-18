@@ -79,7 +79,7 @@ public final class TrackerRequest {
 	/**
 	 * Unique key used for this peer
 	 */
-	private final String key;
+	private final int key;
 	
 	/**
 	 * tracker ID returned by the tracker in previous announces
@@ -125,7 +125,7 @@ public final class TrackerRequest {
 	 */
 	private TrackerRequest ( Sha1Hash infoHash, PeerId peerId, int port,
 		long uploaded, long downloaded, long left, Boolean compact,
-		boolean noPeerId, Event event, InetAddress ip, int numWant, String key,
+		boolean noPeerId, Event event, InetAddress ip, int numWant, int key,
 		byte[] trackerId )
 	{
 		if ( infoHash == null )
@@ -238,7 +238,7 @@ public final class TrackerRequest {
 	/**
 	 * @return the unique key for this client set in the request
 	 */
-	public String getKey () {
+	public int getKey () {
 		return key;
 	}
 	
@@ -354,7 +354,7 @@ public final class TrackerRequest {
 		/**
 		 * Unique key of this builder
 		 */
-		private String key = null;
+		private int key = Integer.MIN_VALUE;
 		
 		/**
 		 * Tracker ID of this builder
@@ -541,15 +541,16 @@ public final class TrackerRequest {
 		}
 		
 		/**
-		 * Stores the passed <tt>String</tt> as the unique key for this client.
+		 * Stores the passed <tt>int</tt> as the unique key for this client.
 		 * <p>
-		 * If this method is never called, the client key is unspecified
+		 * If this method is never called, the client key is the value of
+		 * <tt>Integer.MIN_VALUE</tt>
 		 * 
 		 * @param key
 		 *            New client key for this builder
 		 * @return The <tt>this</tt> reference
 		 */
-		public Builder key ( String key ) {
+		public Builder key ( int key ) {
 			this.key = key;
 			return this;
 		}
@@ -609,22 +610,22 @@ public final class TrackerRequest {
 		/**
 		 * Event for the first announce
 		 */
-		STARTED ( "started" ),
-
+		STARTED ( "started", 2 ),
+		
 		/**
 		 * Event to send when a torrent stops gracefully
 		 */
-		STOPPED ( "stopped" ),
-
+		STOPPED ( "stopped", 3 ),
+		
 		/**
 		 * Event for a completed torrent. Should only be sent once per torrent
 		 */
-		COMPLETED ( "completed" ),
-
+		COMPLETED ( "completed", 1 ),
+		
 		/**
 		 * Event for regular announces
 		 */
-		REGULAR ( "" );
+		REGULAR ( "", 0 );
 		
 		/**
 		 * String that must be sent to the tracker
@@ -632,23 +633,38 @@ public final class TrackerRequest {
 		private final String string;
 		
 		/**
+		 * Integer that must be sent to an UDP tracker
+		 */
+		private final int integer;
+		
+		/**
 		 * Constructs an event with the given string
 		 * 
 		 * @param str
 		 *            The string of the event
 		 */
-		private Event ( String str ) {
+		private Event ( String str, int intg ) {
 			string = str;
+			integer = intg;
 		}
 		
 		/**
 		 * Returns the string that must be sent to the tracker. This method
 		 * returns <tt>""</tt> if no <i>event</i> parameter should be present.
 		 * 
-		 * @return The string assocciated with this event
+		 * @return The string associated with this event
 		 */
 		public String getEventString () {
 			return string;
+		}
+		
+		/**
+		 * Returns the integer value that must be sent to the tracker.
+		 * 
+		 * @return The integer associated with this event
+		 */
+		public int getEventInt () {
+			return integer;
 		}
 	}
 	

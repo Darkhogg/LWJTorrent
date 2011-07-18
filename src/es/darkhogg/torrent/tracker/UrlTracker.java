@@ -45,4 +45,8 @@ import es.darkhogg.torrent.bencode.BencodeInputStream;
 		}
 	}
 	
+	@Override
+	public String toString () {
+		return "URL-Tracker(" + url + ")";
+	}
 }

@@ -27,12 +27,12 @@ import java.util.List;
 	 *            List of sets of announce strings
 	 */
 	public MultiTracker ( List<Tracker> announces ) {
-		trackers = Collections.unmodifiableList( new LinkedList<Tracker>() );
+		trackers =
+			Collections.unmodifiableList( new LinkedList<Tracker>( announces ) );
 	}
 	
 	@Override
 	public TrackerResponse sendRequest ( TrackerRequest request ) {
-		
 		for ( Tracker tracker : trackers ) {
 			TrackerResponse resp = tracker.sendRequest( request );
 			
@@ -44,4 +44,8 @@ import java.util.List;
 		return null;
 	}
 	
+	@Override
+	public String toString () {
+		return "Multi-Tracker(" + trackers + ")";
+	}
 }
