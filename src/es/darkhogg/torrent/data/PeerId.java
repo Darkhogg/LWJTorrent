@@ -30,7 +30,7 @@ public final class PeerId {
 	private final String string;
 	
 	/**
-	 * Cached has-code
+	 * Cached hash-code
 	 */
 	private final int hash;
 	
