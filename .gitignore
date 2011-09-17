@@ -1,7 +1,6 @@
 # Ignore binaries, build scripts and docs
 bin/
 doc/
-lib/
 *.bat
 *.sh
 
