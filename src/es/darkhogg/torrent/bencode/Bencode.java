@@ -52,21 +52,16 @@ public class Bencode {
 		for ( String string : strings ) {
 			if ( value instanceof DictionaryValue ) {
 				DictionaryValue dval = (DictionaryValue) value;
-				Map<String,Value<?>> map = dval.getValue();
-				
-				value = map.get( string );
+				value = dval.get( string );
 				
 			} else if ( value instanceof ListValue ) {
 				ListValue lval = (ListValue) value;
-				List<Value<?>> list = lval.getValue();
-				int pos = 0;
 				try {
-					pos = Integer.parseInt( string );
+					int pos = Integer.parseInt( string );
+					value = lval.get( pos );
 				} catch ( NumberFormatException e ) {
 					return null;
 				}
-				
-				value = list.get( pos );
 			} else {
 				return null;
 			}

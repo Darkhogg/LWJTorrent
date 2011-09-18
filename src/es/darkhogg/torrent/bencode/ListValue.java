@@ -25,7 +25,7 @@ import java.util.List;
  * @version 1.0.0
  */
 public final class ListValue extends Value<List<Value<?>>> {
-
+	
 	private List<Value<?>> value;
 	
 	/**
@@ -38,7 +38,8 @@ public final class ListValue extends Value<List<Value<?>>> {
 	/**
 	 * Creates this object with the given initial value
 	 * 
-	 * @param value Initial value
+	 * @param value
+	 *            Initial value
 	 */
 	public ListValue ( List<Value<?>> value ) {
 		super( value );
@@ -48,7 +49,7 @@ public final class ListValue extends Value<List<Value<?>>> {
 	public List<Value<?>> getValue () {
 		return Collections.unmodifiableList( value );
 	}
-
+	
 	@Override
 	public void setValue ( List<Value<?>> value ) {
 		if ( value == null ) {
@@ -56,6 +57,41 @@ public final class ListValue extends Value<List<Value<?>>> {
 		}
 		
 		this.value = new ArrayList<Value<?>>( value );
+	}
+	
+	/**
+	 * Adds the given <tt>val</tt>ue at the end of this list
+	 * 
+	 * @param val
+	 *            Value to be added
+	 * @see java.util.List#add(Object)
+	 */
+	public void add ( Value<?> val ) {
+		value.add( val );
+	}
+	
+	/**
+	 * Removes the value at the <tt>index</tt> position
+	 * 
+	 * @param index
+	 *            Index of the value to remove
+	 * @return The removed value
+	 * @see java.util.List#remove(int)
+	 */
+	public Value<?> remove ( int index ) {
+		return value.remove( index );
+	}
+	
+	/**
+	 * Retrieves the value at the <tt>index</tt> position
+	 * 
+	 * @param index
+	 *            Index of the value to retrieve
+	 * @return The value at the specified <tt>index</tt>
+	 * @see java.util.List#get(int)
+	 */
+	public Value<?> get ( int index ) {
+		return value.get( index );
 	}
 	
 	@Override
@@ -70,7 +106,7 @@ public final class ListValue extends Value<List<Value<?>>> {
 		
 		return sb.append( ']' ).toString();
 	}
-
+	
 	@Override
 	public long getEncodedLength () {
 		long childLength = 0;
@@ -81,5 +117,5 @@ public final class ListValue extends Value<List<Value<?>>> {
 		
 		return childLength + 2;
 	}
-
+	
 }

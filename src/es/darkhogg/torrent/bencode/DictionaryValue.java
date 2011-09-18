@@ -26,8 +26,8 @@ import java.util.TreeMap;
  * @version 1.0.0
  */
 public final class DictionaryValue extends Value<Map<String,Value<?>>> {
-
-	private SortedMap<String, Value<?>> value;
+	
+	private SortedMap<String,Value<?>> value;
 	
 	/**
 	 * Creates this object with an empty map
@@ -39,17 +39,18 @@ public final class DictionaryValue extends Value<Map<String,Value<?>>> {
 	/**
 	 * Creates this object with the given initial value
 	 * 
-	 * @param value Initial value
+	 * @param value
+	 *            Initial value
 	 */
 	public DictionaryValue ( Map<String,Value<?>> value ) {
 		super( value );
 	}
 	
 	@Override
-	public Map<String, Value<?>> getValue () {
+	public Map<String,Value<?>> getValue () {
 		return Collections.unmodifiableMap( value );
 	}
-
+	
 	@Override
 	public void setValue ( Map<String,Value<?>> value ) {
 		if ( value == null ) {
@@ -58,7 +59,49 @@ public final class DictionaryValue extends Value<Map<String,Value<?>>> {
 		
 		this.value = new TreeMap<String,Value<?>>( value );
 	}
-
+	
+	/**
+	 * Adds a new key-value pair to this dictionary. If the <tt>key</tt> already
+	 * exists in this dictionary, its value is replaced.
+	 * 
+	 * @param key
+	 *            The key to add or replace
+	 * @param val
+	 *            The new value for the <tt>key</tt>
+	 * @return The old value for the <tt>key</tt>
+	 * @see java.util.Map#put(Object,Object)
+	 */
+	public Value<?> put ( String key, Value<?> val ) {
+		return value.put( key, val );
+	}
+	
+	/**
+	 * Removes the given <tt>key</tt> and its associated value from this
+	 * dictionary.
+	 * 
+	 * @param key
+	 *            Key to remove
+	 * @return The value of the removed <tt>key</tt>
+	 * @see java.util.Map#remove(Object)
+	 */
+	public Value<?> remove ( String key ) {
+		return value.remove( key );
+	}
+	
+	/**
+	 * Returns the value for the given <tt>key</tt>, or <tt>nulll</tt> if the
+	 * key doesn't exist.
+	 * 
+	 * @param key
+	 *            Key which value is to be returned
+	 * @return The value associated with the <tt>key</tt>, or <tt>null</tt> if
+	 *         the key is not present
+	 * @see java.util.Map#get(Object)
+	 */
+	public Value<?> get ( String key ) {
+		return value.get( key );
+	}
+	
 	@Override
 	public String toString () {
 		StringBuilder sb = new StringBuilder( "{\n" );
@@ -73,7 +116,7 @@ public final class DictionaryValue extends Value<Map<String,Value<?>>> {
 		
 		return sb.append( '}' ).toString();
 	}
-
+	
 	@Override
 	public long getEncodedLength () {
 		long childLength = 0;
