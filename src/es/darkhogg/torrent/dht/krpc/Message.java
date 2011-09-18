@@ -3,6 +3,8 @@ package es.darkhogg.torrent.dht.krpc;
 import java.util.Arrays;
 import java.util.Objects;
 
+import es.darkhogg.torrent.bencode.Value;
+
 public abstract class Message {
 	
 	/** Transaction ID */
@@ -33,4 +35,6 @@ public abstract class Message {
 	public final MessageType getType () {
 		return type;
 	}
+	
+	public abstract Value<?> getBencodedValue ();
 }
