@@ -1,6 +1,11 @@
 package es.darkhogg.torrent.dht.krpc;
 
-
+/**
+ * A KRPC message indicating an error condition.
+ * 
+ * @author Daniel Escoz
+ * @version 1.0
+ */
 public final class ErrorMessage extends Message {
 	
 	/** Generic error code */

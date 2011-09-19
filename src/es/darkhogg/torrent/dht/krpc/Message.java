@@ -18,6 +18,7 @@ public abstract class Message {
 	 *            Transaction ID for this message
 	 * @param type
 	 *            Message type of this message
+	 * @throw NullPointerException if any of the arguments is <tt>null</tt>
 	 */
 	/* package */Message ( byte[] transaction, MessageType type ) {
 		this.transaction = Arrays.copyOf( Objects.requireNonNull( transaction, "transaction" ), transaction.length );
