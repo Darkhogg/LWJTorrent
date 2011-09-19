@@ -1,5 +1,7 @@
 package es.darkhogg.torrent.dht.krpc;
 
+import java.util.Objects;
+
 /**
  * A KRPC message indicating an error condition.
  * 
@@ -39,7 +41,7 @@ public final class ErrorMessage extends Message {
 	public ErrorMessage ( byte[] transaction, int code, String message ) {
 		super( transaction, MessageType.ERROR );
 		this.code = code;
-		this.message = message;
+		this.message = Objects.requireNonNull( message );
 	}
 	
 	/** @return The error code for this message */

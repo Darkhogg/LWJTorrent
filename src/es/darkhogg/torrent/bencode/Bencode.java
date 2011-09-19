@@ -58,18 +58,17 @@ public class Bencode {
 				DictionaryValue dval = (DictionaryValue) value;
 				value = dval.get( string );
 				
-			} else
-				if ( value instanceof ListValue ) {
-					ListValue lval = (ListValue) value;
-					try {
-						int pos = Integer.parseInt( string );
-						value = lval.get( pos );
-					} catch ( NumberFormatException e ) {
-						return null;
-					}
-				} else {
+			} else if ( value instanceof ListValue ) {
+				ListValue lval = (ListValue) value;
+				try {
+					int pos = Integer.parseInt( string );
+					value = lval.get( pos );
+				} catch ( NumberFormatException e ) {
 					return null;
 				}
+			} else {
+				return null;
+			}
 		}
 		
 		return value;
@@ -120,30 +119,27 @@ public class Bencode {
 		if ( val instanceof IntegerValue ) {
 			return convertFromValue( (IntegerValue) val );
 			
-		} else
-			if ( val instanceof StringValue ) {
-				return convertFromValue( (StringValue) val );
-				
-			} else
-				if ( val instanceof ListValue ) {
-					return convertFromValue( (ListValue) val );
-					
-				} else
-					if ( val instanceof DictionaryValue ) {
-						return convertFromValue( (DictionaryValue) val );
-						
-					} else {
-						// This exception is here for completeness
-						// As Value cannot be subclassed out of this package, no
-						// other
-						// classes should ever extend Value than those listed in
-						// this
-						// method. This is also the reason why it is not
-						// documented
-						// in a @throws tag.
-						throw new IllegalArgumentException();
-						
-					}
+		} else if ( val instanceof StringValue ) {
+			return convertFromValue( (StringValue) val );
+			
+		} else if ( val instanceof ListValue ) {
+			return convertFromValue( (ListValue) val );
+			
+		} else if ( val instanceof DictionaryValue ) {
+			return convertFromValue( (DictionaryValue) val );
+			
+		} else {
+			// This exception is here for completeness
+			// As Value cannot be subclassed out of this package, no
+			// other
+			// classes should ever extend Value than those listed in
+			// this
+			// method. This is also the reason why it is not
+			// documented
+			// in a @throws tag.
+			throw new IllegalArgumentException();
+			
+		}
 	}
 	
 	/**
@@ -224,33 +220,27 @@ public class Bencode {
 		if ( obj instanceof Value<?> ) {
 			return (Value<?>) obj;
 			
-		} else
-			if ( obj instanceof byte[] ) {
-				return convertToValue( (byte[]) obj );
-				
-			} else
-				if ( obj instanceof char[] ) {
-					return convertToValue( (char[]) obj );
-					
-				} else
-					if ( obj instanceof CharSequence ) {
-						return convertToValue( (CharSequence) obj );
-						
-					} else
-						if ( obj instanceof Number ) {
-							return convertToValue( (Number) obj );
-							
-						} else
-							if ( obj instanceof Iterable<?> ) {
-								return convertToValue( (Iterable<?>) obj );
-								
-							} else
-								if ( obj instanceof Map<?,?> ) {
-									return convertToValue( (Map<?,?>) obj );
-									
-								} else {
-									throw new ClassCastException();
-								}
+		} else if ( obj instanceof byte[] ) {
+			return convertToValue( (byte[]) obj );
+			
+		} else if ( obj instanceof char[] ) {
+			return convertToValue( (char[]) obj );
+			
+		} else if ( obj instanceof CharSequence ) {
+			return convertToValue( (CharSequence) obj );
+			
+		} else if ( obj instanceof Number ) {
+			return convertToValue( (Number) obj );
+			
+		} else if ( obj instanceof Iterable<?> ) {
+			return convertToValue( (Iterable<?>) obj );
+			
+		} else if ( obj instanceof Map<?,?> ) {
+			return convertToValue( (Map<?,?>) obj );
+			
+		} else {
+			throw new ClassCastException();
+		}
 	}
 	
 	/**
@@ -367,30 +357,27 @@ public class Bencode {
 		if ( value instanceof IntegerValue ) {
 			return copyOf( (IntegerValue) value );
 			
-		} else
-			if ( value instanceof StringValue ) {
-				return copyOf( (StringValue) value );
-				
-			} else
-				if ( value instanceof ListValue ) {
-					return copyOf( (ListValue) value );
-					
-				} else
-					if ( value instanceof DictionaryValue ) {
-						return copyOf( (DictionaryValue) value );
-						
-					} else {
-						// This exception is here for completeness
-						// As Value cannot be subclassed out of this package, no
-						// other
-						// classes should ever extend Value than those listed in
-						// this
-						// method. This is also the reason why it is not
-						// documented
-						// in a @throws tag.
-						throw new IllegalArgumentException();
-						
-					}
+		} else if ( value instanceof StringValue ) {
+			return copyOf( (StringValue) value );
+			
+		} else if ( value instanceof ListValue ) {
+			return copyOf( (ListValue) value );
+			
+		} else if ( value instanceof DictionaryValue ) {
+			return copyOf( (DictionaryValue) value );
+			
+		} else {
+			// This exception is here for completeness
+			// As Value cannot be subclassed out of this package, no
+			// other
+			// classes should ever extend Value than those listed in
+			// this
+			// method. This is also the reason why it is not
+			// documented
+			// in a @throws tag.
+			throw new IllegalArgumentException();
+			
+		}
 	}
 	
 	/**
