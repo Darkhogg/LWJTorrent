@@ -50,13 +50,7 @@ in fact almost trivial. All you need is an instance of the `PeerConnection`
 class and some calls to its `process` method.
 
 
-Client
-------
+### es.darkhogg.torrent.dht
 
-This project also come with a client, the *LightWeight Java Client*, which can
-only be used using API calls, that is, programmatically.
-
-### es.darkhogg.torrent.lwclient
-
-The main objective of the project, the lightweight client. It is a full client
-that can be controlled without any user interaction.
+An implementation of the Distributed Hash Table system used by BitTorrent for
+trackerless torrents.

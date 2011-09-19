@@ -3,6 +3,18 @@ package es.darkhogg.torrent.dht.krpc;
 
 public final class ErrorMessage extends Message {
 	
+	/** Generic error code */
+	public final static int ERROR_GENERIC = 201;
+	
+	/** Server error code */
+	public final static int ERROR_SERVER = 202;
+	
+	/** Protocol error code */
+	public final static int ERROR_PROTOCOL = 203;
+	
+	/** Method unknown error code */
+	public final static int ERROR_METHOD_UNKNOWN = 204;
+	
 	/** Error code */
 	private final int code;
 	
@@ -34,5 +46,4 @@ public final class ErrorMessage extends Message {
 	public String getErrorMessage () {
 		return message;
 	}
-	
 }
