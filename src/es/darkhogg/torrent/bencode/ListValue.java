@@ -94,6 +94,16 @@ public final class ListValue extends Value<List<Value<?>>> {
 		return value.get( index );
 	}
 	
+	/**
+	 * Returns the number of elements in this list
+	 * 
+	 * @return Number of elements in the list
+	 * @see java.util.List#size()
+	 */
+	public int getSize () {
+		return value.size();
+	}
+	
 	@Override
 	public String toString () {
 		StringBuilder sb = new StringBuilder( "[\n" );

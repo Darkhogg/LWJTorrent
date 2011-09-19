@@ -2,6 +2,7 @@ package es.darkhogg.torrent.dht.krpc;
 
 import java.util.Objects;
 
+import es.darkhogg.torrent.bencode.Bencode;
 import es.darkhogg.torrent.bencode.DictionaryValue;
 import es.darkhogg.torrent.bencode.IntegerValue;
 import es.darkhogg.torrent.bencode.ListValue;
@@ -21,12 +22,54 @@ public final class KrpcBencodeConverter {
 	 * Converts the passed bencoded <tt>Value</tt> to a <tt>Message</tt> that
 	 * represents it.
 	 * 
-	 * @param benc
+	 * @param value
 	 *            Value to convert
-	 * @return Message converted from <tt>benc</tt>
+	 * @return Message converted from <tt>value</tt>
+	 * @throw IllegalArgumentException if the given <tt>value</tt> is not a
+	 *        valid KRPC message representation
 	 */
-	public static Message convertBencodeToMessage ( Value<?> benc ) {
-		return null;
+	public static Message convertBencodeToMessage ( Value<?> value ) {
+		try {
+			StringValue tVal = Bencode.getChildValue( value, StringValue.class, "t" );
+			StringValue yVal = Bencode.getChildValue( value, StringValue.class, "y" );
+			
+			byte[] trid = tVal.getValue();
+			MessageType type = MessageType.fromString( yVal.getStringValue() );
+			
+			switch ( type ) {
+			// Error message
+				case ERROR: {
+					ListValue eVal = Bencode.getChildValue( value, ListValue.class, "e" );
+					if ( eVal.getSize() != 2 ) {
+						throw new IllegalArgumentException();
+					}
+					int eCode = Bencode.getChildValue( eVal, IntegerValue.class, "0" ).getValue().intValue();
+					String eMsg = Bencode.getChildValue( eVal, StringValue.class, "1" ).getStringValue();
+					return new ErrorMessage( trid, eCode, eMsg );
+				}
+				
+				// Query message
+				case QUERY: {
+					StringValue qVal = Bencode.getChildValue( value, StringValue.class, "q" );
+					DictionaryValue aVal = Bencode.getChildValue( value, DictionaryValue.class, "a" );
+					return new QueryMessage( trid, QueryType.fromString( qVal.getStringValue() ), aVal );
+				}
+				
+				// Response message
+				case RESPONSE: {
+					DictionaryValue rVal = Bencode.getChildValue( value, DictionaryValue.class, "r" );
+					return new ResponseMessage( trid, rVal );
+				}
+				
+				// Invalid message
+				default: {
+					throw new IllegalArgumentException();
+				}
+			}
+		} catch ( Exception e ) {
+			// If something goes wrong, throw an IAE
+			throw new IllegalArgumentException( e );
+		}
 	}
 	
 	/**

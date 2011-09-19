@@ -102,6 +102,16 @@ public final class DictionaryValue extends Value<Map<String,Value<?>>> {
 		return value.get( key );
 	}
 	
+	/**
+	 * Returns the number of elements in this dictionary
+	 * 
+	 * @return Number of elements in the dictionary
+	 * @see java.util.Map#size()
+	 */
+	public int getSize () {
+		return value.size();
+	}
+	
 	@Override
 	public String toString () {
 		StringBuilder sb = new StringBuilder( "{\n" );

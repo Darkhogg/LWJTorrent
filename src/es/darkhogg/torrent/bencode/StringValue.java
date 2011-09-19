@@ -17,10 +17,10 @@ package es.darkhogg.torrent.bencode;
 import java.util.Arrays;
 
 /**
- * Wraps the bencoded strin value as an array of bytes. This object represents
+ * Wraps the bencoded string value as an array of bytes. This object represents
  * bencoded string as bytes to simplify handling of binary data. The
- * <tt>toString</tt> method can retrieve a string created converting the value
- * using <tt>UTF-8</tt>.
+ * <tt>getStringValue</tt> method can retrieve a string created converting the
+ * value using <tt>UTF-8</tt>.
  * 
  * @author Daniel Escoz
  * @version 1.0.0
@@ -33,7 +33,8 @@ public final class StringValue extends Value<byte[]> {
 	/**
 	 * Creates this object with the given initial value
 	 * 
-	 * @param value Initial value
+	 * @param value
+	 *            Initial value
 	 */
 	public StringValue ( byte[] value ) {
 		super( value );
@@ -43,16 +44,19 @@ public final class StringValue extends Value<byte[]> {
 	 * Creates this object by converting the given String to bytes using the
 	 * <tt>UTF-8</tt> charset
 	 * 
-	 * @param value Initial String value
+	 * @param value
+	 *            Initial String value
 	 */
 	public StringValue ( String value ) {
 		this( value.getBytes( Bencode.UTF8 ) );
 	}
 	
+	@Override
 	public byte[] getValue () {
 		return Arrays.copyOf( value, value.length );
 	}
 	
+	@Override
 	public void setValue ( byte[] value ) {
 		if ( value == null ) {
 			throw new NullPointerException();
@@ -64,9 +68,10 @@ public final class StringValue extends Value<byte[]> {
 	
 	/**
 	 * Sets this object value by converting the given String to bytes using the
-	 * <tt>UTF-8</tt> charset 
+	 * <tt>UTF-8</tt> charset
 	 * 
-	 * @param value New String value
+	 * @param value
+	 *            New String value
 	 */
 	public void setStringValue ( String value ) {
 		this.value = value.getBytes( Bencode.UTF8 );
@@ -87,7 +92,7 @@ public final class StringValue extends Value<byte[]> {
 	public String toString () {
 		return "\"" + str + "\"";
 	}
-
+	
 	@Override
 	public long getEncodedLength () {
 		return value.length + 2 + (long) Math.log10( value.length );
