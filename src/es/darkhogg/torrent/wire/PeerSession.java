@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -32,8 +33,14 @@ public final class PeerSession implements Closeable {
 	/** Executor used for event dispatching */
 	private final ExecutorService eventExecutor;
 	
+	/** Whether the event executor must be shutdown automatically */
+	private final boolean shutdownEventExecutor;
+	
 	/** Executor used for connection execution */
 	private final ExecutorService connectionExecutor;
+	
+	/** Whether the connection executor must be shutdown automatically */
+	private final boolean shutdownConnectionExecutor;
 	
 	/** Queue for outgoing messages */
 	BlockingQueue<BitTorrentMessage> outQueue = new LinkedBlockingQueue<BitTorrentMessage>();
@@ -99,10 +106,14 @@ public final class PeerSession implements Closeable {
 	
 	// --- Constructor ---
 	
-	private PeerSession ( PeerConnection connection, ExecutorService evExec, ExecutorService clExec ) {
-		this.connection = connection;
-		this.eventExecutor = evExec;
-		this.connectionExecutor = clExec;
+	private PeerSession (
+		PeerConnection conn, ExecutorService evExec, boolean sdEv, ExecutorService clExec, boolean sdCl )
+	{
+		this.connection = Objects.requireNonNull( conn );
+		this.eventExecutor = Objects.requireNonNull( evExec );
+		this.shutdownEventExecutor = sdEv;
+		this.connectionExecutor = Objects.requireNonNull( clExec );
+		this.shutdownConnectionExecutor = sdCl;
 		
 		connectionExecutor.submit( new ReceiveThread() );
 		connectionExecutor.submit( new SendThread() );
@@ -361,6 +372,57 @@ public final class PeerSession implements Closeable {
 		return connection.isClosed();
 	}
 	
+	// --- Factory Methods ---
+	
+	/**
+	 * Returns a new <tt>PeerSession</tt> that used the given arguments to
+	 * operate.
+	 * <p>
+	 * The connection passed as <tt>conn</tt> is used to receive and send
+	 * messages in parallel threads.
+	 * <p>
+	 * The executor passed as <tt>eventExec</tt> is used to execute events. Each
+	 * event is fired in all listeners as a single task, guaranteeing
+	 * non-concurrent execution of a single events. Multiple events are
+	 * submitted as separate tasks. It is recommended that a <i>single-thread
+	 * executor</i> is used as the event dispatch executor, so no two events are
+	 * ever fired concurrently. The passed executor will <i>not</i> be
+	 * auto-shutdown on session termination. If <tt>null</tt> is pased, a
+	 * {@link java.util.concurrent.Executors#newSingleThreadExecutor
+	 * single-thread executor} is used, which <i>will</i> be auto-shutdown on
+	 * termination.
+	 * <p>
+	 * The executor passed as <tt>connExec</tt> is used to execute the
+	 * connection controllers. At least two threads must be available in this
+	 * executor in order for this session to correctly execute. It is
+	 * recommended that a <i>cached thread pool</i> is used as the connection
+	 * controller executor, so there is always room for new connections. The
+	 * passed executor will <i>not</i> be auto-shutdown on session termination.
+	 * If <tt>null</tt> is pased, a
+	 * {@link java.util.concurrent.Executors#newCachedThreadPool cached thread
+	 * pool} is used, which <i>will</i> be auto-shutdown on termination.
+	 * 
+	 * @param conn The connection wraped on this session
+	 * @param eventExec Executor that will execute events
+	 * @param connExec Executor that will execute the connection controllers
+	 * @return
+	 */
+	public static PeerSession newSession ( PeerConnection conn, ExecutorService eventExec, ExecutorService connExec ) {
+		boolean shutdownEvent = false;
+		if ( eventExec == null ) {
+			eventExec = Executors.newSingleThreadExecutor();
+			shutdownEvent = true;
+		}
+		
+		boolean shutdownConn = false;
+		if ( connExec == null ) {
+			connExec = Executors.newFixedThreadPool( 2 );
+			shutdownConn = true;
+		}
+		
+		return new PeerSession( conn, eventExec, shutdownEvent, connExec, shutdownConn );
+	}
+	
 	// --- Message Processing ---
 	
 	/**
@@ -616,6 +678,12 @@ public final class PeerSession implements Closeable {
 		public void run () {
 			for ( PeerListener pl : listeners ) {
 				pl.onClose( PeerSession.this );
+				if ( shutdownEventExecutor ) {
+					eventExecutor.shutdown();
+				}
+				if ( shutdownConnectionExecutor ) {
+					connectionExecutor.shutdown();
+				}
 			}
 		}
 	}
