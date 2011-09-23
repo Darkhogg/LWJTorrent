@@ -4,6 +4,8 @@ import hirondelle.date4j.DateTime;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -318,6 +320,18 @@ public final class TorrentMetaInfo {
 		BencodeInputStream bin = null;
 		try {
 			bin = new BencodeInputStream( file );
+			return fromValue( bin.readValue() );
+		} finally {
+			if ( bin != null ) {
+				bin.close();
+			}
+		}
+	}
+	
+	public static TorrentMetaInfo fromFile ( Path path ) throws IOException {
+		BencodeInputStream bin = null;
+		try {
+			bin = new BencodeInputStream( Files.newInputStream( path ) );
 			return fromValue( bin.readValue() );
 		} finally {
 			if ( bin != null ) {

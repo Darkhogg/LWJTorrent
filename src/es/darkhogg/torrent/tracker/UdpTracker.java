@@ -116,7 +116,7 @@ import java.util.concurrent.TimeUnit;
 			dataOut.writeLong( request.getBytesLeft() );
 			dataOut.writeLong( request.getBytesUploaded() );
 			dataOut.writeLong( request.getEvent().getEventInt() );
-			if ( request.getIp() != null ) {
+			if ( request.getIp() == null ) {
 				dataOut.writeInt( -1 );
 			} else {
 				byte[] ipbuf = request.getIp().getAddress();
@@ -153,7 +153,7 @@ import java.util.concurrent.TimeUnit;
 				if ( read != 4 ) {
 					return null;
 				}
-				short recvPort = dataIn.readShort();
+				int recvPort = 0xFFFF & dataIn.readShort();
 				PeerInfo peer =
 					new PeerInfo( new InetSocketAddress(
 						InetAddress.getByAddress( addrBuf ), recvPort ), null );
