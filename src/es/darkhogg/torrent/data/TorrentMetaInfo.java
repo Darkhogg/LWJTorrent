@@ -89,9 +89,9 @@ public final class TorrentMetaInfo {
 	 * @throws IllegalArgumentException
 	 *             if some argument is not valid.
 	 */
-	protected TorrentMetaInfo ( TorrentInfoSection info, String announce,
-		List<Set<String>> announceList, DateTime creationDate, String comment,
-		String createdBy )
+	protected TorrentMetaInfo (
+		TorrentInfoSection info, String announce, List<Set<String>> announceList, DateTime creationDate,
+		String comment, String createdBy )
 	{
 		if ( announce == null | info == null )
 			throw new NullPointerException();
@@ -123,11 +123,9 @@ public final class TorrentMetaInfo {
 		StringBuilder sb = new StringBuilder( 128 );
 		sb.append( "TorrentMetaInfo{{ " );
 		
-		sb.append( "CreationDate(" ).append( this.creationDate ).append( "), " )
-			.append( "Comment(\"" ).append( this.comment ).append( "\"), " )
-			.append( "Announce(" ).append( this.announce ).append( "), " )
-			.append( "AnnounceList(" ).append( this.announceList )
-			.append( "), " ).append( "Info(" ).append( this.info )
+		sb.append( "CreationDate(" ).append( this.creationDate ).append( "), " ).append( "Comment(\"" )
+			.append( this.comment ).append( "\"), " ).append( "Announce(" ).append( this.announce ).append( "), " )
+			.append( "AnnounceList(" ).append( this.announceList ).append( "), " ).append( "Info(" ).append( this.info )
 			.append( "), " ).append( " }}" );
 		
 		chachedToString = sb.toString();
@@ -237,47 +235,36 @@ public final class TorrentMetaInfo {
 		
 		try {
 			// Announce
-			String announce =
-				( (StringValue) Bencode.getChildValue( value, "announce" ) )
-					.getStringValue();
+			String announce = ( (StringValue) Bencode.getChildValue( value, "announce" ) ).getStringValue();
 			
 			// Creation Date (Optional)
-			IntegerValue datev =
-				(IntegerValue) Bencode.getChildValue( value, "creation date" );
+			IntegerValue datev = (IntegerValue) Bencode.getChildValue( value, "creation date" );
 			DateTime creationDate = null;
 			if ( datev != null ) {
 				long dateInstant = datev.getValue().longValue();
-				creationDate =
-					DateTime.forInstant( dateInstant * 1000,
-						TimeZone.getTimeZone( "UTC" ) );
+				creationDate = DateTime.forInstant( dateInstant * 1000, TimeZone.getTimeZone( "UTC" ) );
 			}
 			
 			// Comment (Optional)
-			StringValue commv =
-				(StringValue) Bencode.getChildValue( value, "comment" );
+			StringValue commv = (StringValue) Bencode.getChildValue( value, "comment" );
 			String comment = commv == null ? null : commv.getStringValue();
 			
 			// Created By (Optional)
-			StringValue crbyv =
-				(StringValue) Bencode.getChildValue( value, "created by" );
+			StringValue crbyv = (StringValue) Bencode.getChildValue( value, "created by" );
 			String createdBy = crbyv == null ? null : crbyv.getStringValue();
 			
 			// Info Section
-			TorrentInfoSection info =
-				TorrentInfoSection.fromValue( Bencode.getChildValue( value,
-					"info" ) );
+			TorrentInfoSection info = TorrentInfoSection.fromValue( Bencode.getChildValue( value, "info" ) );
 			
 			// Announce List (Optional)
-			ListValue annlVal =
-				(ListValue) Bencode.getChildValue( value, "announce-list" );
+			ListValue annlVal = (ListValue) Bencode.getChildValue( value, "announce-list" );
 			List<Set<String>> announceList = null;
 			if ( annlVal != null ) {
 				announceList = new ArrayList<Set<String>>();
 				if ( annlVal != null ) {
 					List<Value<?>> annList = annlVal.getValue();
 					for ( Value<?> annsVal : annList ) {
-						List<Value<?>> annSet =
-							( (ListValue) annsVal ).getValue();
+						List<Value<?>> annSet = ( (ListValue) annsVal ).getValue();
 						Set<String> set = new HashSet<String>();
 						for ( Value<?> anneVal : annSet ) {
 							set.add( ( (StringValue) anneVal ).getStringValue() );
@@ -288,8 +275,7 @@ public final class TorrentMetaInfo {
 			}
 			
 			// Create the object
-			return new TorrentMetaInfo( info, announce, announceList,
-				creationDate, comment, createdBy );
+			return new TorrentMetaInfo( info, announce, announceList, creationDate, comment, createdBy );
 			
 		} catch ( Exception e ) {
 			throw new IllegalArgumentException( e );
@@ -303,9 +289,9 @@ public final class TorrentMetaInfo {
 	 * This method first reads a value from the file and then pass it to
 	 * {@link #fromValue} to create the <tt>TorrentMetaInfo</tt>. If client code
 	 * is going to use the <tt>Value</tt> object returned from the file, it is
-	 * recommended to do it manually using a <tt>BencodeInputStream</tt> and the
-	 * call <tt>fromValue</tt> instead of use this method, which will reparse
-	 * the file.
+	 * recommended to do it manually using a <tt>BencodeInputStream</tt> and
+	 * then call <tt>fromValue</tt> instead of using this method, which will
+	 * reparse the file.
 	 * 
 	 * @param file
 	 *            File used to create the new object
@@ -328,6 +314,26 @@ public final class TorrentMetaInfo {
 		}
 	}
 	
+	/**
+	 * Creates a new <tt>TorrentMetaInfo</tt> object using the contents of the
+	 * file represented by the given <tt>path</tt>.
+	 * <p>
+	 * This method first reads a value from the file and then pass it to
+	 * {@link #fromValue} to create the <tt>TorrentMetaInfo</tt>. If client code
+	 * is going to use the <tt>Value</tt> object returned from the file, it is
+	 * recommended to do it manually using a <tt>BencodeInputStream</tt> and
+	 * then call <tt>fromValue</tt> instead of using this method, which will
+	 * reparse the file.
+	 * 
+	 * @param file
+	 *            File used to create the new object
+	 * @return A new <tt>TorrentMetaInfo</tt> that represents the contents of a
+	 *         file pointed by <tt>path</tt>
+	 * @throws IOException
+	 *             If some I/O error occurs
+	 * @throws IllegalArgumentException
+	 *             if the given file is not a valid torrent metadata file
+	 */
 	public static TorrentMetaInfo fromFile ( Path path ) throws IOException {
 		BencodeInputStream bin = null;
 		try {
@@ -355,14 +361,10 @@ public final class TorrentMetaInfo {
 		
 		boolean dateEq =
 			( creationDate == null && tmi.creationDate == null )
-				|| ( creationDate != null && creationDate
-					.equals( tmi.creationDate ) );
+				|| ( creationDate != null && creationDate.equals( tmi.creationDate ) );
 		
-		return ( dateEq ) && ( announce.equals( tmi.announce ) )
-			&& ( announceList.equals( tmi.announceList ) )
-			&& ( comment.equals( tmi.comment ) )
-			&& ( createdBy.equals( tmi.createdBy ) )
-			&& ( info.equals( tmi.info ) );
+		return ( dateEq ) && ( announce.equals( tmi.announce ) ) && ( announceList.equals( tmi.announceList ) )
+			&& ( comment.equals( tmi.comment ) ) && ( createdBy.equals( tmi.createdBy ) ) && ( info.equals( tmi.info ) );
 	}
 	
 	@Override
