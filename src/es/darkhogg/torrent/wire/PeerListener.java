@@ -1,12 +1,14 @@
 package es.darkhogg.torrent.wire;
 
+import java.util.EventListener;
+
 /**
  * Listener interface for receiving {@link PeerSession}-generated events.
  * 
  * @author Daniel Escoz
  * @version 1.0
  */
-public interface PeerListener {
+public interface PeerListener extends EventListener {
 	
 	/**
 	 * Event generated when a message is received. Events of this kind are

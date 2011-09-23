@@ -45,12 +45,12 @@ Probably the most important package in the whole library. This package models
 the BitTorrent protocol used to exchange data between peers. The name of the
 package is chosen after the name *Peer Wire Protocol* seen in some places, as
 the name *protocol* would have been confusing, as the tracker and meta info
-files also define protocols. Using this package can be complicated, but it is
-in fact almost trivial. All you need is an instance of the `PeerConnection`
-class and some calls to its `process` method.
+files also define protocols. This package seems complicated at first, but is
+in fact really easy to use.
 
 
 ### es.darkhogg.torrent.dht
 
 An implementation of the Distributed Hash Table system used by BitTorrent for
 trackerless torrents.
+
