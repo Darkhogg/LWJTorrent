@@ -389,7 +389,11 @@ public class Bencode {
 	 * @return A copy of the given <tt>value</tt>
 	 */
 	public static IntegerValue copyOf ( IntegerValue value ) {
-		return new IntegerValue( value.getValue() );
+		if ( value == null ) {
+			return null;
+		} else {
+			return new IntegerValue( value.getValue() );
+		}
 	}
 	
 	/**
@@ -402,7 +406,11 @@ public class Bencode {
 	 * @return A copy of the given <tt>value</tt>
 	 */
 	public static StringValue copyOf ( StringValue value ) {
-		return new StringValue( value.getValue() );
+		if ( value == null ) {
+			return null;
+		} else {
+			return new StringValue( value.getValue() );
+		}
 	}
 	
 	/**
@@ -419,12 +427,16 @@ public class Bencode {
 	 * @return A copy of the given <tt>value</tt>
 	 */
 	public static ListValue copyOf ( ListValue value ) {
-		List<Value<?>> lv = new ArrayList<Value<?>>();
-		for ( Value<?> v : value.getValue() ) {
-			lv.add( copyOf( v ) );
+		if ( value == null ) {
+			return null;
+		} else {
+			List<Value<?>> lv = new ArrayList<Value<?>>();
+			for ( Value<?> v : value.getValue() ) {
+				lv.add( copyOf( v ) );
+			}
+			
+			return new ListValue( lv );
 		}
-		
-		return new ListValue( lv );
 	}
 	
 	/**
@@ -441,11 +453,15 @@ public class Bencode {
 	 * @return A copy of the given <tt>value</tt>
 	 */
 	public static DictionaryValue copyOf ( DictionaryValue value ) {
-		Map<String,Value<?>> mv = new HashMap<String,Value<?>>();
-		for ( Map.Entry<String,Value<?>> me : value.getValue().entrySet() ) {
-			mv.put( me.getKey(), copyOf( me.getValue() ) );
+		if ( value == null ) {
+			return null;
+		} else {
+			Map<String,Value<?>> mv = new HashMap<String,Value<?>>();
+			for ( Map.Entry<String,Value<?>> me : value.getValue().entrySet() ) {
+				mv.put( me.getKey(), copyOf( me.getValue() ) );
+			}
+			
+			return new DictionaryValue( mv );
 		}
-		
-		return new DictionaryValue( mv );
 	}
 }
