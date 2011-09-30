@@ -354,7 +354,10 @@ public class Bencode {
 	 * @return A copy of the given <tt>value</tt>
 	 */
 	public static Value<?> copyOf ( Value<?> value ) {
-		if ( value instanceof IntegerValue ) {
+		if ( value == null ) {
+			return null;
+			
+		} else if ( value instanceof IntegerValue ) {
 			return copyOf( (IntegerValue) value );
 			
 		} else if ( value instanceof StringValue ) {
@@ -367,14 +370,10 @@ public class Bencode {
 			return copyOf( (DictionaryValue) value );
 			
 		} else {
-			// This exception is here for completeness
-			// As Value cannot be subclassed out of this package, no
-			// other
-			// classes should ever extend Value than those listed in
-			// this
-			// method. This is also the reason why it is not
-			// documented
-			// in a @throws tag.
+			// This exception is here for completeness. As Value cannot be
+			// subclassed out of this package, no other classes should ever
+			// extend Value than those listed in this method. This is also the
+			// reason why it is not documented in a @throws tag.
 			throw new IllegalArgumentException();
 			
 		}

@@ -359,8 +359,13 @@ public final class PeerSession implements Closeable {
 	
 	@Override
 	public void close () {
-		connection.close();
-		outQueue.offer( EmptyMessage.KEEP_ALIVE );
+		synchronized ( connection ) {
+			if ( !connection.isClosed() ) {
+				connection.close();
+				outQueue.offer( EmptyMessage.KEEP_ALIVE );
+				fireCloseEvent();
+			}
+		}
 	}
 	
 	/**
@@ -402,9 +407,12 @@ public final class PeerSession implements Closeable {
 	 * {@link java.util.concurrent.Executors#newCachedThreadPool cached thread
 	 * pool} is used, which <i>will</i> be auto-shutdown on termination.
 	 * 
-	 * @param conn The connection wraped on this session
-	 * @param eventExec Executor that will execute events
-	 * @param connExec Executor that will execute the connection controllers
+	 * @param conn
+	 *            The connection wraped on this session
+	 * @param eventExec
+	 *            Executor that will execute events
+	 * @param connExec
+	 *            Executor that will execute the connection controllers
 	 * @return
 	 */
 	public static PeerSession newSession ( PeerConnection conn, ExecutorService eventExec, ExecutorService connExec ) {
@@ -587,8 +595,6 @@ public final class PeerSession implements Closeable {
 				}
 			} catch ( IOException e ) {
 				close();
-			} finally {
-				fireCloseEvent();
 			}
 		}
 		
@@ -607,8 +613,10 @@ public final class PeerSession implements Closeable {
 			try {
 				while ( !isClosed() ) {
 					BitTorrentMessage msg = outQueue.poll( 1, TimeUnit.MINUTES );
-					connection.sendMessage( msg );
-					fireSendEvent( msg );
+					if ( msg != null ) {
+						connection.sendMessage( msg );
+						fireSendEvent( msg );
+					}
 				}
 			} catch ( Exception e ) {
 				close();
@@ -687,5 +695,4 @@ public final class PeerSession implements Closeable {
 			}
 		}
 	}
-	
 }

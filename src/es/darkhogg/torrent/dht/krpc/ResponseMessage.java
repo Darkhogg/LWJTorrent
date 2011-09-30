@@ -70,6 +70,12 @@ public final class ResponseMessage extends Message {
 	 *         the key doesn't exist or is of the wrong type
 	 */
 	public <T extends Value<?>> T getTypedReturnValue ( String key, Class<T> type ) {
-		return Bencode.getChildValue( returnValues, type, key );
+		Value<?> v = Bencode.copyOf( returnValues.get( key ) );
+		
+		if ( type.isInstance( v ) ) {
+			return type.cast( Bencode.copyOf( v ) );
+		} else {
+			return null;
+		}
 	}
 }
