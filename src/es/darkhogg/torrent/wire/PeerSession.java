@@ -4,8 +4,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.BitSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -43,10 +44,10 @@ public final class PeerSession implements Closeable {
 	private final boolean shutdownConnectionExecutor;
 	
 	/** Queue for outgoing messages */
-	BlockingQueue<BitTorrentMessage> outQueue = new LinkedBlockingQueue<BitTorrentMessage>();
+	BlockingQueue<BitTorrentMessage> outQueue = new LinkedBlockingQueue<>();
 	
 	/** Peer listeners associated */
-	CopyOnWriteArrayList<PeerListener> listeners = new CopyOnWriteArrayList<PeerListener>();
+	Set<PeerListener> listeners = new CopyOnWriteArraySet<>();
 	
 	// --- State ---
 	
@@ -594,6 +595,8 @@ public final class PeerSession implements Closeable {
 					}
 				}
 			} catch ( IOException e ) {
+				// Nothing specific here
+			} finally {
 				close();
 			}
 		}
@@ -619,6 +622,8 @@ public final class PeerSession implements Closeable {
 					}
 				}
 			} catch ( Exception e ) {
+				// Nothing specific here
+			} finally {
 				close();
 			}
 		}

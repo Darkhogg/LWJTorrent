@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -12,6 +13,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PeerSessionPool implements Closeable {
+	
+	private static final int EVENT_EXECUTOR_SHUTDOWN_TIME = 250;
+	private static final int MISC_EXECUTOR_SHUTDOWN_TIME = 50;
 	
 	/** Internal collection containing all peers */
 	private final Set<PeerSession> peers = Collections.synchronizedSet( new HashSet<PeerSession>() );
@@ -21,16 +25,59 @@ public final class PeerSessionPool implements Closeable {
 		"EventThread" ) );
 	
 	/** Internal executor for clients */
-	private final ExecutorService cachedExecutor = Executors
-		.newCachedThreadPool( new PoolThreadFactory( "MiscThread" ) );
+	private final ExecutorService miscExecutor = Executors.newCachedThreadPool( new PoolThreadFactory( "MiscThread" ) );
+	
+	/** Listeners of this session pool */
+	private final Set<PeerListener> listeners = new CopyOnWriteArraySet<>();
 	
 	/** Whether this pool is closed */
 	private volatile boolean closed = false;
 	
 	// --- Constructors ---
 	
+	/**
+	 * Constructs a new <tt>PeerSessionPool</tt> with no <tt>PeerSession</tt>s
+	 * or <tt>PeerListener</tt>s attached
+	 */
 	public PeerSessionPool () {
-		cachedExecutor.submit( new BackgroundThread() );
+		miscExecutor.submit( new BackgroundThread() );
+	}
+	
+	// --- Listener Methods ---
+	
+	/**
+	 * Adds a <i>peer listener</i> that will receive events when any of the
+	 * <tt>PeerSession</tt>s of this pool receives a message, sends a message or
+	 * is closed. The passed <tt>listener</tt> will be added to all current and
+	 * future sessions managed by this pool.
+	 * 
+	 * @param listener
+	 *            Listener to add to this pool
+	 */
+	public void addPeerListener ( PeerListener listener ) {
+		synchronized ( peers ) {
+			listeners.add( listener );
+			for ( PeerSession peer : peers ) {
+				peer.addPeerListener( listener );
+			}
+		}
+	}
+	
+	/**
+	 * Removes a <i>peer listener</i> from this pool. The passed
+	 * <tt>listener</tt> will be removed from all current sessions managed by
+	 * this pool, and won't be added to new sessions.
+	 * 
+	 * @param listener
+	 *            Listener to remove to this pool
+	 */
+	public void removePeerListener ( PeerListener listener ) {
+		synchronized ( peers ) {
+			listeners.remove( listener );
+			for ( PeerSession peer : peers ) {
+				peer.removePeerListener( listener );
+			}
+		}
 	}
 	
 	// --- Factory Methods ---
@@ -44,20 +91,50 @@ public final class PeerSessionPool implements Closeable {
 	 * @return New session using the specified <tt>connection</tt>
 	 */
 	public PeerSession newSession ( PeerConnection connection ) {
-		PeerSession session = PeerSession.newSession( connection, eventExecutor, cachedExecutor );
-		peers.add( session );
-		return session;
+		PeerSession peer = PeerSession.newSession( connection, eventExecutor, miscExecutor );
+		synchronized ( peers ) {
+			peers.add( peer );
+			for ( PeerListener listener : listeners ) {
+				peer.addPeerListener( listener );
+			}
+		}
+		return peer;
 	}
 	
 	// --- Closing Methods ---
 	
 	@Override
 	public void close () {
-		for ( PeerSession peer : peers ) {
-			peer.close();
+		boolean exec = false;
+		synchronized ( this ) {
+			if ( !closed ) {
+				closed = true;
+				exec = true;
+			}
 		}
-		eventExecutor.shutdown();
-		cachedExecutor.shutdown();
+		if ( exec ) {
+			for ( PeerSession peer : peers ) {
+				peer.close();
+			}
+			
+			eventExecutor.shutdown();
+			miscExecutor.shutdown();
+			
+			try {
+				miscExecutor.awaitTermination( MISC_EXECUTOR_SHUTDOWN_TIME, TimeUnit.MILLISECONDS );
+				eventExecutor.awaitTermination( EVENT_EXECUTOR_SHUTDOWN_TIME, TimeUnit.MILLISECONDS );
+			} catch ( InterruptedException e ) {
+				// Do nothing -> terminate method
+			}
+			
+			if ( !eventExecutor.isTerminated() ) {
+				eventExecutor.shutdownNow();
+			}
+			
+			if ( !miscExecutor.isTerminated() ) {
+				miscExecutor.shutdownNow();
+			}
+		}
 	}
 	
 	/** @return Whether this pool is closed */
@@ -71,21 +148,22 @@ public final class PeerSessionPool implements Closeable {
 		
 		@Override
 		public void run () {
-			try {
-				while ( !isClosed() ) {
-					TimeUnit.SECONDS.sleep( 20 );
-					
-					synchronized ( peers ) {
-						for ( Iterator<PeerSession> it = peers.iterator(); it.hasNext(); ) {
-							PeerSession peer = it.next();
-							if ( peer.isClosed() ) {
-								it.remove();
-							}
+			while ( !isClosed() ) {
+				try {
+					TimeUnit.SECONDS.sleep( 30 );
+				} catch ( InterruptedException e ) {
+					// Interrupted!
+					close();
+				}
+				
+				synchronized ( peers ) {
+					for ( Iterator<PeerSession> it = peers.iterator(); it.hasNext(); ) {
+						PeerSession peer = it.next();
+						if ( peer.isClosed() ) {
+							it.remove();
 						}
 					}
 				}
-			} catch ( InterruptedException e ) {
-				close();
 			}
 		}
 		
@@ -119,4 +197,5 @@ public final class PeerSessionPool implements Closeable {
 		}
 		
 	}
+	
 }
