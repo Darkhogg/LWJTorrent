@@ -44,10 +44,10 @@ public final class PeerSession implements Closeable {
 	private final boolean shutdownConnectionExecutor;
 	
 	/** Queue for outgoing messages */
-	BlockingQueue<BitTorrentMessage> outQueue = new LinkedBlockingQueue<>();
+	BlockingQueue<BitTorrentMessage> outQueue = new LinkedBlockingQueue<BitTorrentMessage>();
 	
 	/** Peer listeners associated */
-	Set<PeerListener> listeners = new CopyOnWriteArraySet<>();
+	Set<PeerListener> listeners = new CopyOnWriteArraySet<PeerListener>();
 	
 	// --- State ---
 	
@@ -367,6 +367,17 @@ public final class PeerSession implements Closeable {
 				fireCloseEvent();
 			}
 		}
+	}
+	
+	// --- To String ---
+	
+	@Override
+	public final String toString () {
+		StringBuilder sb = new StringBuilder( "PeerSession{" );
+		
+		sb.append( "Connection=" ).append( connection );
+		
+		return sb.append( "}" ).toString();
 	}
 	
 	/**
@@ -699,5 +710,4 @@ public final class PeerSession implements Closeable {
 				}
 			}
 		}
-	}
-}
+	}}

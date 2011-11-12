@@ -1,6 +1,7 @@
 package es.darkhogg.torrent.dht;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
 public final class NodeId {
@@ -20,10 +21,15 @@ public final class NodeId {
 	 */
 	private final String string;
 	
+	/**
+	 * Creates a <tt>NodeId</tt> using a byte array of length 20.
+	 * 
+	 * @param bytes Node bytes
+	 * @throws NullPointerException if <tt>bytes</tt> is <tt>null</tt>
+	 * @throws IllegalArgumentException if <tt>bytes</tt> is not of length 20
+	 */
 	public NodeId ( byte[] bytes ) {
-		if ( bytes == null ) {
-			throw new NullPointerException();
-		}
+		Objects.requireNonNull( bytes );
 		
 		if ( bytes.length != 20 ) {
 			throw new IllegalArgumentException( "invalid length" );
@@ -91,7 +97,7 @@ public final class NodeId {
 	 * method with them will produce equal <tt>NodeId</tt> objects.
 	 * 
 	 * @param rand
-	 * @return
+	 * @return A new random node ID
 	 */
 	public static NodeId getRandomNodeId ( Random rand ) {
 		byte[] bytes = new byte[ 20 ];

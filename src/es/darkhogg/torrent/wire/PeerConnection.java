@@ -9,8 +9,8 @@ import java.nio.channels.SocketChannel;
 
 /**
  * Represents a connection with a peer using the BitTorrent wire protocol. This
- * class is intended as a simple abstraction over a
- * {@link java.nio.SocketChannel SocketChannel}, but does not provide any
+ * class is intended as a simple abstraction over a {@link java.nio.SocketChannel SocketChannel}, but does not provide
+ * any
  * associated state.
  * 
  * @author Daniel Escoz
@@ -104,9 +104,8 @@ public final class PeerConnection implements Closeable {
 	 * Returns a message from the input queue. If no message is available, this
 	 * method will wait until one arrives.
 	 * <p>
-	 * Note that this method will only look for <i>regular</i> messages. In
-	 * order to receive <i>handshake</i> messages, you must use
-	 * {@link #receiveHandShakeStart()} and {@link #receiveHandShakeEnd()}
+	 * Note that this method will only look for <i>regular</i> messages. In order to receive <i>handshake</i> messages,
+	 * you must use {@link #receiveHandShakeStart()} and {@link #receiveHandShakeEnd()}
 	 * 
 	 * @return A message from the input queue
 	 * @throws IOException
@@ -167,8 +166,7 @@ public final class PeerConnection implements Closeable {
 	/**
 	 * Tests whether this connection is closed.
 	 * 
-	 * @return <tt>true</tt> if this connection is closed, <tt>false</tt>
-	 *         otherwise
+	 * @return <tt>true</tt> if this connection is closed, <tt>false</tt> otherwise
 	 */
 	public boolean isClosed () {
 		return !channel.isOpen();
@@ -182,15 +180,26 @@ public final class PeerConnection implements Closeable {
 		close();
 	}
 	
+	@Override
+	public String toString () {
+		StringBuilder sb = new StringBuilder( "PeerConnection{" );
+		
+		try {
+			sb.append( channel.getRemoteAddress() );
+		} catch ( IOException e ) {
+			sb.append( "UnknownAddress" );
+		}
+		
+		return sb.append( "}" ).toString();
+	}
+	
 	/**
 	 * Creates a new <tt>PeerConnection</tt> using an already connected socket
 	 * channel.
 	 * <p>
-	 * The connection will use <tt>ibufSize</tt> and <tt>obufSize</tt> as the
-	 * size for the input and output buffers. The actual size is <i>at least</i>
-	 * the values given here, but this method ensures that a <i>Piece</i>
-	 * message with a block of size <tt>ibuf</tt>/<tt>obuf</tt> can be
-	 * respectively sent/received.
+	 * The connection will use <tt>ibufSize</tt> and <tt>obufSize</tt> as the size for the input and output buffers. The
+	 * actual size is <i>at least</i> the values given here, but this method ensures that a <i>Piece</i> message with a
+	 * block of size <tt>ibuf</tt>/<tt>obuf</tt> can be respectively sent/received.
 	 * 
 	 * @param sock
 	 *            Channel to use for this connection
@@ -210,11 +219,9 @@ public final class PeerConnection implements Closeable {
 	 * Creates a new <tt>PeerConnection</tt> using a new channel connected to
 	 * the given address
 	 * <p>
-	 * The connection will use <tt>ibufSize</tt> and <tt>obufSize</tt> as the
-	 * size for the input and output buffers. The actual size is <i>at least</i>
-	 * the values given here, but this method ensures that a <i>Piece</i>
-	 * message with a block of size <tt>ibuf</tt>/<tt>obuf</tt> can be
-	 * respectively sent/received.
+	 * The connection will use <tt>ibufSize</tt> and <tt>obufSize</tt> as the size for the input and output buffers. The
+	 * actual size is <i>at least</i> the values given here, but this method ensures that a <i>Piece</i> message with a
+	 * block of size <tt>ibuf</tt>/<tt>obuf</tt> can be respectively sent/received.
 	 * 
 	 * @param addr
 	 *            Address to connect the socket

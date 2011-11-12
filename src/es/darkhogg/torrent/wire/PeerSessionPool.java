@@ -14,8 +14,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PeerSessionPool implements Closeable {
 	
+	// --- Time Constants ---
+	// When the pool is closed for the first time, the executors are gracefully
+	// shutdown. If they do not terminate in the specified amount of time, they
+	// are forcefully shutdown with a `shutdownNow` call. This gives the threads
+	// some time to end, while ensuring that we have made all we can to stop
+	// them quickly.
+	
+	/** Time, in milliseconds, to wait for the event executor to terminate */
 	private static final int EVENT_EXECUTOR_SHUTDOWN_TIME = 250;
+	
+	/** Time, in milliseconds, to wait for the misc executor to terminate */
 	private static final int MISC_EXECUTOR_SHUTDOWN_TIME = 50;
+	
+	/** Time, in millisecons, the background controller will sleep */
+	private static final int BACKGROUND_SLEEP_TIME = 30000;
+	
+	// --- Pool Fields ---
 	
 	/** Internal collection containing all peers */
 	private final Set<PeerSession> peers = Collections.synchronizedSet( new HashSet<PeerSession>() );
@@ -28,10 +43,15 @@ public final class PeerSessionPool implements Closeable {
 	private final ExecutorService miscExecutor = Executors.newCachedThreadPool( new PoolThreadFactory( "MiscThread" ) );
 	
 	/** Listeners of this session pool */
-	private final Set<PeerListener> listeners = new CopyOnWriteArraySet<>();
+	private final Set<PeerListener> listeners = new CopyOnWriteArraySet<PeerListener>();
 	
 	/** Whether this pool is closed */
 	private volatile boolean closed = false;
+	
+	// --- Synchronization Object ---
+	
+	/** A dummy object used by the background thread to sleep */
+	private final Object sync = new Object();
 	
 	// --- Constructors ---
 	
@@ -46,8 +66,8 @@ public final class PeerSessionPool implements Closeable {
 	// --- Listener Methods ---
 	
 	/**
-	 * Adds a <i>peer listener</i> that will receive events when any of the
-	 * <tt>PeerSession</tt>s of this pool receives a message, sends a message or
+	 * Adds a <i>peer listener</i> that will receive events when any of the <tt>PeerSession</tt>s of this pool receives
+	 * a message, sends a message or
 	 * is closed. The passed <tt>listener</tt> will be added to all current and
 	 * future sessions managed by this pool.
 	 * 
@@ -64,8 +84,8 @@ public final class PeerSessionPool implements Closeable {
 	}
 	
 	/**
-	 * Removes a <i>peer listener</i> from this pool. The passed
-	 * <tt>listener</tt> will be removed from all current sessions managed by
+	 * Removes a <i>peer listener</i> from this pool. The passed <tt>listener</tt> will be removed from all current
+	 * sessions managed by
 	 * this pool, and won't be added to new sessions.
 	 * 
 	 * @param listener
@@ -105,18 +125,66 @@ public final class PeerSessionPool implements Closeable {
 	
 	@Override
 	public void close () {
-		boolean exec = false;
 		synchronized ( this ) {
 			if ( !closed ) {
 				closed = true;
-				exec = true;
+				
+				ExecutorService exec = Executors.newSingleThreadExecutor( new PoolThreadFactory( "CloseThread" ) );
+				exec.submit( new CloseTask() );
+				exec.shutdown();
 			}
 		}
-		if ( exec ) {
+	}
+	
+	/** @return Whether this pool is closed */
+	public boolean isClosed () {
+		return closed;
+	}
+	
+	// --- Background Controller Class ---
+	
+	private final class BackgroundThread implements Runnable {
+		
+		@Override
+		public void run () {
+			try {
+				while ( !isClosed() ) {
+					synchronized ( sync ) {
+						sync.wait( BACKGROUND_SLEEP_TIME );
+					}
+					
+					synchronized ( peers ) {
+						for ( Iterator<PeerSession> it = peers.iterator(); it.hasNext(); ) {
+							PeerSession peer = it.next();
+							if ( peer.isClosed() ) {
+								it.remove();
+							}
+						}
+					}
+				}
+			} catch ( InterruptedException e ) {
+				// Nothing special
+			} finally {
+				close();
+			}
+			
+		}
+		
+	}
+	
+	// --- Closing Task Class ---
+	
+	private final class CloseTask implements Runnable {
+		
+		@Override
+		public void run () {
 			for ( PeerSession peer : peers ) {
 				peer.close();
 			}
 			
+			synchronized ( sync ) {
+				sync.notifyAll();
+			}
 			eventExecutor.shutdown();
 			miscExecutor.shutdown();
 			
@@ -135,38 +203,6 @@ public final class PeerSessionPool implements Closeable {
 				miscExecutor.shutdownNow();
 			}
 		}
-	}
-	
-	/** @return Whether this pool is closed */
-	public boolean isClosed () {
-		return closed;
-	}
-	
-	// --- Background Controller Class ---
-	
-	private final class BackgroundThread implements Runnable {
-		
-		@Override
-		public void run () {
-			while ( !isClosed() ) {
-				try {
-					TimeUnit.SECONDS.sleep( 30 );
-				} catch ( InterruptedException e ) {
-					// Interrupted!
-					close();
-				}
-				
-				synchronized ( peers ) {
-					for ( Iterator<PeerSession> it = peers.iterator(); it.hasNext(); ) {
-						PeerSession peer = it.next();
-						if ( peer.isClosed() ) {
-							it.remove();
-						}
-					}
-				}
-			}
-		}
-		
 	}
 	
 	// --- Thread Factory Class ---
@@ -197,5 +233,4 @@ public final class PeerSessionPool implements Closeable {
 		}
 		
 	}
-	
 }
