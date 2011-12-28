@@ -324,6 +324,7 @@ public final class PeerSession implements Closeable {
 	 * 
 	 * @param message
 	 *            Message to be sent.
+	 * @return <tt>true</tt> if the message was correctly queued, <tt>false</tt> otherwise
 	 * @throws NullPointerException
 	 *             if <tt>message</tt> is <tt>null</tt>
 	 */
