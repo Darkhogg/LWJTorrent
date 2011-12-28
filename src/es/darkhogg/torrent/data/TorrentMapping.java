@@ -1,6 +1,5 @@
 package es.darkhogg.torrent.data;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -188,7 +187,7 @@ public final class TorrentMapping {
 	 * @return The information about which pieces covers the requested file, or
 	 *         <tt>null</tt> if the file is not valid.
 	 */
-	public List<Entry> getPiecesForFile ( File file ) {
+	public List<Entry> getPiecesForFile ( Path file ) {
 		if ( file == null ) {
 			throw new NullPointerException();
 		}

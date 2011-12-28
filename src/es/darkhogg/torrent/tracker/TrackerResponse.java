@@ -23,9 +23,8 @@ import es.darkhogg.torrent.data.PeerId;
  * Represents the response to a request to a {@link Tracker}. This class is
  * immutable.
  * <p>
- * Note that the only public way to create a <tt>TrackerRequest</tt> is using a
- * bencoded value. Objects of this class should not be created by client code,
- * but only returned by <tt>Tracker</tt>s when requested.
+ * Note that the only public way to create a <tt>TrackerRequest</tt> is using a bencoded value. Objects of this class
+ * should not be created by client code, but only returned by <tt>Tracker</tt>s when requested.
  * 
  * @author Daniel Escoz
  * @version 1.0
@@ -100,8 +99,8 @@ public final class TrackerResponse {
 	 * @param peers
 	 *            List of peers
 	 */
-	/* package */TrackerResponse ( boolean failed, String failureReason,
-		String warning, long interval, long minInterval, byte[] trackerId,
+	/* package */TrackerResponse (
+		boolean failed, String failureReason, String warning, long interval, long minInterval, byte[] trackerId,
 		long complete, long incomplete, List<PeerInfo> peers )
 	{
 		this.failed = failed;
@@ -126,13 +125,10 @@ public final class TrackerResponse {
 			this.warning = ( warning == null ) ? "" : warning;
 			this.interval = interval;
 			this.minInterval = minInterval;
-			this.trackerId =
-				trackerId == null ? null : Arrays.copyOf( trackerId,
-					trackerId.length );
+			this.trackerId = trackerId == null ? null : Arrays.copyOf( trackerId, trackerId.length );
 			this.complete = complete;
 			this.incomplete = incomplete;
-			this.peers =
-				Collections.unmodifiableList( new ArrayList<PeerInfo>( peers ) );
+			this.peers = Collections.unmodifiableList( new ArrayList<PeerInfo>( peers ) );
 		}
 	}
 	
@@ -190,14 +186,13 @@ public final class TrackerResponse {
 	
 	/**
 	 * Returns the tracker ID that must be sent in subsequent announces. If the
-	 * request failed or the tracker didn't send this value, this method returns
-	 * <tt>null</tt>. Otherwise, it returns a byte array.
+	 * request failed or the tracker didn't send this value, this method returns <tt>null</tt>. Otherwise, it returns a
+	 * byte array.
 	 * 
 	 * @return The tracker ID of the request
 	 */
 	public byte[] getTrackerId () {
-		return ( trackerId == null ) ? null : Arrays.copyOf( trackerId,
-			trackerId.length );
+		return ( trackerId == null ) ? null : Arrays.copyOf( trackerId, trackerId.length );
 	}
 	
 	/**
@@ -248,27 +243,21 @@ public final class TrackerResponse {
 		}
 		
 		try {
-			Value<?> failReasV =
-				Bencode.getChildValue( value, "failure reason" );
+			Value<?> failReasV = Bencode.getChildValue( value, "failure reason" );
 			if ( failReasV == null ) {
-				Value<?> warnV =
-					Bencode.getChildValue( value, "warning message" );
+				Value<?> warnV = Bencode.getChildValue( value, "warning message" );
 				
 				String warning = "";
 				if ( warnV != null ) {
 					warning = ( (StringValue) warnV ).getStringValue();
 				}
 				
-				long interval =
-					( (IntegerValue) Bencode.getChildValue( value, "interval" ) )
-						.getValue().longValue();
+				long interval = ( (IntegerValue) Bencode.getChildValue( value, "interval" ) ).getValue().longValue();
 				
-				Value<?> minIntV =
-					Bencode.getChildValue( value, "min interval" );
+				Value<?> minIntV = Bencode.getChildValue( value, "min interval" );
 				long minInterval = interval;
 				if ( minIntV != null ) {
-					minInterval =
-						( (IntegerValue) minIntV ).getValue().longValue();
+					minInterval = ( (IntegerValue) minIntV ).getValue().longValue();
 				}
 				
 				Value<?> trIdV = Bencode.getChildValue( value, "tracker id" );
@@ -277,25 +266,18 @@ public final class TrackerResponse {
 					trackerId = ( (StringValue) trIdV ).getValue();
 				}
 				
-				long complete =
-					( (IntegerValue) Bencode.getChildValue( value, "complete" ) )
-						.getValue().longValue();
+				long complete = ( (IntegerValue) Bencode.getChildValue( value, "complete" ) ).getValue().longValue();
 				
 				long incomplete =
-					( (IntegerValue) Bencode
-						.getChildValue( value, "incomplete" ) ).getValue()
-						.longValue();
+					( (IntegerValue) Bencode.getChildValue( value, "incomplete" ) ).getValue().longValue();
 				
-				List<PeerInfo> peers =
-					readPeers( Bencode.getChildValue( value, "peers" ) );
+				List<PeerInfo> peers = readPeers( Bencode.getChildValue( value, "peers" ) );
 				
-				return new TrackerResponse( false, "", warning, interval,
-					minInterval, trackerId, complete, incomplete, peers );
+				return new TrackerResponse( false, "", warning, interval, minInterval, trackerId, complete, incomplete,
+					peers );
 			} else {
-				String failureReason =
-					( (StringValue) failReasV ).getStringValue();
-				return new TrackerResponse( true, failureReason, "", 0, 0,
-					null, 0, 0, null );
+				String failureReason = ( (StringValue) failReasV ).getStringValue();
+				return new TrackerResponse( true, failureReason, "", 0, 0, null, 0, 0, null );
 			}
 		} catch ( Exception e ) {
 			throw new IllegalArgumentException( e );
@@ -318,8 +300,7 @@ public final class TrackerResponse {
 					throw new IllegalArgumentException();
 				}
 				
-				DataInputStream is =
-					new DataInputStream( new ByteArrayInputStream( str ) );
+				DataInputStream is = new DataInputStream( new ByteArrayInputStream( str ) );
 				byte[] ipbuf = new byte[ 4 ];
 				
 				List<PeerInfo> peers = new ArrayList<PeerInfo>();
@@ -328,9 +309,7 @@ public final class TrackerResponse {
 					is.readFully( ipbuf );
 					int port = is.readChar();
 					
-					InetSocketAddress addr =
-						new InetSocketAddress(
-							InetAddress.getByAddress( ipbuf ), port );
+					InetSocketAddress addr = new InetSocketAddress( InetAddress.getByAddress( ipbuf ), port );
 					PeerInfo pi = new PeerInfo( addr, null );
 					
 					peers.add( pi );
@@ -353,19 +332,14 @@ public final class TrackerResponse {
 					peerId = ( (StringValue) pIdV ).getValue();
 				}
 				
-				String host =
-					( (StringValue) Bencode.getChildValue( v, "ip" ) )
-						.getStringValue();
+				String host = ( (StringValue) Bencode.getChildValue( v, "ip" ) ).getStringValue();
 				
-				int port =
-					( (IntegerValue) Bencode.getChildValue( v, "port" ) )
-						.getValue().intValue();
+				int port = ( (IntegerValue) Bencode.getChildValue( v, "port" ) ).getValue().intValue();
 				
 				try {
 					InetAddress addr = InetAddress.getByName( host );
-					peers.add( new PeerInfo(
-						new InetSocketAddress( addr, port ),
-						new PeerId( peerId ) ) );
+					peers.add( new PeerInfo( new InetSocketAddress( addr, port ),
+						( peerId == null ? null : new PeerId( peerId ) ) ) );
 				} catch ( UnknownHostException e ) {
 					// Don't add this peer
 				}
@@ -379,8 +353,7 @@ public final class TrackerResponse {
 	
 	@Override
 	public String toString () {
-		StringBuilder sb =
-			new StringBuilder( TrackerResponse.class.getSimpleName() );
+		StringBuilder sb = new StringBuilder( TrackerResponse.class.getSimpleName() );
 		
 		sb.append( "{" );
 		
@@ -399,8 +372,7 @@ public final class TrackerResponse {
 			sb.append( minInterval );
 			
 			sb.append( "; TrackerId=[" );
-			sb.append( ( trackerId == null ) ? null : new String( trackerId,
-				Charset.forName( "ISO-8859-1" ) ) );
+			sb.append( ( trackerId == null ) ? null : new String( trackerId, Charset.forName( "ISO-8859-1" ) ) );
 			
 			sb.append( "]; Complete=" );
 			sb.append( complete );

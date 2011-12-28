@@ -327,8 +327,8 @@ public final class PeerSession implements Closeable {
 	 * @throws NullPointerException
 	 *             if <tt>message</tt> is <tt>null</tt>
 	 */
-	public void sendMessage ( BitTorrentMessage message ) {
-		outQueue.offer( message );
+	public boolean sendMessage ( BitTorrentMessage message ) {
+		return outQueue.offer( message );
 	}
 	
 	// --- Listener Management ---

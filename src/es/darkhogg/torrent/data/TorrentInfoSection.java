@@ -93,8 +93,8 @@ public final class TorrentInfoSection {
 		boolean priv, String baseDir, List<TorrentFileInfo> files,
 		Sha1Hash hash, String name )
 	{
-		if ( baseDir == null | hash == null | name == null
-			| pieceHashes.contains( null ) | files.contains( null ) )
+		if ( ( baseDir == null | hash == null | name == null )
+			|| pieceHashes.contains( null ) || files.contains( null ) )
 		{
 			throw new NullPointerException();
 		}

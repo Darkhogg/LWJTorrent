@@ -43,7 +43,7 @@ public final class BencodeOutputStream implements Closeable {
 	 */
 	public BencodeOutputStream ( OutputStream out ) {
 		stream = out;
-		printer = new PrintWriter( new OutputStreamWriter( out ) );
+		printer = new PrintWriter( new OutputStreamWriter( out, Bencode.UTF8 ) );
 	}
 	
 	/**

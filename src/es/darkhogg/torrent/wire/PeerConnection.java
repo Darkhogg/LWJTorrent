@@ -176,7 +176,7 @@ public final class PeerConnection implements Closeable {
 	 * Fallback for unclosed connections.
 	 */
 	@Override
-	public void finalize () {
+	protected void finalize () {
 		close();
 	}
 	

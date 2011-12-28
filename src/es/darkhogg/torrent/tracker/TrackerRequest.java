@@ -571,7 +571,7 @@ public final class TrackerRequest {
 		 * @return The <tt>this</tt> reference
 		 */
 		public Builder trackerId ( byte[] trackerId ) {
-			this.trackerId = trackerId;
+			this.trackerId = Arrays.copyOf( trackerId, trackerId.length );
 			return this;
 		}
 		
