@@ -6,20 +6,23 @@
  * 
  * This package is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with this package.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this package. If not, see <http://www.gnu.org/licenses/>.
  */
 package es.darkhogg.torrent.bencode;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetDecoder;
 import java.util.Arrays;
 
 /**
  * Wraps the bencoded string value as an array of bytes. This object represents
- * bencoded string as bytes to simplify handling of binary data. The
- * <tt>getStringValue</tt> method can retrieve a string created converting the
+ * bencoded string as bytes to simplify handling of binary data. The <tt>getStringValue</tt> method can retrieve a
+ * string created converting the
  * value using <tt>UTF-8</tt>.
  * 
  * @author Daniel Escoz
@@ -29,6 +32,7 @@ public final class StringValue extends Value<byte[]> {
 	
 	private byte[] value;
 	private String str;
+	private boolean validUtf8;
 	
 	/**
 	 * Creates this object with the given initial value
@@ -41,8 +45,7 @@ public final class StringValue extends Value<byte[]> {
 	}
 	
 	/**
-	 * Creates this object by converting the given String to bytes using the
-	 * <tt>UTF-8</tt> charset
+	 * Creates this object by converting the given String to bytes using the <tt>UTF-8</tt> charset
 	 * 
 	 * @param value
 	 *            Initial String value
@@ -64,11 +67,11 @@ public final class StringValue extends Value<byte[]> {
 		
 		this.value = Arrays.copyOf( value, value.length );
 		this.str = new String( value, Bencode.UTF8 );
+		this.validUtf8 = checkValidUtf8( value );
 	}
 	
 	/**
-	 * Sets this object value by converting the given String to bytes using the
-	 * <tt>UTF-8</tt> charset
+	 * Sets this object value by converting the given String to bytes using the <tt>UTF-8</tt> charset
 	 * 
 	 * @param value
 	 *            New String value
@@ -76,6 +79,7 @@ public final class StringValue extends Value<byte[]> {
 	public void setStringValue ( String value ) {
 		this.value = value.getBytes( Bencode.UTF8 );
 		this.str = value;
+		this.validUtf8 = true;
 	}
 	
 	/**
@@ -86,6 +90,27 @@ public final class StringValue extends Value<byte[]> {
 	 */
 	public String getStringValue () {
 		return str;
+	}
+	
+	/**
+	 * Returns whether the {@link #getValue() value} of this object is a valid <i>UTF-8</i> byte sequence.
+	 * 
+	 * @return <tt>true</tt> if this object contains a valid UTF-8 encoded byte array, <tt>false</tt> otherwise.
+	 */
+	public boolean isValidUtf8 () {
+		return validUtf8;
+	}
+	
+	private static boolean checkValidUtf8 ( byte[] bytes ) {
+		CharsetDecoder cd = Bencode.UTF8.newDecoder();
+		
+		try {
+			cd.decode( ByteBuffer.wrap( bytes ) );
+		} catch ( CharacterCodingException e ) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 	@Override
