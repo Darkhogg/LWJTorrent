@@ -6,23 +6,23 @@
  * 
  * This package is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with this package.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this package. If not, see <http://www.gnu.org/licenses/>.
  */
 package es.darkhogg.torrent.bencode;
 
 /**
  * Represents a value that can be bencoded.
  * <p>
- * Even if this class is generic, it should never be used in a form different
- * than <tt>Value&lt;?&gt;</tt>. Generic support is given only for convenience when
- * implementing subclasses.
+ * Even if this class is generic, it should never be used in a form different than <tt>Value&lt;?&gt;</tt>. Generic
+ * support is given only for convenience when implementing subclasses.
  * 
  * @author Daniel Escoz
- * @param T Basic return type for the class
+ * @param T
+ *            Basic return type for the class
  * @version 1.0.0
  */
 public abstract class Value<T> {
@@ -30,9 +30,10 @@ public abstract class Value<T> {
 	/**
 	 * Creates this object with the given initial value
 	 * 
-	 * @param value Initial value
+	 * @param value
+	 *            Initial value
 	 */
-	/*package-private*/ Value ( T value ) {
+	/* package-private */Value ( final T value ) {
 		setValue( value );
 	}
 	
@@ -46,7 +47,8 @@ public abstract class Value<T> {
 	/**
 	 * Sets a new value for this object
 	 * 
-	 * @param value New value
+	 * @param value
+	 *            New value
 	 */
 	public abstract void setValue ( T value );
 	
@@ -54,8 +56,7 @@ public abstract class Value<T> {
 	 * Returns the length, in bytes, this value will take up when encoded using
 	 * UTF-8 as the encoding character set.
 	 * <p>
-	 * If the size cannot be determined accurately, an upper bound must be
-	 * returned.
+	 * If the size cannot be determined accurately, an upper bound must be returned.
 	 * 
 	 * @return The length of the encoded byte stream for this value
 	 */

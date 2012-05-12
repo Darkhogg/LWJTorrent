@@ -40,7 +40,7 @@ public final class StringValue extends Value<byte[]> {
 	 * @param value
 	 *            Initial value
 	 */
-	public StringValue ( byte[] value ) {
+	public StringValue ( final byte[] value ) {
 		super( value );
 	}
 	
@@ -50,7 +50,7 @@ public final class StringValue extends Value<byte[]> {
 	 * @param value
 	 *            Initial String value
 	 */
-	public StringValue ( String value ) {
+	public StringValue ( final String value ) {
 		this( value.getBytes( Bencode.UTF8 ) );
 	}
 	
@@ -59,15 +59,20 @@ public final class StringValue extends Value<byte[]> {
 		return Arrays.copyOf( value, value.length );
 	}
 	
+	/** @return The length of the internal byte array of this object */
+	public int getValueLength () {
+		return value.length;
+	}
+	
 	@Override
-	public void setValue ( byte[] value ) {
+	public void setValue ( final byte[] value ) {
 		if ( value == null ) {
 			throw new NullPointerException();
 		}
 		
 		this.value = Arrays.copyOf( value, value.length );
-		this.str = new String( value, Bencode.UTF8 );
-		this.validUtf8 = checkValidUtf8( value );
+		str = new String( value, Bencode.UTF8 );
+		validUtf8 = checkValidUtf8( value );
 	}
 	
 	/**
@@ -76,10 +81,10 @@ public final class StringValue extends Value<byte[]> {
 	 * @param value
 	 *            New String value
 	 */
-	public void setStringValue ( String value ) {
+	public void setStringValue ( final String value ) {
 		this.value = value.getBytes( Bencode.UTF8 );
-		this.str = value;
-		this.validUtf8 = true;
+		str = value;
+		validUtf8 = true;
 	}
 	
 	/**
@@ -101,12 +106,12 @@ public final class StringValue extends Value<byte[]> {
 		return validUtf8;
 	}
 	
-	private static boolean checkValidUtf8 ( byte[] bytes ) {
-		CharsetDecoder cd = Bencode.UTF8.newDecoder();
+	private static boolean checkValidUtf8 ( final byte[] bytes ) {
+		final CharsetDecoder cd = Bencode.UTF8.newDecoder();
 		
 		try {
 			cd.decode( ByteBuffer.wrap( bytes ) );
-		} catch ( CharacterCodingException e ) {
+		} catch ( final CharacterCodingException e ) {
 			return false;
 		}
 		

@@ -6,11 +6,11 @@
  * 
  * This package is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with this package.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this package. If not, see <http://www.gnu.org/licenses/>.
  */
 package es.darkhogg.torrent.bencode;
 
@@ -41,7 +41,7 @@ public final class ListValue extends Value<List<Value<?>>> {
 	 * @param value
 	 *            Initial value
 	 */
-	public ListValue ( List<Value<?>> value ) {
+	public ListValue ( final List<Value<?>> value ) {
 		super( value );
 	}
 	
@@ -51,7 +51,7 @@ public final class ListValue extends Value<List<Value<?>>> {
 	}
 	
 	@Override
-	public void setValue ( List<Value<?>> value ) {
+	public void setValue ( final List<Value<?>> value ) {
 		if ( value == null ) {
 			throw new NullPointerException();
 		}
@@ -66,7 +66,7 @@ public final class ListValue extends Value<List<Value<?>>> {
 	 *            Value to be added
 	 * @see java.util.List#add(Object)
 	 */
-	public void add ( Value<?> val ) {
+	public void add ( final Value<?> val ) {
 		value.add( val );
 	}
 	
@@ -78,7 +78,7 @@ public final class ListValue extends Value<List<Value<?>>> {
 	 * @return The removed value
 	 * @see java.util.List#remove(int)
 	 */
-	public Value<?> remove ( int index ) {
+	public Value<?> remove ( final int index ) {
 		return value.remove( index );
 	}
 	
@@ -90,7 +90,7 @@ public final class ListValue extends Value<List<Value<?>>> {
 	 * @return The value at the specified <tt>index</tt>
 	 * @see java.util.List#get(int)
 	 */
-	public Value<?> get ( int index ) {
+	public Value<?> get ( final int index ) {
 		return value.get( index );
 	}
 	
@@ -106,9 +106,9 @@ public final class ListValue extends Value<List<Value<?>>> {
 	
 	@Override
 	public String toString () {
-		StringBuilder sb = new StringBuilder( "[\n" );
+		final StringBuilder sb = new StringBuilder( "[\n" );
 		
-		for ( Value<?> val : value ) {
+		for ( final Value<?> val : value ) {
 			sb.append( "  " );
 			sb.append( val.toString().replace( "\n", "\n  " ) );
 			sb.append( ",\n" );
@@ -121,7 +121,7 @@ public final class ListValue extends Value<List<Value<?>>> {
 	public long getEncodedLength () {
 		long childLength = 0;
 		
-		for ( Value<?> val : value ) {
+		for ( final Value<?> val : value ) {
 			childLength += val.getEncodedLength();
 		}
 		

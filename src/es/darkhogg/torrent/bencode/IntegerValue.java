@@ -6,11 +6,11 @@
  * 
  * This package is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with this package.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this package. If not, see <http://www.gnu.org/licenses/>.
  */
 package es.darkhogg.torrent.bencode;
 
@@ -27,17 +27,20 @@ public final class IntegerValue extends Value<Long> {
 	/**
 	 * Creates this object with the given initial value
 	 * 
-	 * @param value Initial value
+	 * @param value
+	 *            Initial value
 	 */
-	public IntegerValue ( Long value ) {
+	public IntegerValue ( final Long value ) {
 		super( value );
 	}
 	
+	@Override
 	public Long getValue () {
 		return value;
 	}
 	
-	public void setValue ( Long value ) {
+	@Override
+	public void setValue ( final Long value ) {
 		if ( value == null ) {
 			throw new NullPointerException();
 		}
@@ -49,11 +52,11 @@ public final class IntegerValue extends Value<Long> {
 	public String toString () {
 		return value.toString();
 	}
-
+	
 	@Override
-	public long getEncodedLength ()  {
-		double val = value.doubleValue();
-		return 3 + (long) Math.log10( Math.abs( val ) ) + (val<0?1:0);
+	public long getEncodedLength () {
+		final double val = value.doubleValue();
+		return 3 + (long) Math.log10( Math.abs( val ) ) + ( val < 0 ? 1 : 0 );
 	}
 	
 }

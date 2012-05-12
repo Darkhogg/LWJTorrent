@@ -6,11 +6,11 @@
  * 
  * This package is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with this package.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this package. If not, see <http://www.gnu.org/licenses/>.
  */
 package es.darkhogg.torrent.bencode;
 
@@ -42,7 +42,7 @@ public final class DictionaryValue extends Value<Map<String,Value<?>>> {
 	 * @param value
 	 *            Initial value
 	 */
-	public DictionaryValue ( Map<String,Value<?>> value ) {
+	public DictionaryValue ( final Map<String,Value<?>> value ) {
 		super( value );
 	}
 	
@@ -52,7 +52,7 @@ public final class DictionaryValue extends Value<Map<String,Value<?>>> {
 	}
 	
 	@Override
-	public void setValue ( Map<String,Value<?>> value ) {
+	public void setValue ( final Map<String,Value<?>> value ) {
 		if ( value == null ) {
 			throw new NullPointerException();
 		}
@@ -71,7 +71,7 @@ public final class DictionaryValue extends Value<Map<String,Value<?>>> {
 	 * @return The old value for the <tt>key</tt>
 	 * @see java.util.Map#put(Object,Object)
 	 */
-	public Value<?> put ( String key, Value<?> val ) {
+	public Value<?> put ( final String key, final Value<?> val ) {
 		return value.put( key, val );
 	}
 	
@@ -84,7 +84,7 @@ public final class DictionaryValue extends Value<Map<String,Value<?>>> {
 	 * @return The value of the removed <tt>key</tt>
 	 * @see java.util.Map#remove(Object)
 	 */
-	public Value<?> remove ( String key ) {
+	public Value<?> remove ( final String key ) {
 		return value.remove( key );
 	}
 	
@@ -98,7 +98,7 @@ public final class DictionaryValue extends Value<Map<String,Value<?>>> {
 	 *         the key is not present
 	 * @see java.util.Map#get(Object)
 	 */
-	public Value<?> get ( String key ) {
+	public Value<?> get ( final String key ) {
 		return value.get( key );
 	}
 	
@@ -114,9 +114,9 @@ public final class DictionaryValue extends Value<Map<String,Value<?>>> {
 	
 	@Override
 	public String toString () {
-		StringBuilder sb = new StringBuilder( "{\n" );
+		final StringBuilder sb = new StringBuilder( "{\n" );
 		
-		for ( Map.Entry<String,Value<?>> me : value.entrySet() ) {
+		for ( final Map.Entry<String,Value<?>> me : value.entrySet() ) {
 			sb.append( "  \"" );
 			sb.append( me.getKey() );
 			sb.append( "\":" );
@@ -131,8 +131,8 @@ public final class DictionaryValue extends Value<Map<String,Value<?>>> {
 	public long getEncodedLength () {
 		long childLength = 0;
 		
-		for ( Map.Entry<String,Value<?>> me : value.entrySet() ) {
-			byte[] bytes = me.getKey().getBytes( Bencode.UTF8 );
+		for ( final Map.Entry<String,Value<?>> me : value.entrySet() ) {
+			final byte[] bytes = me.getKey().getBytes( Bencode.UTF8 );
 			childLength += bytes.length + 2 + (long) Math.log10( bytes.length );
 			childLength += me.getValue().getEncodedLength();
 		}

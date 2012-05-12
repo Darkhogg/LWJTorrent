@@ -6,11 +6,11 @@
  * 
  * This package is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with this package.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this package. If not, see <http://www.gnu.org/licenses/>.
  */
 package es.darkhogg.torrent.bencode;
 
@@ -39,9 +39,10 @@ public final class BencodeOutputStream implements Closeable {
 	 * Constructs a BencodeOutputStream that writes bencoded values to the
 	 * given OutputStream
 	 * 
-	 * @param out Stream to wrap in this object
+	 * @param out
+	 *            Stream to wrap in this object
 	 */
-	public BencodeOutputStream ( OutputStream out ) {
+	public BencodeOutputStream ( final OutputStream out ) {
 		stream = out;
 		printer = new PrintWriter( new OutputStreamWriter( out, Bencode.UTF8 ) );
 	}
@@ -50,48 +51,50 @@ public final class BencodeOutputStream implements Closeable {
 	 * Constructs a BencodeInputStream that writes bencoded values to the
 	 * specified file
 	 * 
-	 * @param file The file to open
+	 * @param file
+	 *            The file to open
 	 */
-	public BencodeOutputStream ( File file )
-	throws FileNotFoundException {
+	public BencodeOutputStream ( final File file ) throws FileNotFoundException {
 		this( new FileOutputStream( file ) );
 	}
 	
 	/**
-	 * Writes a bencoded value into the wrapped stream 
+	 * Writes a bencoded value into the wrapped stream
 	 * 
-	 * @param value The value to write
-	 * @throws IOException If some I/O error occurs
+	 * @param value
+	 *            The value to write
+	 * @throws IOException
+	 *             If some I/O error occurs
 	 */
-	public void writeValue ( Value<?> value )
-	throws IOException {
+	public void writeValue ( final Value<?> value ) throws IOException {
 		if ( value instanceof StringValue ) {
-			StringValue sv = (StringValue) value;
-			printer.print( sv.getValue().length );
+			final StringValue sv = (StringValue) value;
+			printer.print( sv.getValueLength() );
 			printer.print( ':' );
 			printer.flush();
 			stream.write( sv.getValue() );
+			stream.flush();
 			
 		} else if ( value instanceof IntegerValue ) {
-			IntegerValue iv = (IntegerValue) value;
+			final IntegerValue iv = (IntegerValue) value;
 			printer.print( 'i' );
 			printer.print( iv.getValue() );
 			printer.print( 'e' );
 			printer.flush();
 			
 		} else if ( value instanceof ListValue ) {
-			ListValue lv = (ListValue) value;
+			final ListValue lv = (ListValue) value;
 			printer.print( 'l' );
-			for ( Value<?> val : lv.getValue() ) {
+			for ( final Value<?> val : lv.getValue() ) {
 				writeValue( val );
 			}
 			printer.print( 'e' );
 			printer.flush();
 			
 		} else if ( value instanceof DictionaryValue ) {
-			DictionaryValue dv = (DictionaryValue) value;
+			final DictionaryValue dv = (DictionaryValue) value;
 			printer.print( 'd' );
-			for ( Map.Entry<String,Value<?>> me : dv.getValue().entrySet() ) {
+			for ( final Map.Entry<String,Value<?>> me : dv.getValue().entrySet() ) {
 				writeValue( new StringValue( me.getKey() ) );
 				writeValue( me.getValue() );
 			}
@@ -103,9 +106,8 @@ public final class BencodeOutputStream implements Closeable {
 		}
 	}
 	
-	@Override 
-	public void close ()
-	throws IOException {
+	@Override
+	public void close () throws IOException {
 		stream.close();
 		printer.close();
 	}

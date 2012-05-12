@@ -6,11 +6,11 @@
  * 
  * This package is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with this package.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this package. If not, see <http://www.gnu.org/licenses/>.
  */
 package es.darkhogg.torrent.bencode;
 
@@ -35,13 +35,29 @@ import java.util.TreeMap;
  * @version 1.0.0
  */
 public final class BencodeInputStream implements Closeable {
-
-	private static final int INTEGER_VALUE = (int) 'i';
-	private static final int LIST_VALUE = (int) 'l';
-	private static final int DICTIONARY_VALUE = (int) 'd';
-	private static final int STRING_VALUE_FROM = (int) '0';
-	private static final int STRING_VALUE_TO = (int) '9';
-	private static final int END_VALUE = (int) 'e';
+	
+	private static final int INTEGER_VALUE = 'i';
+	private static final int LIST_VALUE = 'l';
+	private static final int DICTIONARY_VALUE = 'd';
+	private static final int STRING_VALUE_FROM = '0';
+	private static final int STRING_VALUE_TO = '9';
+	private static final int END_VALUE = 'e';
+	
+	private static final Value<?> BVOID = new Value<Void>( null ) {
+		
+		@Override
+		public Void getValue () {
+			return null;
+		}
+		
+		@Override
+		public void setValue ( final Void value ) {}
+		
+		@Override
+		public long getEncodedLength () {
+			return 0;
+		}
+	};
 	
 	private final char[] charBuffer = new char[ 32 ];
 	private byte[] byteBuffer = new byte[ 32 ];
@@ -52,9 +68,10 @@ public final class BencodeInputStream implements Closeable {
 	 * Constructs a BencodeInputStream that uses the given InputStream as
 	 * source of bencoded values
 	 * 
-	 * @param in Stream to wrap in this object
+	 * @param in
+	 *            Stream to wrap in this object
 	 */
-	public BencodeInputStream ( InputStream in ) {
+	public BencodeInputStream ( final InputStream in ) {
 		stream = in;
 	}
 	
@@ -62,42 +79,52 @@ public final class BencodeInputStream implements Closeable {
 	 * Constructs a BencodeInputStream that reads bencoded values from the
 	 * specified file
 	 * 
-	 * @param file The file to open
-	 * @throws FileNotFoundException if the file does not exist, is a directory
-	 *         rather than a regular file, or for some other reason cannot be
-	 *         opened for reading.
+	 * @param file
+	 *            The file to open
+	 * @throws FileNotFoundException
+	 *             if the file does not exist, is a directory
+	 *             rather than a regular file, or for some other reason cannot be
+	 *             opened for reading.
 	 */
-	public BencodeInputStream ( File file )
-	throws FileNotFoundException {
+	public BencodeInputStream ( final File file ) throws FileNotFoundException {
 		this( new FileInputStream( file ) );
 	}
 	
 	/**
-	 * Retrieves a value from this object wrapped stream
+	 * Retrieves a value from this object wrapped stream. If the wrapped stream is already as its <i>end-of-stream</i>
+	 * position, then a <tt>null</tt> is removed. If, however, <i>end-of-stream</i> is reached in the middle of a read
+	 * operation, a {@link java.io.EOFException} is thrown.
 	 * 
-	 * @return The next value in the stream
-	 * @throws IOException If some I/O error occurs
+	 * @return The next value in the stream, or <tt>null</tt> if the wrapped stream has no more bytes left.
+	 * @throws IOException
+	 *             If some I/O error occurs
 	 */
-	public Value<?> readValue ()
-	throws IOException {
-		int first = stream.read();
+	public Value<?> readValue () throws IOException {
+		final Value<?> val = readValueRec();
+		
+		if ( val == BVOID ) {
+			throw new IOException( "Unexpected end value" );
+		}
+		
+		return val;
+	}
+	
+	public Value<?> readValueRec () throws IOException {
+		final int first = stream.read();
 		
 		if ( first == END_VALUE ) {
-			return null;
+			return BVOID;
 			
 		} else if ( first == INTEGER_VALUE ) {
 			int i = 0;
 			boolean end = false;
 			while ( !end ) {
-				int readInt = stream.read();
+				final int readInt = stream.read();
 				if ( readInt < 0 ) {
 					throw new EOFException();
 				} else if ( readInt == END_VALUE ) {
 					end = true;
-				} else if (
-					( readInt >= '0' && readInt <= '9' )
-				 || ( i == 0 && readInt == '-' )
-				) {
+				} else if ( ( readInt >= '0' && readInt <= '9' ) || ( i == 0 && readInt == '-' ) ) {
 					charBuffer[ i ] = (char) readInt;
 					i++;
 				} else {
@@ -105,17 +132,15 @@ public final class BencodeInputStream implements Closeable {
 				}
 			}
 			
-			return new IntegerValue(
-				Long.valueOf( new String( charBuffer, 0, i ) )
-			);
-
+			return new IntegerValue( Long.valueOf( new String( charBuffer, 0, i ) ) );
+			
 		} else if ( first == LIST_VALUE ) {
-			List<Value<?>> list = new ArrayList<Value<?>>();
+			final List<Value<?>> list = new ArrayList<Value<?>>();
 			
 			boolean end = false;
 			while ( !end ) {
-				Value<?> val = readValue();
-				if ( val == null ) {
+				final Value<?> val = readValueRec();
+				if ( val == BVOID ) {
 					end = true;
 				} else {
 					list.add( val );
@@ -125,43 +150,38 @@ public final class BencodeInputStream implements Closeable {
 			return new ListValue( list );
 			
 		} else if ( first == DICTIONARY_VALUE ) {
-			SortedMap<String,Value<?>> map = new TreeMap<String,Value<?>>();
+			final SortedMap<String,Value<?>> map = new TreeMap<String,Value<?>>();
 			
 			String lastKeyStr = null;
 			
 			boolean end = false;
 			while ( !end ) {
-				Value<?> key = readValue();
-				if ( key != null && !(key instanceof StringValue) ) {
+				final Value<?> key = readValueRec();
+				if ( key != null && !( key instanceof StringValue ) ) {
 					throw new IOException( "Invalid key type" );
 				}
 				
-				if ( key == null ) {
+				if ( key == BVOID ) {
 					end = true;
 				} else {
 					// Imposes key ordering when reading
-					String currKeyStr = ( (StringValue) key ).getStringValue();
+					final String currKeyStr = ( (StringValue) key ).getStringValue();
 					
 					if ( lastKeyStr != null ) {
-						int cmp = lastKeyStr.compareTo( currKeyStr );
+						final int cmp = lastKeyStr.compareTo( currKeyStr );
 						if ( cmp > 0 ) {
 							throw new IOException( "Unordered dictionary" );
 						} else if ( cmp == 0 ) {
-							throw new IOException(
-								"Repeated key in dictionary" );
+							throw new IOException( "Repeated key in dictionary" );
 						}
 					}
 					lastKeyStr = currKeyStr;
 					
-					Value<?> val = readValue();
+					final Value<?> val = readValueRec();
 					if ( val == null ) {
-						throw new IOException(
-							"Found key with no associated value" );
+						throw new IOException( "Found key with no associated value" );
 					}
-					map.put(
-						new String( (byte[]) key.getValue(), Bencode.UTF8 ),
-						val
-					);
+					map.put( new String( (byte[]) key.getValue(), Bencode.UTF8 ), val );
 				}
 			}
 			
@@ -174,7 +194,7 @@ public final class BencodeInputStream implements Closeable {
 			int i = 1;
 			boolean end = false;
 			while ( !end ) {
-				int readInt = stream.read();
+				final int readInt = stream.read();
 				if ( readInt < 0 ) {
 					throw new EOFException();
 				} else if ( readInt == ':' ) {
@@ -187,17 +207,16 @@ public final class BencodeInputStream implements Closeable {
 				}
 			}
 			
-			long lsize = Long.parseLong( new String( charBuffer, 0, i ) );
+			final long lsize = Long.parseLong( new String( charBuffer, 0, i ) );
 			if ( lsize > Integer.MAX_VALUE ) {
 				throw new IOException( "String is too long!" );
 			}
 			
-			int size = (int) lsize;
+			final int size = (int) lsize;
 			if ( byteBuffer.length < lsize ) {
-				byteBuffer = new byte[
-					Math.max( size+1, byteBuffer.length*2 + 1 ) ];
+				byteBuffer = new byte[ Math.max( size + 1, byteBuffer.length * 2 + 1 ) ];
 			}
-			int howMany = stream.read( byteBuffer, 0, size );
+			final int howMany = stream.read( byteBuffer, 0, size );
 			
 			if ( howMany != size ) {
 				throw new EOFException();
@@ -207,17 +226,15 @@ public final class BencodeInputStream implements Closeable {
 			
 		} else {
 			if ( first == -1 ) {
-				throw new EOFException();
+				return null;
 			} else {
-				throw new IOException( "Unexpected byte 0x"
-					+ Integer.toHexString( first ) );
+				throw new IOException( "Unexpected byte 0x" + Integer.toHexString( first ) );
 			}
 		}
 	}
 	
-	@Override 
-	public void close ()
-	throws IOException {
+	@Override
+	public void close () throws IOException {
 		stream.close();
 	}
 }
