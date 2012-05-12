@@ -18,10 +18,11 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 /**
@@ -30,10 +31,10 @@ import java.util.Map;
  * @author Daniel Escoz
  * @version 1.0.0
  */
-public final class BencodeOutputStream implements Closeable {
+public final class BencodeOutputStream implements Closeable, Flushable {
 	
-	private final OutputStream stream;
-	private final PrintWriter printer;
+	/** The actual stream used to write bencode values */
+	private final PrintStream stream;
 	
 	/**
 	 * Constructs a BencodeOutputStream that writes bencoded values to the
@@ -43,8 +44,14 @@ public final class BencodeOutputStream implements Closeable {
 	 *            Stream to wrap in this object
 	 */
 	public BencodeOutputStream ( final OutputStream out ) {
-		stream = out;
-		printer = new PrintWriter( new OutputStreamWriter( out, Bencode.UTF8 ) );
+		try {
+			stream = new PrintStream( out, false, Bencode.UTF8.name() );
+			
+		} catch ( UnsupportedEncodingException exc ) {
+			// If this ever happens, something seriously wrong is going on with the JVM.
+			// Notice that the charset name is obtained from an actual charset which, obviously, is supported.
+			throw new AssertionError( exc );
+		}
 	}
 	
 	/**
@@ -69,37 +76,32 @@ public final class BencodeOutputStream implements Closeable {
 	public void writeValue ( final Value<?> value ) throws IOException {
 		if ( value instanceof StringValue ) {
 			final StringValue sv = (StringValue) value;
-			printer.print( sv.getValueLength() );
-			printer.print( ':' );
-			printer.flush();
+			stream.print( sv.getValueLength() );
+			stream.print( ':' );
 			stream.write( sv.getValue() );
-			stream.flush();
 			
 		} else if ( value instanceof IntegerValue ) {
 			final IntegerValue iv = (IntegerValue) value;
-			printer.print( 'i' );
-			printer.print( iv.getValue() );
-			printer.print( 'e' );
-			printer.flush();
+			stream.print( 'i' );
+			stream.print( iv.getValue() );
+			stream.print( 'e' );
 			
 		} else if ( value instanceof ListValue ) {
 			final ListValue lv = (ListValue) value;
-			printer.print( 'l' );
+			stream.print( 'l' );
 			for ( final Value<?> val : lv.getValue() ) {
 				writeValue( val );
 			}
-			printer.print( 'e' );
-			printer.flush();
+			stream.print( 'e' );
 			
 		} else if ( value instanceof DictionaryValue ) {
 			final DictionaryValue dv = (DictionaryValue) value;
-			printer.print( 'd' );
+			stream.print( 'd' );
 			for ( final Map.Entry<String,Value<?>> me : dv.getValue().entrySet() ) {
 				writeValue( new StringValue( me.getKey() ) );
 				writeValue( me.getValue() );
 			}
-			printer.print( 'e' );
-			printer.flush();
+			stream.print( 'e' );
 			
 		} else {
 			throw new IllegalArgumentException( "Invalid value type" );
@@ -109,6 +111,10 @@ public final class BencodeOutputStream implements Closeable {
 	@Override
 	public void close () throws IOException {
 		stream.close();
-		printer.close();
+	}
+
+	@Override
+	public void flush () throws IOException {
+		stream.flush();
 	}
 }
