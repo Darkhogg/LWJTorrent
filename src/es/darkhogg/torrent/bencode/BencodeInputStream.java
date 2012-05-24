@@ -109,7 +109,7 @@ public final class BencodeInputStream implements Closeable {
 		return val;
 	}
 	
-	public Value<?> readValueRec () throws IOException {
+	private Value<?> readValueRec () throws IOException {
 		final int first = stream.read();
 		
 		if ( first == END_VALUE ) {
