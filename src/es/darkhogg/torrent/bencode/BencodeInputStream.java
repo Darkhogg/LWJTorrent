@@ -157,7 +157,7 @@ public final class BencodeInputStream implements Closeable {
 			boolean end = false;
 			while ( !end ) {
 				final Value<?> key = readValueRec();
-				if ( key != null && !( key instanceof StringValue ) ) {
+				if ( key != BVOID && !( key instanceof StringValue ) ) {
 					throw new IOException( "Invalid key type" );
 				}
 				

@@ -109,12 +109,12 @@ public final class BencodeOutputStream implements Closeable, Flushable {
 	}
 	
 	@Override
-	public void close () throws IOException {
+	public void close () {
 		stream.close();
 	}
 
 	@Override
-	public void flush () throws IOException {
+	public void flush () {
 		stream.flush();
 	}
 }
