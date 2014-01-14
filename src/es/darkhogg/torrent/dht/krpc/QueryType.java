@@ -43,13 +43,14 @@ public enum QueryType {
         this.string = string;
     }
 
-    /** @return The value to be used on the "q" field */
-    public String getString () {
+    /** @return The value to be used on the <tt>q</tt> field */
+    public String toString () {
         return string;
     }
 
     /**
-     * @return The <tt>QueryType</tt> object which {@link #getString string} method would return <tt>str</tt>
+     * @param str Query type string obtained from the <tt>q</tt> field
+     * @return The <tt>QueryType</tt> object which {@link #toString string} method would return <tt>str</tt>
      */
     public static QueryType fromString (String str) {
         return values.get(str);

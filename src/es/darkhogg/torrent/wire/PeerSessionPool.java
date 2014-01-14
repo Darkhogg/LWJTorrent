@@ -14,7 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public final class PeerSessionPool implements Closeable {
 
-    // --- Time Constants ---
+    // ======================
+    // === Time Constants ===
     // When the pool is closed for the first time, the executors are gracefully
     // shutdown. If they do not terminate in the specified amount of time, they
     // are forcefully shutdown with a `shutdownNow` call. This gives the threads
@@ -22,25 +23,27 @@ public final class PeerSessionPool implements Closeable {
     // them quickly.
 
     /** Time, in milliseconds, to wait for the event executor to terminate */
-    private static final int EVENT_EXECUTOR_SHUTDOWN_TIME = 1500;
+    /* package */static final int EVENT_EXECUTOR_SHUTDOWN_TIME = 1500;
 
     /** Time, in milliseconds, to wait for the misc executor to terminate */
-    private static final int MISC_EXECUTOR_SHUTDOWN_TIME = 250;
+    /* package */static final int MISC_EXECUTOR_SHUTDOWN_TIME = 250;
 
     /** Time, in millisecons, the background controller will sleep */
-    private static final int BACKGROUND_SLEEP_TIME = 30000;
+    /* package */static final int BACKGROUND_SLEEP_TIME = 30000;
 
-    // --- Pool Fields ---
+    // ===================
+    // === Pool Fields ===
 
     /** Internal collection containing all peers */
-    private final Set<PeerSession> peers = Collections.synchronizedSet(new HashSet<PeerSession>());
+    /* package */final Set<PeerSession> peers = Collections.synchronizedSet(new HashSet<PeerSession>());
 
     /** Internal executor for events */
-    private final ExecutorService eventExecutor = Executors
-        .newSingleThreadExecutor(new PoolThreadFactory("EventThread"));
+    /* package */final ExecutorService eventExecutor = Executors.newSingleThreadExecutor(new PoolThreadFactory(
+        "EventThread"));
 
     /** Internal executor for clients */
-    private final ExecutorService miscExecutor = Executors.newCachedThreadPool(new PoolThreadFactory("MiscThread"));
+    /* package */final ExecutorService miscExecutor = Executors
+        .newCachedThreadPool(new PoolThreadFactory("MiscThread"));
 
     /** Listeners of this session pool */
     private final Set<PeerListener> listeners = new CopyOnWriteArraySet<PeerListener>();
@@ -48,12 +51,14 @@ public final class PeerSessionPool implements Closeable {
     /** Whether this pool is closed */
     private volatile boolean closed = false;
 
-    // --- Synchronization Object ---
+    // ==============================
+    // === Synchronization Object ===
 
     /** A dummy object used by the background thread to sleep */
-    private final Object sync = new Object();
+    /* package */final Object sync = new Object();
 
-    // --- Constructors ---
+    // ====================
+    // === Constructors ===
 
     /**
      * Constructs a new <tt>PeerSessionPool</tt> with no <tt>PeerSession</tt>s or <tt>PeerListener</tt>s attached
@@ -62,7 +67,8 @@ public final class PeerSessionPool implements Closeable {
         miscExecutor.submit(new BackgroundThread());
     }
 
-    // --- Listener Methods ---
+    // ========================
+    // === Listener Methods ===
 
     /**
      * Adds a <i>peer listener</i> that will receive events when any of the <tt>PeerSession</tt>s of this pool receives
@@ -95,7 +101,8 @@ public final class PeerSessionPool implements Closeable {
         }
     }
 
-    // --- Factory Methods ---
+    // =======================
+    // === Factory Methods ===
 
     /**
      * Creates a new {@link PeerSession} using this pool's internal executors and listeners.
@@ -114,7 +121,8 @@ public final class PeerSessionPool implements Closeable {
         return peer;
     }
 
-    // --- Closing Methods ---
+    // =======================
+    // === Closing Methods ===
 
     @Override
     public void close () {
@@ -134,7 +142,8 @@ public final class PeerSessionPool implements Closeable {
         return closed;
     }
 
-    // --- Background Controller Class ---
+    // ===================================
+    // === Background Controller Class ===
 
     /* package */final class BackgroundThread implements Runnable {
 
@@ -155,8 +164,9 @@ public final class PeerSessionPool implements Closeable {
                         }
                     }
                 }
-            } catch (InterruptedException e) {
-                // Nothing special
+            } catch (InterruptedException exc) {
+                Thread.currentThread().interrupt();
+
             } finally {
                 close();
             }
@@ -165,7 +175,8 @@ public final class PeerSessionPool implements Closeable {
 
     }
 
-    // --- Closing Task Class ---
+    // ==========================
+    // === Closing Task Class ===
 
     /* package */final class CloseTask implements Runnable {
 
@@ -185,7 +196,7 @@ public final class PeerSessionPool implements Closeable {
                 miscExecutor.awaitTermination(MISC_EXECUTOR_SHUTDOWN_TIME, TimeUnit.MILLISECONDS);
                 eventExecutor.awaitTermination(EVENT_EXECUTOR_SHUTDOWN_TIME, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
-                // Do nothing -> terminate method
+                Thread.currentThread().interrupt();
             }
 
             if (!eventExecutor.isTerminated()) {
@@ -198,7 +209,8 @@ public final class PeerSessionPool implements Closeable {
         }
     }
 
-    // --- Thread Factory Class ---
+    // ============================
+    // === Thread Factory Class ===
 
     /* package */static final class PoolThreadFactory implements ThreadFactory {
 

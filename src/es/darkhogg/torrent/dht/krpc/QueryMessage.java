@@ -19,6 +19,7 @@ public final class QueryMessage extends Message {
         this.arguments = Objects.requireNonNull(arguments, "argumnts");
     }
 
+    /** @return The query type for this message */
     public QueryType getQueryType () {
         return type;
     }

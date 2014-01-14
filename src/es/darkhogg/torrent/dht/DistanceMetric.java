@@ -24,7 +24,7 @@ public abstract class DistanceMetric {
     public abstract BigInteger getDistance (NodeId n1, NodeId n2);
 
     /**
-     * Returns the distance between the passed node and hash as a <tt>Distance</tt> object.
+     * Returns the distance between the passed node and hash as a <tt>BigInteger</tt> object.
      * 
      * @param hash Hash object
      * @param node Node ID

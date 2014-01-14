@@ -33,7 +33,6 @@ public final class KrpcBencodeConverter {
             MessageType type = MessageType.fromString(yVal.getStringValue());
 
             switch (type) {
-            // Error message
                 case ERROR: {
                     ListValue eVal = Bencode.getChildValue(value, ListValue.class, "e");
                     if (eVal.getSize() != 2) {
@@ -44,20 +43,17 @@ public final class KrpcBencodeConverter {
                     return new ErrorMessage(trid, eCode, eMsg);
                 }
 
-                // Query message
                 case QUERY: {
                     StringValue qVal = Bencode.getChildValue(value, StringValue.class, "q");
                     DictionaryValue aVal = Bencode.getChildValue(value, DictionaryValue.class, "a");
                     return new QueryMessage(trid, QueryType.fromString(qVal.getStringValue()), aVal);
                 }
 
-                // Response message
                 case RESPONSE: {
                     DictionaryValue rVal = Bencode.getChildValue(value, DictionaryValue.class, "r");
                     return new ResponseMessage(trid, rVal);
                 }
 
-                // Invalid message
                 default: {
                     throw new IllegalArgumentException();
                 }
@@ -128,7 +124,7 @@ public final class KrpcBencodeConverter {
      */
     private static DictionaryValue convertQueryMessage (QueryMessage msg) {
         DictionaryValue dict = convertCommonMessage(msg);
-        dict.put("q", new StringValue(msg.getQueryType().getString()));
+        dict.put("q", new StringValue(msg.getQueryType().toString()));
         dict.put("a", msg.getArguments());
         return dict;
     }

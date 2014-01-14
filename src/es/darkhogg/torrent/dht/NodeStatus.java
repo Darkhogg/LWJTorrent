@@ -7,5 +7,15 @@ package es.darkhogg.torrent.dht;
  * @version 1.0
  */
 public enum NodeStatus {
-    UNKNOWN, BAD, QUESTIONABLE, GOOD;
+    /** Status of the node is not known */
+    UNKNOWN,
+
+    /** Node is a bad node */
+    BAD,
+
+    /** Node is not good, but also not bad */
+    QUESTIONABLE,
+
+    /** Node is a good node */
+    GOOD;
 }

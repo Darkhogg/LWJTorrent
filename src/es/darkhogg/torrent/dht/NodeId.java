@@ -112,7 +112,7 @@ public final class NodeId {
 
     /**
      * Creates a <tt>NodeId</tt> object using random bytes, by calling {@link #getRandomNodeId(Random)} with a newly
-     * created <tt>Random</tt> object
+     * created <tt>Random</tt> object.
      * 
      * @return A new random node ID
      */
