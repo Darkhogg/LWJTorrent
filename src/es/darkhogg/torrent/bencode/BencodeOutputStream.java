@@ -32,89 +32,84 @@ import java.util.Map;
  * @version 1.0.0
  */
 public final class BencodeOutputStream implements Closeable, Flushable {
-	
-	/** The actual stream used to write bencode values */
-	private final PrintStream stream;
-	
-	/**
-	 * Constructs a BencodeOutputStream that writes bencoded values to the
-	 * given OutputStream
-	 * 
-	 * @param out
-	 *            Stream to wrap in this object
-	 */
-	public BencodeOutputStream ( final OutputStream out ) {
-		try {
-			stream = new PrintStream( out, false, Bencode.UTF8.name() );
-			
-		} catch ( UnsupportedEncodingException exc ) {
-			// If this ever happens, something seriously wrong is going on with the JVM.
-			// Notice that the charset name is obtained from an actual charset which, obviously, is supported.
-			throw new AssertionError( exc );
-		}
-	}
-	
-	/**
-	 * Constructs a BencodeInputStream that writes bencoded values to the
-	 * specified file
-	 * 
-	 * @param file
-	 *            The file to open
-	 */
-	public BencodeOutputStream ( final File file ) throws FileNotFoundException {
-		this( new FileOutputStream( file ) );
-	}
-	
-	/**
-	 * Writes a bencoded value into the wrapped stream
-	 * 
-	 * @param value
-	 *            The value to write
-	 * @throws IOException
-	 *             If some I/O error occurs
-	 */
-	public void writeValue ( final Value<?> value ) throws IOException {
-		if ( value instanceof StringValue ) {
-			final StringValue sv = (StringValue) value;
-			stream.print( sv.getValueLength() );
-			stream.print( ':' );
-			stream.write( sv.getValue() );
-			
-		} else if ( value instanceof IntegerValue ) {
-			final IntegerValue iv = (IntegerValue) value;
-			stream.print( 'i' );
-			stream.print( iv.getValue() );
-			stream.print( 'e' );
-			
-		} else if ( value instanceof ListValue ) {
-			final ListValue lv = (ListValue) value;
-			stream.print( 'l' );
-			for ( final Value<?> val : lv.getValue() ) {
-				writeValue( val );
-			}
-			stream.print( 'e' );
-			
-		} else if ( value instanceof DictionaryValue ) {
-			final DictionaryValue dv = (DictionaryValue) value;
-			stream.print( 'd' );
-			for ( final Map.Entry<String,Value<?>> me : dv.getValue().entrySet() ) {
-				writeValue( new StringValue( me.getKey() ) );
-				writeValue( me.getValue() );
-			}
-			stream.print( 'e' );
-			
-		} else {
-			throw new IllegalArgumentException( "Invalid value type" );
-		}
-	}
-	
-	@Override
-	public void close () {
-		stream.close();
-	}
 
-	@Override
-	public void flush () {
-		stream.flush();
-	}
+    /** The actual stream used to write bencode values */
+    private final PrintStream stream;
+
+    /**
+     * Constructs a BencodeOutputStream that writes bencoded values to the given OutputStream
+     * 
+     * @param out Stream to wrap in this object
+     */
+    public BencodeOutputStream (final OutputStream out) {
+        try {
+            stream = new PrintStream(out, false, Bencode.UTF8.name());
+
+        } catch (UnsupportedEncodingException exc) {
+            // If this ever happens, something seriously wrong is going on with the JVM.
+            // Notice that the charset name is obtained from an actual charset which, obviously, is supported.
+            throw new AssertionError(exc);
+        }
+    }
+
+    /**
+     * Constructs a BencodeInputStream that writes bencoded values to the specified file
+     * 
+     * @param file The file to open
+     * @throws FileNotFoundException if the file doesn't exist
+     */
+    public BencodeOutputStream (final File file) throws FileNotFoundException {
+        this(new FileOutputStream(file));
+    }
+
+    /**
+     * Writes a bencoded value into the wrapped stream
+     * 
+     * @param value The value to write
+     * @throws IOException If some I/O error occurs
+     */
+    public void writeValue (final Value<?> value) throws IOException {
+        if (value instanceof StringValue) {
+            final StringValue sv = (StringValue) value;
+            stream.print(sv.getValueLength());
+            stream.print(':');
+            stream.write(sv.getValue());
+
+        } else if (value instanceof IntegerValue) {
+            final IntegerValue iv = (IntegerValue) value;
+            stream.print('i');
+            stream.print(iv.getValue());
+            stream.print('e');
+
+        } else if (value instanceof ListValue) {
+            final ListValue lv = (ListValue) value;
+            stream.print('l');
+            for (final Value<?> val : lv.getValue()) {
+                writeValue(val);
+            }
+            stream.print('e');
+
+        } else if (value instanceof DictionaryValue) {
+            final DictionaryValue dv = (DictionaryValue) value;
+            stream.print('d');
+            for (final Map.Entry<String,Value<?>> me : dv.getValue().entrySet()) {
+                writeValue(new StringValue(me.getKey()));
+                writeValue(me.getValue());
+            }
+            stream.print('e');
+
+        } else {
+            throw new IllegalArgumentException("Invalid value type");
+        }
+    }
+
+    @Override
+    public void close () {
+        stream.close();
+    }
+
+    @Override
+    public void flush () {
+        stream.flush();
+    }
 }

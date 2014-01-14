@@ -21,42 +21,41 @@ package es.darkhogg.torrent.bencode;
  * @version 1.0.0
  */
 public final class IntegerValue extends Value<Long> {
-	
-	private Long value;
-	
-	/**
-	 * Creates this object with the given initial value
-	 * 
-	 * @param value
-	 *            Initial value
-	 */
-	public IntegerValue ( final Long value ) {
-		super( value );
-	}
-	
-	@Override
-	public Long getValue () {
-		return value;
-	}
-	
-	@Override
-	public void setValue ( final Long value ) {
-		if ( value == null ) {
-			throw new NullPointerException();
-		}
-		
-		this.value = value;
-	}
-	
-	@Override
-	public String toString () {
-		return value.toString();
-	}
-	
-	@Override
-	public long getEncodedLength () {
-		final double val = value.doubleValue();
-		return 3 + (long) Math.log10( Math.abs( val ) ) + ( val < 0 ? 1 : 0 );
-	}
-	
+
+    private Long value;
+
+    /**
+     * Creates this object with the given initial value
+     * 
+     * @param value Initial value
+     */
+    public IntegerValue (final Long value) {
+        super(value);
+    }
+
+    @Override
+    public Long getValue () {
+        return value;
+    }
+
+    @Override
+    public void setValue (final Long value) {
+        if (value == null) {
+            throw new NullPointerException();
+        }
+
+        this.value = value;
+    }
+
+    @Override
+    public String toString () {
+        return value.toString();
+    }
+
+    @Override
+    public long getEncodedLength () {
+        final double val = value.doubleValue();
+        return 3 + (long) Math.log10(Math.abs(val)) + (val < 0 ? 1 : 0);
+    }
+
 }

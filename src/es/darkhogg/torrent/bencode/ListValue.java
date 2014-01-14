@@ -25,107 +25,103 @@ import java.util.List;
  * @version 1.0.0
  */
 public final class ListValue extends Value<List<Value<?>>> {
-	
-	private List<Value<?>> value;
-	
-	/**
-	 * Creates this object with an empty list
-	 */
-	public ListValue () {
-		super( new ArrayList<Value<?>>() );
-	}
-	
-	/**
-	 * Creates this object with the given initial value
-	 * 
-	 * @param value
-	 *            Initial value
-	 */
-	public ListValue ( final List<Value<?>> value ) {
-		super( value );
-	}
-	
-	@Override
-	public List<Value<?>> getValue () {
-		return Collections.unmodifiableList( value );
-	}
-	
-	@Override
-	public void setValue ( final List<Value<?>> value ) {
-		if ( value == null ) {
-			throw new NullPointerException();
-		}
-		
-		this.value = new ArrayList<Value<?>>( value );
-	}
-	
-	/**
-	 * Adds the given <tt>val</tt>ue at the end of this list
-	 * 
-	 * @param val
-	 *            Value to be added
-	 * @see java.util.List#add(Object)
-	 */
-	public void add ( final Value<?> val ) {
-		value.add( val );
-	}
-	
-	/**
-	 * Removes the value at the <tt>index</tt> position
-	 * 
-	 * @param index
-	 *            Index of the value to remove
-	 * @return The removed value
-	 * @see java.util.List#remove(int)
-	 */
-	public Value<?> remove ( final int index ) {
-		return value.remove( index );
-	}
-	
-	/**
-	 * Retrieves the value at the <tt>index</tt> position
-	 * 
-	 * @param index
-	 *            Index of the value to retrieve
-	 * @return The value at the specified <tt>index</tt>
-	 * @see java.util.List#get(int)
-	 */
-	public Value<?> get ( final int index ) {
-		return value.get( index );
-	}
-	
-	/**
-	 * Returns the number of elements in this list
-	 * 
-	 * @return Number of elements in the list
-	 * @see java.util.List#size()
-	 */
-	public int getSize () {
-		return value.size();
-	}
-	
-	@Override
-	public String toString () {
-		final StringBuilder sb = new StringBuilder( "[\n" );
-		
-		for ( final Value<?> val : value ) {
-			sb.append( "  " );
-			sb.append( val.toString().replace( "\n", "\n  " ) );
-			sb.append( ",\n" );
-		}
-		
-		return sb.append( ']' ).toString();
-	}
-	
-	@Override
-	public long getEncodedLength () {
-		long childLength = 0;
-		
-		for ( final Value<?> val : value ) {
-			childLength += val.getEncodedLength();
-		}
-		
-		return childLength + 2;
-	}
-	
+
+    private List<Value<?>> value;
+
+    /**
+     * Creates this object with an empty list
+     */
+    public ListValue () {
+        super(new ArrayList<Value<?>>());
+    }
+
+    /**
+     * Creates this object with the given initial value
+     * 
+     * @param value Initial value
+     */
+    public ListValue (final List<Value<?>> value) {
+        super(value);
+    }
+
+    @Override
+    public List<Value<?>> getValue () {
+        return Collections.unmodifiableList(value);
+    }
+
+    @Override
+    public void setValue (final List<Value<?>> value) {
+        if (value == null) {
+            throw new NullPointerException();
+        }
+
+        this.value = new ArrayList<Value<?>>(value);
+    }
+
+    /**
+     * Adds the given <tt>val</tt>ue at the end of this list
+     * 
+     * @param val Value to be added
+     * @see java.util.List#add(Object)
+     */
+    public void add (final Value<?> val) {
+        value.add(val);
+    }
+
+    /**
+     * Removes the value at the <tt>index</tt> position
+     * 
+     * @param index Index of the value to remove
+     * @return The removed value
+     * @see java.util.List#remove(int)
+     */
+    public Value<?> remove (final int index) {
+        return value.remove(index);
+    }
+
+    /**
+     * Retrieves the value at the <tt>index</tt> position
+     * 
+     * @param index Index of the value to retrieve
+     * @return The value at the specified <tt>index</tt>
+     * @see java.util.List#get(int)
+     */
+    public Value<?> get (final int index) {
+        return value.get(index);
+    }
+
+    /**
+     * Returns the number of elements in this list
+     * 
+     * @return Number of elements in the list
+     * @see java.util.List#size()
+     */
+    public int getSize () {
+        return value.size();
+    }
+
+    @Override
+    public String toString () {
+        final StringBuilder sb = new StringBuilder("[\n");
+
+        for (final Value<?> val : value) {
+            sb.append("  ");
+            sb.append(val.toString().replace("\n", "\n  "));
+            sb.append(",\n");
+        }
+
+        return sb.append(']').toString();
+    }
+
+    @Override
+    public long getEncodedLength () {
+        long childLength = 0;
+
+        for (final Value<?> val : value) {
+            childLength += val.getEncodedLength();
+        }
+
+        return childLength + 2;
+    }
+
 }

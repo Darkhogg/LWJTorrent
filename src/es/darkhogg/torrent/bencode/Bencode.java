@@ -28,432 +28,390 @@ import java.util.Objects;
  * @version 1.0.1
  */
 public class Bencode {
-	
-	/**
-	 * UTF-8 charset used for Bencode
-	 */
-	public static final Charset UTF8 = Charset.forName( "UTF-8" );
-	
-	/**
-	 * Gets a child element from the passed value using the strings as a path.
-	 * <p>
-	 * Each element of the <tt>strings</tt> parameter represents an element of the path. Dictionaries can be accessed
-	 * using its string keys and lists using numeric strings. If an element doesn't exist, this method returns
-	 * <tt>null</tt>.
-	 * 
-	 * @param from
-	 *            Value to get the child from
-	 * @param strings
-	 *            Path to the child
-	 * @return Child accessed from the path, or <tt>null</tt> if it doesn't
-	 *         exist.
-	 * @throw NullPointerException if any of the arguments is <tt>null</tt>
-	 */
-	public static Value<?> getChildValue ( final Value<?> from, final String... strings ) {
-		Value<?> value = Objects.requireNonNull( from );
-		
-		for ( final String string : strings ) {
-			if ( value instanceof DictionaryValue ) {
-				final DictionaryValue dval = (DictionaryValue) value;
-				value = dval.get( string );
-				
-			} else if ( value instanceof ListValue ) {
-				final ListValue lval = (ListValue) value;
-				try {
-					final int pos = Integer.parseInt( string );
-					value = lval.get( pos );
-				} catch ( final NumberFormatException e ) {
-					return null;
-				}
-			} else {
-				return null;
-			}
-		}
-		
-		return value;
-	}
-	
-	/**
-	 * Gets a child element from the passed value using the strings as a path,
-	 * converted to an specific value type. If the value does not exist or is
-	 * not of that type, this method returns <tt>null</tt>.
-	 * <p>
-	 * See the description of {@link #getChildValue(Value,String...)} for more information.
-	 * 
-	 * @param from
-	 *            Value to get the child from
-	 * @param type
-	 *            Expected type of the value returned
-	 * @param strings
-	 *            Path to the child
-	 * @return Child accessed from the path, or <tt>null</tt> if it doesn't
-	 *         exist or is not of the correct type.
-	 * @see #getChildValue(Value,String...)
-	 * @throw NullPointerException if any of the arguments is <tt>null</tt>
-	 */
-	public static <T extends Value<?>> T getChildValue (
-		final Value<?> from, final Class<T> type, final String... strings )
-	{
-		Objects.requireNonNull( type );
-		final Value<?> val = getChildValue( from, strings );
-		
-		if ( type.isInstance( val ) ) {
-			return type.cast( val );
-		}
-		
-		return null;
-	}
-	
-	/**
-	 * Converts a bencode value to a Java standard objects.
-	 * <p>
-	 * <i>NOTE: This method delegates its calls to its more specific overloads. See them for details on how
-	 * <tt>Value</tt>s are converted</i>
-	 * 
-	 * @param val
-	 *            The value to be converted
-	 * @return An object from the standard Java API that represents the same
-	 *         information
-	 */
-	public static Object convertFromValue ( final Value<?> val ) {
-		if ( val instanceof IntegerValue ) {
-			return convertFromValue( (IntegerValue) val );
-			
-		} else if ( val instanceof StringValue ) {
-			return convertFromValue( (StringValue) val );
-			
-		} else if ( val instanceof ListValue ) {
-			return convertFromValue( (ListValue) val );
-			
-		} else if ( val instanceof DictionaryValue ) {
-			return convertFromValue( (DictionaryValue) val );
-			
-		} else {
-			// This exception is here for completeness
-			// As Value cannot be subclassed out of this package, no
-			// other
-			// classes should ever extend Value than those listed in
-			// this
-			// method. This is also the reason why it is not
-			// documented
-			// in a @throws tag.
-			throw new IllegalArgumentException();
-			
-		}
-	}
-	
-	/**
-	 * Converts a bencode integer value to a <tt>Long</tt>
-	 * 
-	 * @param val
-	 *            The value to be converted
-	 * @return A <tt>Long</tt> object that represents the given value
-	 */
-	public static Long convertFromValue ( final IntegerValue val ) {
-		return val.getValue();
-	}
-	
-	/**
-	 * Converts a bencode string value to a <tt>String</tt>
-	 * 
-	 * @param val
-	 *            The value to be converted
-	 * @return A <tt>String</tt> object that represents the given value
-	 */
-	public static String convertFromValue ( final StringValue val ) {
-		return val.toString();
-	}
-	
-	/**
-	 * Converts a bencode list value to a <tt>List</tt> of converted values
-	 * 
-	 * @param val
-	 *            The value to be converted
-	 * @return A <tt>List</tt> object that represents the given value
-	 */
-	public static List<Object> convertFromValue ( final ListValue val ) {
-		final List<Object> retList = new ArrayList<Object>();
-		final List<Value<?>> valList = val.getValue();
-		
-		for ( final Value<?> v : valList ) {
-			retList.add( convertFromValue( v ) );
-		}
-		
-		return retList;
-	}
-	
-	/**
-	 * Converts a bencode list value to a <tt>SortedMap</tt> from <tt>String</tt> to converted values
-	 * 
-	 * @param val
-	 *            The value to be converted
-	 * @return A <tt>SortedMap</tt> object that represents the given value
-	 */
-	public static Map<String,Object> convertFromValue ( final DictionaryValue val ) {
-		final Map<String,Object> retMap = new HashMap<String,Object>();
-		final Map<String,Value<?>> valMap = val.getValue();
-		
-		for ( final Map.Entry<String,Value<?>> me : valMap.entrySet() ) {
-			retMap.put( me.getKey(), convertFromValue( me.getValue() ) );
-		}
-		
-		return retMap;
-	}
-	
-	/**
-	 * Converts a regular object into a bencode value.
-	 * <p>
-	 * <i>NOTE: This method delegates its calls to its more specific overloads, except in the case of a <tt>Value</tt>
-	 * itself, which is immediately returned. If the object cannot be converted to a <tt>Value</tt>, a
-	 * <tt>ClassCastException</tt> is thrown.
-	 * 
-	 * @param obj
-	 *            Object to convert into a <tt>Value</tt>
-	 * @return a value that represents the same information that the given
-	 *         object
-	 * @throws ClassCastException
-	 *             if the object cannot be converted to <tt>Value</tt>
-	 */
-	public static Value<?> convertToValue ( final Object obj ) {
-		if ( obj instanceof Value<?> ) {
-			return (Value<?>) obj;
-			
-		} else if ( obj instanceof byte[] ) {
-			return convertToValue( (byte[]) obj );
-			
-		} else if ( obj instanceof char[] ) {
-			return convertToValue( (char[]) obj );
-			
-		} else if ( obj instanceof CharSequence ) {
-			return convertToValue( (CharSequence) obj );
-			
-		} else if ( obj instanceof Number ) {
-			return convertToValue( (Number) obj );
-			
-		} else if ( obj instanceof Iterable<?> ) {
-			return convertToValue( (Iterable<?>) obj );
-			
-		} else if ( obj instanceof Map<?,?> ) {
-			return convertToValue( (Map<?,?>) obj );
-			
-		} else {
-			throw new ClassCastException();
-		}
-	}
-	
-	/**
-	 * Converts a byte array to a bencode string value by creating a new <tt>StringValue</tt> with the given byte array
-	 * 
-	 * @param obj
-	 *            Object to convert into a <tt>Value</tt>
-	 * @return a value that represents the same information that the given
-	 *         object
-	 */
-	public static StringValue convertToValue ( final byte[] obj ) {
-		return new StringValue( obj );
-	}
-	
-	/**
-	 * Converts a char array to a bencode string value by creating a new <tt>StringValue</tt> from a new String created
-	 * from the given array
-	 * 
-	 * @param obj
-	 *            Object to convert into a <tt>Value</tt>
-	 * @return a value that represents the same information that the given
-	 *         object
-	 */
-	public static StringValue convertToValue ( final char[] obj ) {
-		return new StringValue( new String( obj ) );
-	}
-	
-	/**
-	 * Converts a <tt>CharSequence</tt> to a bencode string value by creating a
-	 * new <tt>StringValue</tt> with the String that represents the given object
-	 * 
-	 * @param obj
-	 *            Object to convert into a <tt>Value</tt>
-	 * @return a value that represents the same information that the given
-	 *         object
-	 */
-	public static StringValue convertToValue ( final CharSequence obj ) {
-		return new StringValue( obj.toString() );
-	}
-	
-	/**
-	 * Converts a number to a bencode string value by creating a new <tt>IntegerValue</tt> with the corresponding long
-	 * value
-	 * 
-	 * @param obj
-	 *            Object to convert into a <tt>Value</tt>
-	 * @return a value that represents the same information that the given
-	 *         object
-	 */
-	public static IntegerValue convertToValue ( final Number obj ) {
-		return new IntegerValue( obj.longValue() );
-	}
-	
-	/**
-	 * Converts any <tt>Iterable</tt> to a <tt>ListValue</tt> by converting the
-	 * elements in the iterable using {@link Bencode#convertToValue(Object)}.
-	 * 
-	 * @param obj
-	 *            Object to convert into a <tt>Value</tt>
-	 * @return a value that represents the same information that the given
-	 *         object
-	 * @throws ClassCastException
-	 *             if some element of the <tt>Iterable</tt> cannot be converted
-	 *             to <tt>Value</tt>
-	 */
-	public static ListValue convertToValue ( final Iterable<?> obj ) {
-		final List<Value<?>> list = new ArrayList<Value<?>>();
-		
-		for ( final Object o : obj ) {
-			list.add( convertToValue( o ) );
-		}
-		
-		return new ListValue( list );
-	}
-	
-	/**
-	 * Converts a <tt>Map</tt> to a <tt>DirectoryValue</tt> by converting the
-	 * keys to Strings and converting the values using {@link Bencode#convertToValue(Object)}
-	 * 
-	 * @param obj
-	 *            Object to convert into a <tt>Value</tt>
-	 * @return a value that represents the same information that the given
-	 *         object
-	 * @throws ClassCastException
-	 *             if some value in the mapping cannot be converted to <tt>Value</tt>
-	 */
-	public static DictionaryValue convertToValue ( final Map<?,?> obj ) {
-		final Map<String,Value<?>> map = new HashMap<String,Value<?>>();
-		
-		for ( final Map.Entry<?,?> me : obj.entrySet() ) {
-			map.put( me.getKey().toString(), convertToValue( me.getValue() ) );
-		}
-		
-		return new DictionaryValue( map );
-	}
-	
-	/**
-	 * Returns a copy of the given <tt>Value</tt>. The returned copy is
-	 * guaranteed to be independent from the passed object, in that no
-	 * references to child <tt>Value</tt>s or other mutable objects are held by
-	 * the copy.
-	 * <p>
-	 * <i>NOTE: This method delegates its calls to its more specific overloads. See them for details on how
-	 * <tt>Value</tt>s are copied.</i>
-	 * 
-	 * @param value
-	 *            Bencode value to copy
-	 * @return A copy of the given <tt>value</tt>
-	 */
-	public static Value<?> copyOf ( final Value<?> value ) {
-		if ( value == null ) {
-			return null;
-			
-		} else if ( value instanceof IntegerValue ) {
-			return copyOf( (IntegerValue) value );
-			
-		} else if ( value instanceof StringValue ) {
-			return copyOf( (StringValue) value );
-			
-		} else if ( value instanceof ListValue ) {
-			return copyOf( (ListValue) value );
-			
-		} else if ( value instanceof DictionaryValue ) {
-			return copyOf( (DictionaryValue) value );
-			
-		} else {
-			// This exception is here for completeness. As Value cannot be
-			// subclassed out of this package, no other classes should ever
-			// extend Value than those listed in this method. This is also the
-			// reason why it is not documented in a @throws tag.
-			throw new IllegalArgumentException();
-			
-		}
-	}
-	
-	/**
-	 * Returns a copy of the given <tt>IntegerValue</tt>. The copy will
-	 * initially have the same value as the original. Changes on the copy won't
-	 * affect the original and vice-versa.
-	 * 
-	 * @param value
-	 *            Bencode integer value to copy
-	 * @return A copy of the given <tt>value</tt>
-	 */
-	public static IntegerValue copyOf ( final IntegerValue value ) {
-		if ( value == null ) {
-			return null;
-		} else {
-			return new IntegerValue( value.getValue() );
-		}
-	}
-	
-	/**
-	 * Returns a copy of the given <tt>StringValue</tt>. The copy will initially
-	 * have the same value as the original. Changes on the copy won't affect the
-	 * original and vice-versa.
-	 * 
-	 * @param value
-	 *            Bencode string value to copy
-	 * @return A copy of the given <tt>value</tt>
-	 */
-	public static StringValue copyOf ( final StringValue value ) {
-		if ( value == null ) {
-			return null;
-		} else {
-			return new StringValue( value.getValue() );
-		}
-	}
-	
-	/**
-	 * Returns a copy of the given <tt>ListValue</tt>. Changes on the copy won't
-	 * affect the original and vice-versa.
-	 * <p>
-	 * The initial value of the copy is a <tt>List</tt> which elements are copies of the elements of the original
-	 * object, in the same order. This ensures that no mutable references are shared between the original and the copy.
-	 * 
-	 * @param value
-	 *            Bencode list value to copy
-	 * @return A copy of the given <tt>value</tt>
-	 */
-	public static ListValue copyOf ( final ListValue value ) {
-		if ( value == null ) {
-			return null;
-		} else {
-			final List<Value<?>> lv = new ArrayList<Value<?>>();
-			for ( final Value<?> v : value.getValue() ) {
-				lv.add( copyOf( v ) );
-			}
-			
-			return new ListValue( lv );
-		}
-	}
-	
-	/**
-	 * Returns a copy of the given <tt>DisctionaryValue</tt>. Changes on the
-	 * copy won't affect the original and vice-versa.
-	 * <p>
-	 * The initial value of the copy is a <tt>Map</tt> which keys are the same and its assocciated values are copies of
-	 * the corresponding values of the original object. This ensures that no mutable references are shared between the
-	 * original and the copy.
-	 * 
-	 * @param value
-	 *            Bencode dictionary value to copy
-	 * @return A copy of the given <tt>value</tt>
-	 */
-	public static DictionaryValue copyOf ( final DictionaryValue value ) {
-		if ( value == null ) {
-			return null;
-		} else {
-			final Map<String,Value<?>> mv = new HashMap<String,Value<?>>();
-			for ( final Map.Entry<String,Value<?>> me : value.getValue().entrySet() ) {
-				mv.put( me.getKey(), copyOf( me.getValue() ) );
-			}
-			
-			return new DictionaryValue( mv );
-		}
-	}
+
+    /**
+     * UTF-8 charset used for Bencode
+     */
+    public static final Charset UTF8 = Charset.forName("UTF-8");
+
+    /**
+     * Gets a child element from the passed value using the strings as a path.
+     * <p>
+     * Each element of the <tt>strings</tt> parameter represents an element of the path. Dictionaries can be accessed
+     * using its string keys and lists using numeric strings. If an element doesn't exist, this method returns
+     * <tt>null</tt>.
+     * 
+     * @param from Value to get the child from
+     * @param strings Path to the child
+     * @return Child accessed from the path, or <tt>null</tt> if it doesn't exist.
+     * @throw NullPointerException if any of the arguments is <tt>null</tt>
+     */
+    public static Value<?> getChildValue (final Value<?> from, final String... strings) {
+        Value<?> value = Objects.requireNonNull(from);
+
+        for (final String string : strings) {
+            if (value instanceof DictionaryValue) {
+                final DictionaryValue dval = (DictionaryValue) value;
+                value = dval.get(string);
+
+            } else if (value instanceof ListValue) {
+                final ListValue lval = (ListValue) value;
+                try {
+                    final int pos = Integer.parseInt(string);
+                    value = lval.get(pos);
+                } catch (final NumberFormatException e) {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        }
+
+        return value;
+    }
+
+    /**
+     * Gets a child element from the passed value using the strings as a path, converted to an specific value type. If
+     * the value does not exist or is not of that type, this method returns <tt>null</tt>.
+     * <p>
+     * See the description of {@link #getChildValue(Value,String...)} for more information.
+     * 
+     * @param from Value to get the child from
+     * @param type Expected type of the value returned
+     * @param strings Path to the child
+     * @return Child accessed from the path, or <tt>null</tt> if it doesn't exist or is not of the correct type.
+     * @see #getChildValue(Value,String...)
+     * @throw NullPointerException if any of the arguments is <tt>null</tt>
+     */
+    public static <T extends Value<?>> T getChildValue (
+        final Value<?> from, final Class<T> type, final String... strings)
+    {
+        Objects.requireNonNull(type);
+        final Value<?> val = getChildValue(from, strings);
+
+        if (type.isInstance(val)) {
+            return type.cast(val);
+        }
+
+        return null;
+    }
+
+    /**
+     * Converts a bencode value to a Java standard objects.
+     * <p>
+     * <i>NOTE: This method delegates its calls to its more specific overloads. See them for details on how
+     * <tt>Value</tt>s are converted</i>
+     * 
+     * @param val The value to be converted
+     * @return An object from the standard Java API that represents the same information
+     */
+    public static Object convertFromValue (final Value<?> val) {
+        if (val instanceof IntegerValue) {
+            return convertFromValue((IntegerValue) val);
+
+        } else if (val instanceof StringValue) {
+            return convertFromValue((StringValue) val);
+
+        } else if (val instanceof ListValue) {
+            return convertFromValue((ListValue) val);
+
+        } else if (val instanceof DictionaryValue) {
+            return convertFromValue((DictionaryValue) val);
+
+        } else {
+            // This exception is here for completeness
+            // As Value cannot be subclassed out of this package, no
+            // other
+            // classes should ever extend Value than those listed in
+            // this
+            // method. This is also the reason why it is not
+            // documented
+            // in a @throws tag.
+            throw new IllegalArgumentException();
+
+        }
+    }
+
+    /**
+     * Converts a bencode integer value to a <tt>Long</tt>
+     * 
+     * @param val The value to be converted
+     * @return A <tt>Long</tt> object that represents the given value
+     */
+    public static Long convertFromValue (final IntegerValue val) {
+        return val.getValue();
+    }
+
+    /**
+     * Converts a bencode string value to a <tt>String</tt>
+     * 
+     * @param val The value to be converted
+     * @return A <tt>String</tt> object that represents the given value
+     */
+    public static String convertFromValue (final StringValue val) {
+        return val.toString();
+    }
+
+    /**
+     * Converts a bencode list value to a <tt>List</tt> of converted values
+     * 
+     * @param val The value to be converted
+     * @return A <tt>List</tt> object that represents the given value
+     */
+    public static List<Object> convertFromValue (final ListValue val) {
+        final List<Object> retList = new ArrayList<Object>();
+        final List<Value<?>> valList = val.getValue();
+
+        for (final Value<?> v : valList) {
+            retList.add(convertFromValue(v));
+        }
+
+        return retList;
+    }
+
+    /**
+     * Converts a bencode list value to a <tt>SortedMap</tt> from <tt>String</tt> to converted values
+     * 
+     * @param val The value to be converted
+     * @return A <tt>SortedMap</tt> object that represents the given value
+     */
+    public static Map<String,Object> convertFromValue (final DictionaryValue val) {
+        final Map<String,Object> retMap = new HashMap<String,Object>();
+        final Map<String,Value<?>> valMap = val.getValue();
+
+        for (final Map.Entry<String,Value<?>> me : valMap.entrySet()) {
+            retMap.put(me.getKey(), convertFromValue(me.getValue()));
+        }
+
+        return retMap;
+    }
+
+    /**
+     * Converts a regular object into a bencode value.
+     * <p>
+     * <i>NOTE: This method delegates its calls to its more specific overloads, except in the case of a <tt>Value</tt>
+     * itself, which is immediately returned. If the object cannot be converted to a <tt>Value</tt>, a
+     * <tt>ClassCastException</tt> is thrown.
+     * 
+     * @param obj Object to convert into a <tt>Value</tt>
+     * @return a value that represents the same information that the given object
+     * @throws ClassCastException if the object cannot be converted to <tt>Value</tt>
+     */
+    public static Value<?> convertToValue (final Object obj) {
+        if (obj instanceof Value<?>) {
+            return (Value<?>) obj;
+
+        } else if (obj instanceof byte[]) {
+            return convertToValue((byte[]) obj);
+
+        } else if (obj instanceof char[]) {
+            return convertToValue((char[]) obj);
+
+        } else if (obj instanceof CharSequence) {
+            return convertToValue((CharSequence) obj);
+
+        } else if (obj instanceof Number) {
+            return convertToValue((Number) obj);
+
+        } else if (obj instanceof Iterable<?>) {
+            return convertToValue((Iterable<?>) obj);
+
+        } else if (obj instanceof Map<?,?>) {
+            return convertToValue((Map<?,?>) obj);
+
+        } else {
+            throw new ClassCastException();
+        }
+    }
+
+    /**
+     * Converts a byte array to a bencode string value by creating a new <tt>StringValue</tt> with the given byte array
+     * 
+     * @param obj Object to convert into a <tt>Value</tt>
+     * @return a value that represents the same information that the given object
+     */
+    public static StringValue convertToValue (final byte[] obj) {
+        return new StringValue(obj);
+    }
+
+    /**
+     * Converts a char array to a bencode string value by creating a new <tt>StringValue</tt> from a new String created
+     * from the given array
+     * 
+     * @param obj Object to convert into a <tt>Value</tt>
+     * @return a value that represents the same information that the given object
+     */
+    public static StringValue convertToValue (final char[] obj) {
+        return new StringValue(new String(obj));
+    }
+
+    /**
+     * Converts a <tt>CharSequence</tt> to a bencode string value by creating a new <tt>StringValue</tt> with the String
+     * that represents the given object
+     * 
+     * @param obj Object to convert into a <tt>Value</tt>
+     * @return a value that represents the same information that the given object
+     */
+    public static StringValue convertToValue (final CharSequence obj) {
+        return new StringValue(obj.toString());
+    }
+
+    /**
+     * Converts a number to a bencode string value by creating a new <tt>IntegerValue</tt> with the corresponding long
+     * value
+     * 
+     * @param obj Object to convert into a <tt>Value</tt>
+     * @return a value that represents the same information that the given object
+     */
+    public static IntegerValue convertToValue (final Number obj) {
+        return new IntegerValue(obj.longValue());
+    }
+
+    /**
+     * Converts any <tt>Iterable</tt> to a <tt>ListValue</tt> by converting the elements in the iterable using
+     * {@link Bencode#convertToValue(Object)}.
+     * 
+     * @param obj Object to convert into a <tt>Value</tt>
+     * @return a value that represents the same information that the given object
+     * @throws ClassCastException if some element of the <tt>Iterable</tt> cannot be converted to <tt>Value</tt>
+     */
+    public static ListValue convertToValue (final Iterable<?> obj) {
+        final List<Value<?>> list = new ArrayList<Value<?>>();
+
+        for (final Object o : obj) {
+            list.add(convertToValue(o));
+        }
+
+        return new ListValue(list);
+    }
+
+    /**
+     * Converts a <tt>Map</tt> to a <tt>DirectoryValue</tt> by converting the keys to Strings and converting the values
+     * using {@link Bencode#convertToValue(Object)}
+     * 
+     * @param obj Object to convert into a <tt>Value</tt>
+     * @return a value that represents the same information that the given object
+     * @throws ClassCastException if some value in the mapping cannot be converted to <tt>Value</tt>
+     */
+    public static DictionaryValue convertToValue (final Map<?,?> obj) {
+        final Map<String,Value<?>> map = new HashMap<String,Value<?>>();
+
+        for (final Map.Entry<?,?> me : obj.entrySet()) {
+            map.put(me.getKey().toString(), convertToValue(me.getValue()));
+        }
+
+        return new DictionaryValue(map);
+    }
+
+    /**
+     * Returns a copy of the given <tt>Value</tt>. The returned copy is guaranteed to be independent from the passed
+     * object, in that no references to child <tt>Value</tt>s or other mutable objects are held by the copy.
+     * <p>
+     * <i>NOTE: This method delegates its calls to its more specific overloads. See them for details on how
+     * <tt>Value</tt>s are copied.</i>
+     * 
+     * @param value Bencode value to copy
+     * @return A copy of the given <tt>value</tt>
+     */
+    public static Value<?> copyOf (final Value<?> value) {
+        if (value == null) {
+            return null;
+
+        } else if (value instanceof IntegerValue) {
+            return copyOf((IntegerValue) value);
+
+        } else if (value instanceof StringValue) {
+            return copyOf((StringValue) value);
+
+        } else if (value instanceof ListValue) {
+            return copyOf((ListValue) value);
+
+        } else if (value instanceof DictionaryValue) {
+            return copyOf((DictionaryValue) value);
+
+        } else {
+            // This exception is here for completeness. As Value cannot be
+            // subclassed out of this package, no other classes should ever
+            // extend Value than those listed in this method. This is also the
+            // reason why it is not documented in a @throws tag.
+            throw new IllegalArgumentException();
+
+        }
+    }
+
+    /**
+     * Returns a copy of the given <tt>IntegerValue</tt>. The copy will initially have the same value as the original.
+     * Changes on the copy won't affect the original and vice-versa.
+     * 
+     * @param value Bencode integer value to copy
+     * @return A copy of the given <tt>value</tt>
+     */
+    public static IntegerValue copyOf (final IntegerValue value) {
+        if (value == null) {
+            return null;
+        } else {
+            return new IntegerValue(value.getValue());
+        }
+    }
+
+    /**
+     * Returns a copy of the given <tt>StringValue</tt>. The copy will initially have the same value as the original.
+     * Changes on the copy won't affect the original and vice-versa.
+     * 
+     * @param value Bencode string value to copy
+     * @return A copy of the given <tt>value</tt>
+     */
+    public static StringValue copyOf (final StringValue value) {
+        if (value == null) {
+            return null;
+        } else {
+            return new StringValue(value.getValue());
+        }
+    }
+
+    /**
+     * Returns a copy of the given <tt>ListValue</tt>. Changes on the copy won't affect the original and vice-versa.
+     * <p>
+     * The initial value of the copy is a <tt>List</tt> which elements are copies of the elements of the original
+     * object, in the same order. This ensures that no mutable references are shared between the original and the copy.
+     * 
+     * @param value Bencode list value to copy
+     * @return A copy of the given <tt>value</tt>
+     */
+    public static ListValue copyOf (final ListValue value) {
+        if (value == null) {
+            return null;
+        } else {
+            final List<Value<?>> lv = new ArrayList<Value<?>>();
+            for (final Value<?> v : value.getValue()) {
+                lv.add(copyOf(v));
+            }
+
+            return new ListValue(lv);
+        }
+    }
+
+    /**
+     * Returns a copy of the given <tt>DisctionaryValue</tt>. Changes on the copy won't affect the original and
+     * vice-versa.
+     * <p>
+     * The initial value of the copy is a <tt>Map</tt> which keys are the same and its assocciated values are copies of
+     * the corresponding values of the original object. This ensures that no mutable references are shared between the
+     * original and the copy.
+     * 
+     * @param value Bencode dictionary value to copy
+     * @return A copy of the given <tt>value</tt>
+     */
+    public static DictionaryValue copyOf (final DictionaryValue value) {
+        if (value == null) {
+            return null;
+        } else {
+            final Map<String,Value<?>> mv = new HashMap<String,Value<?>>();
+            for (final Map.Entry<String,Value<?>> me : value.getValue().entrySet()) {
+                mv.put(me.getKey(), copyOf(me.getValue()));
+            }
+
+            return new DictionaryValue(mv);
+        }
+    }
 }

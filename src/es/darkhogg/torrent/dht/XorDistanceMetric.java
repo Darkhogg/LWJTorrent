@@ -9,18 +9,18 @@ import java.math.BigInteger;
  * @version 1.0
  */
 /* package */final class XorDistanceMetric extends DistanceMetric {
-	
-	@Override
-	public BigInteger getDistance ( NodeId n1, NodeId n2 ) {
-		byte[] b1 = n1.getBytes();
-		byte[] b2 = n2.getBytes();
-		
-		byte[] ret = new byte[ 20 ];
-		for ( int i = 0; i < 20; i++ ) {
-			ret[ i ] = (byte) ( b1[ i ] ^ b2[ i ] );
-		}
-		
-		return new BigInteger( +1, ret );
-	}
-	
+
+    @Override
+    public BigInteger getDistance (NodeId n1, NodeId n2) {
+        byte[] b1 = n1.getBytes();
+        byte[] b2 = n2.getBytes();
+
+        byte[] ret = new byte[20];
+        for (int i = 0; i < 20; i++) {
+            ret[i] = (byte) (b1[i] ^ b2[i]);
+        }
+
+        return new BigInteger(+1, ret);
+    }
+
 }

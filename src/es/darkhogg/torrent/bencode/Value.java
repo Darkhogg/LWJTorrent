@@ -21,45 +21,41 @@ package es.darkhogg.torrent.bencode;
  * support is given only for convenience when implementing subclasses.
  * 
  * @author Daniel Escoz
- * @param T
- *            Basic return type for the class
  * @version 1.0.0
+ * @param <T> Basic return type for the class
  */
 public abstract class Value<T> {
-	
-	/**
-	 * Creates this object with the given initial value
-	 * 
-	 * @param value
-	 *            Initial value
-	 */
-	/* package-private */Value ( final T value ) {
-		setValue( value );
-	}
-	
-	/**
-	 * Gets the current value for this object
-	 * 
-	 * @return This object value
-	 */
-	public abstract T getValue ();
-	
-	/**
-	 * Sets a new value for this object
-	 * 
-	 * @param value
-	 *            New value
-	 */
-	public abstract void setValue ( T value );
-	
-	/**
-	 * Returns the length, in bytes, this value will take up when encoded using
-	 * UTF-8 as the encoding character set.
-	 * <p>
-	 * If the size cannot be determined accurately, an upper bound must be returned.
-	 * 
-	 * @return The length of the encoded byte stream for this value
-	 */
-	public abstract long getEncodedLength ();
-	
+
+    /**
+     * Creates this object with the given initial value
+     * 
+     * @param value Initial value
+     */
+    /* package-private */Value (final T value) {
+        setValue(value);
+    }
+
+    /**
+     * Gets the current value for this object
+     * 
+     * @return This object value
+     */
+    public abstract T getValue ();
+
+    /**
+     * Sets a new value for this object
+     * 
+     * @param value New value
+     */
+    public abstract void setValue (T value);
+
+    /**
+     * Returns the length, in bytes, this value will take up when encoded using UTF-8 as the encoding character set.
+     * <p>
+     * If the size cannot be determined accurately, an upper bound must be returned.
+     * 
+     * @return The length of the encoded byte stream for this value
+     */
+    public abstract long getEncodedLength ();
+
 }
