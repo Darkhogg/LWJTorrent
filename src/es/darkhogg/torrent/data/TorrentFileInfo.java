@@ -1,6 +1,7 @@
 package es.darkhogg.torrent.data;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Represents one file from a torrent file.
@@ -26,18 +27,18 @@ public final class TorrentFileInfo {
      * @param length Length of the file, in bytes
      * @param path Path of the file, including its name
      * @throws NullPointerException if <tt>path</tt> or any of its childs is <tt>null</tt>
-     * @throws IllegalArgumentException if <tt>length</tt> is less than 0 or the passed path is not relative
+     * @throws IllegalArgumentException if <tt>length</tt> is less than 0
      */
     public TorrentFileInfo (long length, Path path) {
         if (path == null) {
             throw new NullPointerException();
         }
-        if (length < 0 | path.isAbsolute()) {
+        if (length < 0) {
             throw new IllegalArgumentException();
         }
 
         this.length = length;
-        this.path = path;
+        this.path = path.isAbsolute() ? Paths.get("/").relativize(path) : path;
     }
 
     /**
