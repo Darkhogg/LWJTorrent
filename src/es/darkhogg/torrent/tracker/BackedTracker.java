@@ -7,26 +7,26 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A tracker that sends announces to different URLs until one of them responds. In theory, this class should behave just
- * like is specified for the <tt>announce-list</tt> torrent field. In practice, there are most important this to program
- * right now, so it just send requests until one is answered.
+ * like is specified for the <tt>announce-list</tt> torrent field. In practice, there are most important things to
+ * program right now, so it just send requests until one is answered.
  * 
  * @author Daniel Escoz
  * @version 1.0
  */
-/* package */final class MultiTracker extends Tracker {
+/* package */final class BackedTracker extends Tracker {
 
     /**
-     * List of URL's of the tracker
+     * List of sub-trackers
      */
     private final LinkedList<Tracker> trackers;
 
     /**
-     * Constructs the tracker from a given list of sets of announce strings
+     * Constructs the tracker from a given list of trackers
      * 
-     * @param announces List of sets of announce strings
+     * @param trackers List of sets of announce strings
      */
-    public MultiTracker (List<Tracker> announces) {
-        trackers = new LinkedList<Tracker>(announces);
+    public BackedTracker (List<Tracker> trackers) {
+        this.trackers = new LinkedList<Tracker>(trackers);
     }
 
     @Override
@@ -45,9 +45,8 @@ import java.util.concurrent.TimeUnit;
 
             if (resp != null) {
                 // WARNING :: ConcurrentModificationException !
-                // This will NEVER throw such an exception, as the loop ENDS
-                // here. I wanted to clarify this, so no one ever, not even
-                // myself, removes it for that reason.
+                // This will NEVER throw such an exception, as the loop ENDS here. I wanted to clarify this, so no one
+                // ever, not even myself, removes this for that reason.
                 it.remove();
                 trackers.addFirst(tracker);
                 return resp;

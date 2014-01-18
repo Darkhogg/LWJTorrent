@@ -14,7 +14,7 @@ import es.darkhogg.torrent.bencode.BencodeInputStream;
  * @author Daniel Escoz
  * @version 1.0
  */
-/* package */final class UrlTracker extends Tracker {
+public final class UrlTracker extends Tracker {
 
     /**
      * URL to send announces

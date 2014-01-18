@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * @author Daniel Escoz
  * @version 1.0
  */
-/* package */final class UdpTracker extends Tracker {
+public final class UdpTracker extends Tracker {
 
     /**
      * Empty byte array for the datagram packets
@@ -57,12 +57,10 @@ import java.util.concurrent.TimeUnit;
         String host = uri.getHost();
         int port = uri.getPort();
 
-        DatagramSocket socket = null;
-        try {
+        try (DatagramSocket socket = new DatagramSocket()) {
             InetAddress addr = InetAddress.getByName(host);
 
             // UDP Socket - already bound
-            socket = new DatagramSocket();
             socket.setSoTimeout((int) (unit.toMillis(time) / 2));
 
             // UDP Datagram - setup of address/port
@@ -154,10 +152,7 @@ import java.util.concurrent.TimeUnit;
             return new TrackerResponse(false, null, "", interval, interval, EMPTY_BYTE_ARR, seeders, leechers, peers);
         } catch (IOException e) {
             return null;
-        } finally {
-            if (socket != null) {
-                socket.close();
-            }
+
         }
     }
 

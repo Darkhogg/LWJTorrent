@@ -603,4 +603,24 @@ public final class TrackerRequest {
         }
     }
 
+    @Override
+    public String toString () {
+        StringBuilder sb = new StringBuilder("Request(");
+        sb.append("InfoHash=").append(infoHash);
+        
+        sb.append(", Bytes=[Dn:").append(downloaded);
+        sb.append("; Up:").append(uploaded);
+        sb.append("; Left:").append(left);
+        
+        sb.append("], IP=").append(ip).append(":").append(port);
+        
+        sb.append(", PeerID=").append(peerId).append(", TrackerID=").append(trackerId);
+        sb.append(", Key=").append(key);
+        
+        sb.append(", NumWant=").append(numWant);
+        sb.append(", WantPID=").append(!noPeerId);
+        sb.append(", Compact=").append(compact);
+        
+        return sb.append(")").toString();
+    }
 }

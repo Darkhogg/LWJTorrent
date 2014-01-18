@@ -7,6 +7,8 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -137,68 +139,75 @@ public abstract class Tracker {
      * 
      * @param announce The URL of the announce service
      * @return A tracker which announces to the given URL
-     * @throws URISyntaxException if the announce is not a valid URI
-     * @throws MalformedURLException if the announce is not a valid URL
      */
-    protected static Tracker getSingleTracker (String announce) throws URISyntaxException, MalformedURLException {
-        URI uri = new URI(announce);
+    protected static Tracker getSingleTracker (String announce) {
+        try {
+            URI uri = new URI(announce);
 
-        if (uri.getScheme().equals("udp")) {
-            return new UdpTracker(uri);
-        } else {
-            // Create URL tracker
-            return new UrlTracker(uri.toURL());
+            if (uri.getScheme().equals("udp")) {
+                return new UdpTracker(uri);
+            } else {
+                // Create URL tracker
+                return new UrlTracker(uri.toURL());
+            }
+        } catch (URISyntaxException exc) {
+            return null;
+
+        } catch (MalformedURLException e) {
+            return null;
         }
     }
 
     /**
-     * Returns a <tt>Tracker</tt> object that send its request to the given announce URLs, in order, until one of them
-     * is successfull.
-     * <p>
-     * The passed object is treated as the <tt>announce-list</tt> key of a torrent, and behaves like it.
+     * Returns a <tt>Tracker</tt> object that sends its request to the given announce URLs, in order, until one of them
+     * is successful.
      * 
      * @param announces List of announce URLs
      * @return A tracker which announces to the given URL list
      */
-    /* package */static Tracker getMultiTracker (List<Set<String>> announces) {
+    /* package */static Tracker getBackedTracker (Collection<String> announces) {
         List<Tracker> trackers = new ArrayList<Tracker>();
 
-        for (Set<String> set : announces) {
-            for (String str : set) {
-                try {
-                    Tracker tracker = getSingleTracker(str);
-                    trackers.add(tracker);
-                } catch (MalformedURLException e) {
-                    // Just don't add it
-                } catch (URISyntaxException e) {
-                    // Again, just don't add it
-                }
-            }
+        for (String str : announces) {
+            Tracker tracker = getSingleTracker(str);
+            trackers.add(tracker);
+
         }
 
-        return new MultiTracker(trackers);
+        if (trackers.isEmpty()) {
+            return null;
+        }
+
+        if (trackers.size() == 1) {
+            return trackers.get(0);
+        }
+
+        return new BackedTracker(trackers);
     }
 
     /**
-     * Returns a tracker that sends its request to the specified URLs in the torrent.
+     * Returns the collection of trackers a torrent is supposed to send its announce requests .
      * <p>
-     * Whether the returned object uses the <tt>announce</tt> or the <tt>announce-list</tt> values depends on the object
-     * passed and the implementation availability. In general, the best possible method is chosen for each torrent.
+     * If the URL's of the passed torrent are malformed, this method will end up returning an empty collection. Caller
+     * code should check for this condition before trying to make requests.
      * 
      * @param torrent Torrent meta-info used to build the tracker
-     * @return A tracker that announces to the corresponding URL, or <tt>null</tt> if an error occurs
+     * @return A collection of trackers to use for the given torrent
      */
-    public static Tracker forTorrent (TorrentMetaInfo torrent) {
-        try {
-            if (torrent.getAnnounceList().isEmpty()) {
-                return getSingleTracker(torrent.getAnnounce());
-            } else {
-                return getMultiTracker(torrent.getAnnounceList());
-            }
-        } catch (MalformedURLException e) {
-            return null;
-        } catch (URISyntaxException e) {
-            return null;
+    public static Collection<Tracker> forTorrent (TorrentMetaInfo torrent) {
+        Collection<Tracker> trackers = new ArrayList<>();
+        Tracker announceTracker = getSingleTracker(torrent.getAnnounce());
+        if (announceTracker != null) {
+            trackers.add(announceTracker);
         }
+
+        for (Set<String> announces : torrent.getAnnounceList()) {
+            Tracker tracker = getBackedTracker(announces);
+            if (tracker != null) {
+                trackers.add(tracker);
+            }
+        }
+
+        return Collections.unmodifiableCollection(trackers);
     }
 }
