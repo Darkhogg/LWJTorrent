@@ -25,9 +25,10 @@ public final class ReadTorrentFile {
      * @throws IOException If the file cannot be read
      */
     public static TorrentMetaInfo readExampleFile () throws IOException {
+    	FileInputStream  torrentFile = new FileInputStream("/path/to/example.torrent");
         try (
             BencodeInputStream bis =
-                new BencodeInputStream(ReadTorrentFile.class.getResourceAsStream("/example.torrent"))) {
+                new BencodeInputStream(torrentFile)){
             return TorrentMetaInfo.fromValue(bis.readValue());
         }
     }
